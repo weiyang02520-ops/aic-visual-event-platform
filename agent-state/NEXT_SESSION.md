@@ -88,3 +88,11 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - Optional `ultralytics` provider adapter is implemented and tested offline; source/curated suites are `368 passed` / `VERIFY_OK`.
 - Real runtime smoke is unverified because `ultralytics` and model weights are absent.
 - Read `.ai/CODEX_REPORT.md`, the Task-0001 run record and PR before Master review. Do not start TASK-0002 or merge on your own.
+
+## TASK-0001 PR handoff (2026-09-24)
+
+- Branch: `codex/task-0001-real-vision-provider`
+- Commit: `d819e5a44fd8854e58e8a26d25adb04632f3751a`
+- PR: [#2](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/2)
+- State: `WAITING_FOR_MASTER`; lock released; next actor is `chatgpt-master`.
+- Do not start another task or merge this PR from Codex.

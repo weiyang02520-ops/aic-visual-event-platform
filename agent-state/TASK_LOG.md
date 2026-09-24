@@ -456,3 +456,9 @@
 - Source full suite: `368 passed`; curated verifier: `VERIFY_OK`, `368 passed`.
 - Real runtime smoke was not performed because the optional package and model path are absent; no weights were downloaded.
 - Pending: commit, push, PR and Master review. Do not select TASK-0002.
+
+## 2026-09-24 — TASK-0001 PR handoff
+
+- Commit `d819e5a44fd8854e58e8a26d25adb04632f3751a` pushed on `codex/task-0001-real-vision-provider`.
+- Opened [PR #2](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/2) targeting `main`; GitHub reports `OPEN` and merge state `CLEAN`.
+- Updated `.ai/CODEX_REPORT.md`, run record, state and heartbeat; released the task lock and handed control to Master.

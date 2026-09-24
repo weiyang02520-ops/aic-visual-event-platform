@@ -61,4 +61,6 @@ Review the offline adapter contract and PR. If accepted, Master may merge and is
 
 ## Commit / PR
 
-To be filled after the task branch commit and pull request are created.
+- Commit: `d819e5a44fd8854e58e8a26d25adb04632f3751a`
+- PR: [#2](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/2) targeting `main`
+- PR state at handoff: `OPEN`, merge state `CLEAN`
