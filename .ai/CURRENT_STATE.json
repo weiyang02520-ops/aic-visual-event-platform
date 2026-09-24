@@ -6,10 +6,10 @@
   "task_version": 1,
   "task_hash": "sha256:aa527e1f620ea9dbb9ab163860102ce46fd839e7034772bab7a96826d0f31cff",
   "iteration": 6,
-  "status": "READY_FOR_CODEX",
-  "last_actor": "chatgpt-master",
+  "status": "CODEX_RUNNING",
+  "last_actor": "codex",
   "next_actor": "codex",
-  "active_branch": null,
+  "active_branch": "codex/task-0006-skeleton-contract",
   "active_pr": null,
   "last_commit": "0b979d5a669a627ec6db0fbb1224da2eb8ef12f4",
   "retry_count": 0,
@@ -17,8 +17,8 @@
   "consecutive_failures": 0,
   "human_required": false,
   "blocked_reason": null,
-  "lock_owner": null,
-  "lock_token": null,
-  "lock_expires_at": null,
-  "updated_at": "2026-09-24T14:12:00Z"
+  "lock_owner": "codex-luna",
+  "lock_token": "7ac8b5e8-5ce8-4c85-b6b0-9f8fe89be640",
+  "lock_expires_at": "2026-09-24T15:02:55Z",
+  "updated_at": "2026-09-24T14:32:55Z"
 }
