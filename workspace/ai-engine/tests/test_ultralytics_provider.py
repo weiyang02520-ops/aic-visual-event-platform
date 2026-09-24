@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import sys
 
 import pytest
 
@@ -118,4 +119,73 @@ def test_ultralytics_provider_reaches_normalized_fact_pipeline():
     assert person.subject == {"track_id": 1, "label": "person"}
     assert person.metadata["source_id"] == "mock://pose"
     assert person.metadata["keypoints"]["nose"] == [20.0, 20.0, 0.9]
+
+
+def test_opencv_style_frame_reaches_ultralytics_provider_and_fact_path(monkeypatch, tmp_path):
+    path = tmp_path / "pose.avi"
+    path.touch()
+
+    class BgrImage:
+        shape = (3, 4, 3)
+
+    class GrayImage:
+        shape = (3, 4)
+
+        @staticmethod
+        def tolist():
+            return [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]]
+
+    bgr = BgrImage()
+
+    class Capture:
+        def __init__(self):
+            self.read_count = 0
+
+        def isOpened(self):
+            return True
+
+        def get(self, property_id):
+            return 25.0 if property_id == 1 else 0.0
+
+        def read(self):
+            if self.read_count:
+                return False, None
+            self.read_count += 1
+            return True, bgr
+
+        def release(self):
+            pass
+
+    class CV2:
+        CAP_PROP_FPS = 1
+        CAP_PROP_POS_MSEC = 2
+        COLOR_BGR2GRAY = 3
+
+        def __init__(self):
+            self.capture = Capture()
+
+        def VideoCapture(self, _path):
+            return self.capture
+
+        @staticmethod
+        def cvtColor(_image, _conversion):
+            return GrayImage()
+
+    monkeypatch.setitem(sys.modules, "cv2", CV2())
+    provider = UltralyticsProvider(model=FakeModel())
+
+    class Registry:
+        def session_for_source(self, _source):
+            return provider
+
+    facts = FrameFactExtractor(
+        pipeline=FramePipeline(),
+        detectors=Registry(),
+    ).extract(str(path), max_frames=1)
+
+    person = next(fact for fact in facts if fact.fact_type == "object_detected")
+    assert provider._model.calls[0][0] is bgr
+    assert person.metadata["source_id"] == str(path)
+    assert person.metadata["keypoints"]["left_wrist"] == [20.0, 25.0, 0.9]
+    assert person.timestamp.tzinfo is not None
 

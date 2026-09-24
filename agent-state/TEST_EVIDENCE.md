@@ -588,3 +588,15 @@
 - Curated command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\workspace\submission\VERIFY.ps1 -SkipFrontendBuild` → `VERIFY_OK`, `369 passed`, 616 warnings.
 - Real smoke: not run; optional package and model weights remain absent.
 - Cleanup: all R1 basetemp children were absolute project-local paths and were removed.
+
+
+## 2026-09-24 — TASK-0002 local video pixel bridge
+
+- Branch: `codex/task-0002-local-video-pixel-bridge`; task hash verified against LF-normalized `.ai/tasks/TASK-0002.md`.
+- OpenCV payload: decoded BGR `image`, list-based `gray`, shape and channels; MotionDetector reads `gray`.
+- Targeted command: `python -B -m pytest -p no:cacheprovider tests/test_frame_pipeline.py tests/test_ultralytics_provider.py tests/test_fact_pipeline.py tests/test_api.py tests/test_privacy.py -q --basetemp <project-root>\workspace\ai-engine\.codex-pytest-temp-task-0002` → `57 passed`.
+- Full source command: `python -B -m pytest -p no:cacheprovider -q --basetemp <project-root>\workspace\ai-engine\.codex-pytest-temp-task-0002-full` → `371 passed`, 616 non-blocking warnings.
+- Curated command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\workspace\submission\VERIFY.ps1 -SkipFrontendBuild` → `VERIFY_OK`, `371 passed`, 616 warnings.
+- Privacy evidence: API frame preview regression confirms BGR and gray arrays are summarized; existing fact/job/event/SQLite redaction tests remain green.
+- Real smoke: not run; model weights/runtime dependency absent by task design.
+- Cleanup: project-local basetemp children were removed.

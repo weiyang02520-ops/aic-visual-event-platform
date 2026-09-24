@@ -95,4 +95,6 @@ $env:AI_ZONES_JSON = '[{"zone_id":"shelf-a","label":"工具架 A","x":0,"y":0,"w
 
 本地 JSONL/OpenCV 帧现在会进入 analysis job 的检测、跟踪、关系和 `PrimitiveFact` 链；如果没有可用 OpenCV，请安装 `.[media]`，或使用 JSONL fixture。
 
+OpenCV 本地视频帧的 payload 同时提供模型输入用的 BGR `image` 和 MotionDetector 使用的 list-based `gray` helper，并附带 `shape` / `channels`。像素只在瞬时帧/推理路径中存在；公共预览、事实 metadata、job metadata 和 SQLite 事件写入会走递归像素摘要脱敏。
+
 若检测 provider 在人物对象中提供 `nose`、`left_wrist`、`right_wrist` 关键点，`KeypointActionExtractor` 可按几何距离生成启发式 `hand_to_face` 事实，并绑定同一人物附近的药品框；它容忍一个采样帧的关键点缺失以避免重复动作边缘。当前只有 fixture 输入验证此路；项目没有内置姿态模型，也不会从普通像素帧伪造关键点。

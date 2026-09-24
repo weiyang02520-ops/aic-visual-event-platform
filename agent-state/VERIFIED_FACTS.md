@@ -530,3 +530,11 @@ Makerverse 与 livestream-rs 的静态仓库事实已在 Phase 0 以本目录内
 - File/URL: `workspace/ai-engine/src/visual_event_ai/ultralytics_provider.py`, `model_providers.py`, `tests/test_model_providers.py`, corresponding submission files.
 - Limitation: The test does not load a real model or measure inference; dependency, weights, accuracy and latency remain unverified.
 - Confidence: high for environment-to-registry wiring and offline status behavior; low for real model runtime until authorized weights/runtime exist.
+
+
+### FACT-077
+- Claim: OpenCV local-video frames now provide a model-ready BGR image and a separate grayscale helper without changing timestamp/FPS/PTS behavior.
+- Evidence: `test_opencv_provider_exposes_bgr_image_and_gray_helper_payload` verifies identity of the BGR object, list-based gray values, shape and channel metadata. `test_opencv_style_frame_reaches_ultralytics_provider_and_fact_path` proves the BGR object reaches the fake provider and normalized fact source/timestamp/keypoint metadata survives. Full source and curated suites returned `371 passed` / `VERIFY_OK`.
+- File/URL: `workspace/ai-engine/src/visual_event_ai/frame_pipeline.py`, `tests/test_frame_pipeline.py`, `tests/test_ultralytics_provider.py`, `workspace/docs/AI_FRAME_PIPELINE_PHASE2.md`.
+- Limitation: Stub OpenCV only; codec-specific channel behavior and real model runtime are unverified.
+- Confidence: high for the local payload contract and existing pipeline integration; low for external media/model behavior.

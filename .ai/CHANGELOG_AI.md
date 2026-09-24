@@ -47,3 +47,10 @@ PLANNING → READY_FOR_CODEX
 actor: chatgpt-master
 task_hash: sha256:72199024e2a6fe1fbac8a5e70be6572c08784455cf138c30dc0278c277f36f01
 notes: Local OpenCV video BGR+gray bridge for real vision providers; no model download/runtime claim in this task.
+
+
+2026-09-24T12:16:24Z
+TASK-0002
+CODEX_RUNNING -> CODEX_VALIDATING
+actor: codex-luna
+notes: Added OpenCV BGR+gray local-video payload bridge, fake-provider integration and BGR/gray privacy coverage. Source suite 371 passed; curated VERIFY_OK.

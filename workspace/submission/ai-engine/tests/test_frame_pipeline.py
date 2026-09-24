@@ -77,6 +77,67 @@ def test_opencv_provider_reads_real_local_video_when_available(tmp_path):
     assert frames[0].payload["shape"] == [12, 16]
 
 
+def test_opencv_provider_exposes_bgr_image_and_gray_helper_payload(tmp_path, monkeypatch):
+    path = tmp_path / "payload-contract.avi"
+    path.touch()
+
+    class BgrImage:
+        shape = (3, 4, 3)
+
+    class GrayImage:
+        shape = (3, 4)
+
+        @staticmethod
+        def tolist():
+            return [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]]
+
+    bgr = BgrImage()
+
+    class Capture:
+        def __init__(self):
+            self.read_count = 0
+
+        def isOpened(self):
+            return True
+
+        def get(self, property_id):
+            return 25.0 if property_id == 1 else 0.0
+
+        def read(self):
+            if self.read_count:
+                return False, None
+            self.read_count += 1
+            return True, bgr
+
+        def release(self):
+            pass
+
+    class CV2:
+        CAP_PROP_FPS = 1
+        CAP_PROP_POS_MSEC = 2
+        COLOR_BGR2GRAY = 3
+
+        def __init__(self):
+            self.capture = Capture()
+
+        def VideoCapture(self, _path):
+            return self.capture
+
+        @staticmethod
+        def cvtColor(_image, _conversion):
+            return GrayImage()
+
+    monkeypatch.setitem(sys.modules, "cv2", CV2())
+
+    frames = list(FramePipeline().iter_frames(str(path), interval_ms=0, max_frames=1))
+
+    payload = frames[0].payload
+    assert payload["image"] is bgr
+    assert payload["gray"] == [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]]
+    assert payload["shape"] == [3, 4]
+    assert payload["channels"] == 3
+
+
 class _FakeCapture:
     def __init__(self, fps, positions):
         self.fps = fps

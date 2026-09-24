@@ -103,3 +103,11 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - Master blocker fixed: registry-created Ultralytics provider reads `AI_ULTRALYTICS_MODEL_PATH` and exposes selection/status offline.
 - Verification: source/curated `369 passed`, `VERIFY_OK`; real runtime remains unverified.
 - State is `WAITING_FOR_MASTER`, lock is released, and Codex must not choose TASK-0002.
+
+
+## TASK-0002 handoff checkpoint (2026-09-24)
+
+- Active branch: `codex/task-0002-local-video-pixel-bridge`.
+- OpenCV BGR+gray payload bridge and privacy/integration tests are implemented; source/curated suites are `371 passed` / `VERIFY_OK`.
+- Real model runtime remains unverified; no weights or runtime dependency were added.
+- Read `.ai/CODEX_REPORT.md`, the TASK-0002 run record and PR before Master review. Do not start TASK-0003 or merge on your own.
