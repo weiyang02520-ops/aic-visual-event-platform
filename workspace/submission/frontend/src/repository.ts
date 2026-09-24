@@ -4,6 +4,7 @@ import type {
   RegisteredObject,
   RegisteredPerson,
   Repository,
+  RepositoryHealth,
   ReviewStatus,
   UnifiedEvent,
 } from "./types";
@@ -98,6 +99,10 @@ export function createMockRepository(): Repository {
     { person_id: "person-02", display_name: "工作人员", role: "staff", reference_uris: [], status: "active" },
   ];
   return {
+    async health(): Promise<RepositoryHealth> {
+      await wait(80);
+      return { status: "mock" };
+    },
     async listPlugins() {
       await wait();
       return structuredClone(plugins);
@@ -165,12 +170,29 @@ export function createMockRepository(): Repository {
 }
 
 export function createRealRepository(baseUrl: string): Repository {
+  const root = baseUrl.replace(/\/+$/, "");
+
   async function request<T>(path: string, options?: RequestInit): Promise<T> {
-    const response = await fetch(`${baseUrl}${path}`, { headers: { "Content-Type": "application/json" }, ...options });
-    if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+    let response: Response;
+    try {
+      response = await fetch(`${root}${path}`, { headers: { "Content-Type": "application/json" }, ...options });
+    } catch (error) {
+      throw new Error(error instanceof Error && error.message ? error.message : "网络请求失败");
+    }
+    if (!response.ok) {
+      let detail = "";
+      try {
+        const body = (await response.json()) as { detail?: unknown };
+        detail = typeof body.detail === "string" ? `：${body.detail}` : "";
+      } catch {
+        // Keep the HTTP status when the server does not return JSON.
+      }
+      throw new Error(`${response.status} ${response.statusText}${detail}`.trim());
+    }
     return response.json() as Promise<T>;
   }
   return {
+    health: () => request<RepositoryHealth>("/health"),
     listPlugins: () => request<Plugin[]>("/api/v1/plugins"),
     togglePlugin: (id, enabled) => request<Plugin>(`/api/v1/plugins/${id}/${enabled ? "enable" : "disable"}`, { method: "POST" }),
     listEvents: () => request<UnifiedEvent[]>("/api/v1/events"),

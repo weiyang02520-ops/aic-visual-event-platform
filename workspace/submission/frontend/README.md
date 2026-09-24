@@ -32,6 +32,8 @@ $env:VITE_MAKERVERSE_TOKEN = "仅放在本地环境，不提交到仓库"
 
 页面通过 `src/repository.ts` 的 `Repository` 接口访问数据，Mock/Real 切换不会散落在页面业务逻辑中。
 
+Real 模式切换时会先清空上一数据源的事件、插件、对象和人员，再请求 `/health` 与首屏数据。连接状态会显示为“连接中”“Real API 在线”或“Real API 离线”；失败时保留空状态和简短错误原因，不把 Mock 数据当作 Real 数据展示。复核、插件启停、分析任务和登记操作在 Real API 未在线时会直接提示失败，不会回退到 Mock。
+
 Real 模式创建分析任务后会按 `job_id` 轮询 `/api/v1/analysis/jobs/{id}`，直到 `completed`、`failed` 或 `stopped`，再刷新事件中心；这对应 AI API 的 `202 Accepted` 异步任务语义。
 
 Makerverse 媒体边界在 `src/media.ts`：它归一化 `/lives/online` 与 `/lives/{id}/endpoint` 的 DTO，并区分 Mock、RTMP、RTSP、HLS 和 HTTP-FLV。当前只完成地址分类和接口边界，真实播放器需要在部署地址、CORS、鉴权和浏览器实测确认后再接入；详见 `workspace/docs/MEDIA_PLAYBACK_ADAPTER.md`。
@@ -48,4 +50,4 @@ AI 服务启动后，可以在另一个终端执行 `npm run smoke:real`，检�
 - 对象与人员：自定义对象和人员注册；
 - 系统设置：数据源、场景和证据边界说明。
 
-当前视频画面和机器人状态属于 Mock/接口占位，真实媒体播放和机器人协议等待工具链、老师文档和硬件资料验证。
+当前视频画面和机器人状态属于 Mock/接口占位；Real API 在线也不代表媒体流在线，只有 Makerverse adapter 返回并识别出播放地址时才显示媒体会话，否则显示“未接入”。真实媒体播放和机器人协议等待工具链、老师文档和硬件资料验证。

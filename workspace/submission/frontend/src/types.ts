@@ -1,6 +1,18 @@
 export type Mode = "mock" | "real";
 export type View = "dashboard" | "monitor" | "events" | "plugins" | "registry" | "settings";
 export type Scenario = "elderly" | "workshop" | "robot" | "universal";
+export type RepositoryConnectionStatus = "loading" | "online" | "offline" | "mock";
+
+export interface RepositoryConnection {
+  mode: Mode;
+  status: RepositoryConnectionStatus;
+  reason?: string;
+}
+
+export interface RepositoryHealth {
+  status: string;
+  [key: string]: unknown;
+}
 
 export type ReviewStatus = "pending" | "confirmed" | "rejected";
 export type PlaybackKind = "mock" | "hls" | "http-flv" | "rtmp" | "rtsp" | "unknown";
@@ -105,6 +117,7 @@ export interface RegistryMatch {
 }
 
 export interface Repository {
+  health(): Promise<RepositoryHealth>;
   listPlugins(): Promise<Plugin[]>;
   togglePlugin(pluginId: string, enabled: boolean): Promise<Plugin>;
   listEvents(): Promise<UnifiedEvent[]>;

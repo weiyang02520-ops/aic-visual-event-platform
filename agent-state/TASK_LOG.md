@@ -513,3 +513,15 @@
 - Evidence is `REAL_RUNTIME_SMOKE`, not accuracy, scene-event, camera or robot validation.
 - Full source suite: `371 passed`; curated verifier: `VERIFY_OK`, `371 passed`; project-local basetemp cleaned.
 - No adapter/pipeline bug was found; no AI source/test change was required.
+
+
+## 2026-09-24 — TASK-0005 truthful frontend Real connection state
+
+- Claimed the M2 TASK-0005 packet after verifying its LF-normalized hash and created the frontend task branch.
+- Added Repository health checks and explicit loading/online/offline/Mock state; source switching clears events/plugins/objects/persons and ignores stale responses.
+- Real actions (review, plugin toggle, analysis, registry writes) now report offline/loading/API errors without Mock fallback.
+- Sidebar, dashboard, monitor and settings no longer claim static AI/stream health; Real API online is separate from media stream availability.
+- Synchronized frontend sources, README/design docs and curated submission copies.
+- `npm run build` passed; local AI service + `npm run smoke:real` passed; direct unreachable probe returned `fetch failed`.
+- Full AI suite: `371 passed`; curated verifier: `VERIFY_OK`, `371 passed`; project-local basetemp and runtime smoke DB cleaned.
+- Browser click-through was not run because no browser executable is available; no backend/AI source change was needed.

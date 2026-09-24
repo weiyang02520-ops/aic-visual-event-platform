@@ -591,3 +591,16 @@ Phase 0–3 已完成可验证骨架；当前环境缺少 Cargo、FFmpeg 和 .NE
 - [x] Full source suite returned `371 passed`; curated verifier returned `VERIFY_OK` / `371 passed`; project-local basetemp cleanup passed.
 - [x] No adapter/pipeline bug was exposed; no source/test changes were necessary.
 - [ ] Master review and PR handoff remain pending; Codex must not choose TASK-0005.
+
+
+## TASK-0005 checkpoint — truthful frontend Real connection state (2026-09-24)
+
+- [x] Verified the Task Packet hash and claimed the task on `codex/task-0005-frontend-real-connection-state`.
+- [x] Added Repository health checks and explicit loading/online/offline/Mock state.
+- [x] Cleared stale source data on every mode switch and ignored late responses from prior sources.
+- [x] Guarded review, plugin, analysis and registry actions so Real failures never fall back to Mock.
+- [x] Made sidebar, dashboard, monitor, settings and media labels derive from connection/media state.
+- [x] Synchronized frontend source, README/design docs and curated submission copies.
+- [x] Frontend build passed; local AI service `npm run smoke:real` passed; AI suite and curated verifier passed.
+- [ ] Browser click-through remains pending because the worker environment has no browser executable.
+- [ ] Master review and PR handoff remain pending; Codex must not choose TASK-0006.

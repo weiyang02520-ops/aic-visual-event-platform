@@ -143,3 +143,10 @@ PLANNING → READY_FOR_CODEX
 actor: chatgpt-master
 task_hash: sha256:09cc8a1afcbf1a30ee0a3b2647433693ddd5786c9ff12ce78b7c9f25a1304f43
 notes: Start M2 by making frontend Real API connection state truthful and clearing stale Mock data on failure.
+
+
+2026-09-24T13:56:15Z
+TASK-0005
+CODEX_RUNNING -> CODEX_VALIDATING
+actor: codex-luna
+notes: Added truthful frontend Real API connection state, source-switch clearing/stale-response protection, guarded Real actions and truthful media status; npm build and real API smoke passed; AI suite 371 passed and curated VERIFY_OK.

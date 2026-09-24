@@ -89,3 +89,12 @@ Latest AI verification (2026-09-24): source and curated submission suites return
 - Feature commit `f2b9e7505c16d6a979bfe25d8cefcfb9722f8a7e` pushed on `codex/task-0004-real-local-video-pose-smoke`; PR [#5](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/5) is `OPEN` / `CLEAN` against `main`.
 - State is `WAITING_FOR_MASTER`, lock released, and `next_actor=chatgpt`.
 - No next task was selected by Codex.
+
+
+## TASK-0005 frontend Real connection checkpoint (2026-09-24)
+
+- Repository now exposes a health check; frontend source switching clears stale data and tracks loading/online/offline/Mock state.
+- Real API failures leave empty source-owned lists and guarded actions report errors without falling back to Mock.
+- Sidebar/dashboard/monitor/settings derive connection status; Real API online does not claim a live media stream.
+- Frontend build passed; local `smoke:real` passed; AI suite returned `371 passed`; curated verifier returned `VERIFY_OK`.
+- Browser click-through remains pending because no browser executable is available in the worker environment.

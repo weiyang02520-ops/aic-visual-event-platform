@@ -1,62 +1,63 @@
-# Codex Completion Report — TASK-0004
+# Codex Completion Report — TASK-0005
 
 ## Result
 
-`PASS_REAL_LOCAL_VIDEO_RUNTIME_SMOKE`
+`PASS_FRONTEND_REAL_CONNECTION_STATE`
 
-The authorized local-video end-to-end smoke completed successfully. A two-frame AVI generated from the already authorized official `bus.jpg` sample was decoded by `OpenCVFrameProvider`, sent as BGR frames to the real `UltralyticsProvider`, then passed through the tracker, observation normalization and `FrameFactExtractor` to produce real person `object_detected` facts.
-
-This is a controlled runtime smoke only. It is not an accuracy benchmark, scene-event validation, production deployment, real-camera validation, privacy-source validation or robot validation.
+The frontend Real API boundary is now truthful and failure-safe. The Repository abstraction exposes a health check, source switching clears the previous data before loading, stale responses from an old source are ignored, and Real API failures render an explicit offline state with empty data instead of retaining Mock content.
 
 ## Task identity
 
-- Task: `TASK-0004`
+- Task: `TASK-0005`
 - Task version: `1`
-- Task hash: `sha256:858e7e5b3cf7e6f4d2fec336a7a40f7177c281d1a269d1987e38b401f8a86dfd`
-- Branch: `codex/task-0004-real-local-video-pose-smoke`
-- Base commit: `7dfcdc12f9665e6803ffac347243eeb16ec69a4e` (`origin/main` at task claim)
-- Run: `codex-task-0004-20260924T131219Z`
+- Task hash: `sha256:09cc8a1afcbf1a30ee0a3b2647433693ddd5786c9ff12ce78b7c9f25a1304f43`
+- Branch: `codex/task-0005-frontend-real-connection-state`
+- Base commit: `ba5b242de6f87b4d84c6af944c10cf3a718a21db` (`origin/main` at task claim)
+- Run: `codex-task-0005-20260924T133940Z`
 
 ## Changed files
 
-- `workspace/docs/REAL_LOCAL_VIDEO_SMOKE_TASK-0004.md`
-- `workspace/docs/AI_FRAME_PIPELINE_PHASE2.md`
-- `workspace/docs/AI_PROVIDERS_PHASE3.md`
-- `workspace/ai-engine/README.md`
-- Corresponding synchronized documentation under `workspace/submission/`
+- `workspace/frontend/src/types.ts`
+- `workspace/frontend/src/repository.ts`
+- `workspace/frontend/src/App.tsx`
+- `workspace/frontend/src/styles.css`
+- `workspace/frontend/README.md`
+- `workspace/docs/AI_FRONTEND_PHASE1.md`
+- `workspace/docs/FRONTEND_SYSTEM_DESIGN.md`
+- Matching frontend source, README and documentation copies under `workspace/submission/`
 - `.ai/` report, run, heartbeat and state records
 - `agent-state/` evidence and handoff records
 
-No adapter or pipeline bug was exposed, so no AI Python source or deterministic test code changed. The generated video, model weights, sample image, virtual environment, runtime settings and caches remain under ignored local paths.
+No backend, AI algorithm, media adapter or robot code changed. No new frontend test framework was introduced.
 
-## Runtime evidence
+## Behavior
 
-- Input: `runtime/samples/task-0004-bus.avi`, a two-frame project-local AVI generated from official public `bus.jpg` only to exercise the OpenCV decoder.
-- Runtime: Python 3.12.10, `ultralytics 8.4.161`, `torch 2.14.0+cpu`, OpenCV 5.0.0, CPU.
-- `FramePipeline` decoded 2 frames through `OpenCVFrameProvider`; each frame carried a BGR `image` payload.
-- `DetectorProviderRegistry` selected the real `UltralyticsProvider` and the real `yolo11n-pose.pt` model.
-- `FrameFactExtractor` produced 8 person `object_detected` facts (4 per frame); tracker IDs 1–4 were present on both frames.
-- Every person fact retained `nose`, `left_wrist` and `right_wrist` keypoints, the source ID `runtime/samples/task-0004-bus.avi`, and timezone-aware UTC timestamps.
-- Raw pixel keys were absent from fact metadata. A single run took about `0.078 s` to decode and `3.074 s` for the complete model-to-facts path; both are non-benchmark diagnostics.
-- Detailed sanitized evidence and source/model hashes are in `workspace/docs/REAL_LOCAL_VIDEO_SMOKE_TASK-0004.md`.
+- Repository implementations now expose `health()`. Real requests normalize trailing base URL slashes, report network/HTTP/API detail errors, and never fall back to Mock.
+- App connection state is explicit: loading, online, offline or Mock. Switching sources clears events, plugins, objects and persons before requests; a cancelled previous request cannot repopulate the new source.
+- Real initial load requires `/health` plus the four initial resource lists to succeed before showing `Real API 在线`. Failure leaves empty lists and shows the concise error reason.
+- Sidebar, page banner, dashboard, monitor and settings derive AI status from the connection state. Real API online does not imply a live media stream; without a resolved Makerverse endpoint the UI says `未接入`/`NO STREAM`.
+- Review, plugin toggle, analysis and registry actions are guarded while Real is loading/offline and report errors without invoking Mock.
+- Mock health/data and demo analysis behavior remain unchanged.
 
 ## Tests and verification
 
-- Full source suite in the project `.venv`, with an absolute project-local basetemp: `371 passed`, 1 non-blocking Starlette deprecation warning.
+- Frontend `npm run build`: passed (`tsc -b` + Vite).
+- Local AI service started with a project-local runtime database; `npm run smoke:real`: passed (`health=ok`, plugins 2, events 0, objects 0, persons 0, evidence fixture, selected detector motion_cpu, registry matches 0).
+- Direct unreachable API probe to `http://127.0.0.1:8199/health`: `fetch failed`; the UI path handles this as offline and clears source arrays before load.
+- Full AI source suite with absolute project-local basetemp: `371 passed`, 1 non-blocking Starlette deprecation warning.
 - Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `371 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette deprecation warnings.
-- Curated source/submission documentation hashes match. The verifier contamination scan passed and the verified project-local pytest temp directory was removed.
+- Full verifier also passed; it skipped the frontend build because `workspace/submission/frontend/node_modules` is intentionally absent. The source frontend build above is the frontend build evidence.
+- Build output, runtime database and temporary pytest directories were removed; no generated artifacts are tracked.
 
-## Evidence limits
+## Verification limits
 
-The smoke does not establish pose accuracy, recall, precision, cross-frame identity stability, occlusion handling, temporal action recognition, scene-event quality, camera-side skeletonization, real-video generalization or hardware behavior. No model weights, sample media, raw pixels, runtime databases or caches are part of the Git change.
+No browser executable is installed in this environment, so a click-through visual check of Mock → unreachable Real was not run. The source-level state path is deterministic and build-checked; the direct unreachable probe confirms the expected network failure. Browser-level interaction should be rechecked when a browser session is available.
 
 ## Master decision needed
 
-Review the real local-video source-to-fact evidence and PR. If accepted, Master may decide the next task; Codex must not select one.
+Review the connection-state behavior and PR. If accepted, Master may decide the next task; Codex must not select one.
 
 ## Commit / PR
 
-- Claim commit: `de6650e`
-- Feature commit: `f2b9e75` (`feat(ai): record local video pose fact smoke`)
-- PR: [#5](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/5) targeting `main`
-- PR state at handoff: `OPEN`, merge state `CLEAN`; state returned to `WAITING_FOR_MASTER` and lock released
+- Claim commit: `6eccacc`
+- Feature commit and PR: pending handoff after final state update
