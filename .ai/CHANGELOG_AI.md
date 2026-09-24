@@ -31,3 +31,19 @@ actor: codex-luna
 commit: e5f6180
 pr: https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/2
 notes: R1 environment-path blocker fixed; source suite 369 passed; curated VERIFY_OK; lock released.
+
+
+2026-09-24T11:55:00Z
+TASK-0001
+MASTER_REVIEWING → PASS
+actor: chatgpt-master
+pr: #2
+merge_commit: 29b78c8b85aff188884d9564165c80248011c375
+notes: R1 environment-path blocker resolved; offline adapter accepted. Real model runtime remains unverified.
+
+2026-09-24T11:55:00Z
+TASK-0002
+PLANNING → READY_FOR_CODEX
+actor: chatgpt-master
+task_hash: sha256:72199024e2a6fe1fbac8a5e70be6572c08784455cf138c30dc0278c277f36f01
+notes: Local OpenCV video BGR+gray bridge for real vision providers; no model download/runtime claim in this task.
