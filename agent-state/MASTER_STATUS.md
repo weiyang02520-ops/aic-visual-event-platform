@@ -49,3 +49,11 @@ Latest AI verification (2026-09-24): source and curated submission suites return
 - Added offline selection/status regression; no weights or real runtime were used.
 - Source and curated suites now return `369 passed`, `VERIFY_OK`.
 - PR #2 remains open for Master review; no next task selected.
+
+
+## TASK-0002 Codex checkpoint (2026-09-24)
+
+- Added the local OpenCV BGR+gray payload bridge for optional real vision providers while preserving the CPU motion path.
+- Added OpenCV payload, fake-provider integration and BGR/gray privacy regressions.
+- Source and curated suites return `371 passed`, `VERIFY_OK`; no real model smoke was run.
+- Awaiting PR handoff and Master review; no next task selected.

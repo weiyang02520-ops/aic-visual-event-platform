@@ -6,12 +6,12 @@
   "task_version": 1,
   "task_hash": "sha256:72199024e2a6fe1fbac8a5e70be6572c08784455cf138c30dc0278c277f36f01",
   "iteration": 2,
-  "status": "READY_FOR_CODEX",
-  "last_actor": "chatgpt-master",
-  "next_actor": "codex",
-  "active_branch": null,
-  "active_pr": null,
-  "last_commit": "29b78c8b85aff188884d9564165c80248011c375",
+  "status": "WAITING_FOR_MASTER",
+  "last_actor": "codex",
+  "next_actor": "chatgpt",
+  "active_branch": "codex/task-0002-local-video-pixel-bridge",
+  "active_pr": 3,
+  "last_commit": "fe12552",
   "retry_count": 0,
   "review_round": 0,
   "consecutive_failures": 0,
@@ -20,5 +20,5 @@
   "lock_owner": null,
   "lock_token": null,
   "lock_expires_at": null,
-  "updated_at": "2026-09-24T11:55:00Z"
+  "updated_at": "2026-09-24T12:17:41Z"
 }

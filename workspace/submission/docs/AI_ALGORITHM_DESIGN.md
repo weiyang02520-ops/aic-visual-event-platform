@@ -37,7 +37,7 @@ VideoSourceAdapter
 
 ## 3. 输入与时间
 
-`FramePacket` 至少保留 `source_id`、`timestamp`、`frame_index` 和可选的 `fps/time_base`。Mock、JSONL 和 OpenCV provider 均使用同一时间传播逻辑。抽帧策略由 `interval_ms`、`max_frames` 和 provider 能力共同决定；`interval_ms` 必须是可表示为 timedelta 的非布尔非负整数，`max_frames` 必须是非布尔非负整数或 `None`（0 表示不读取帧）；不以处理完成时间替代媒体时间。JSONL 恢复模式若跳过坏记录，会在下一帧标记 `discontinuity_before`、原因和行号，供事实管线建立新的连续观察段。
+`FramePacket` 至少保留 `source_id`、`timestamp`、`frame_index` 和可选的 `fps/time_base`。Mock、JSONL 和 OpenCV provider 均使用同一时间传播逻辑。OpenCV 本地视频 payload 同时提供模型输入用的 BGR `image`、CPU 帧差用的 list-based `gray`、`shape` 和 `channels`；下游 MotionDetector 只读灰度 helper，公共预览/事实/存储边界仍对 BGR/gray 像素做脱敏。抽帧策略由 `interval_ms`、`max_frames` 和 provider 能力共同决定；`interval_ms` 必须是可表示为 timedelta 的非布尔非负整数，`max_frames` 必须是非布尔非负整数或 `None`（0 表示不读取帧）；不以处理完成时间替代媒体时间。JSONL 恢复模式若跳过坏记录，会在下一帧标记 `discontinuity_before`、原因和行号，供事实管线建立新的连续观察段。
 
 网络流、RTSP、HLS、HTTP-FLV 和 livestream-rs 的真实解码属于可替换输入适配器。当前环境没有 FFmpeg 和真实部署，因此网络输入只完成配置检查和接口边界，不会伪造帧。OpenCV provider 会校验 FPS/PTS：不可用 FPS 回退到 25 fps，异常 PTS 回退到 read_index/fps；若时间戳仍超出 datetime 可表示范围，会显式失败。模拟元数据测试验证 fallback，现有本地 AVI fixture 验证正常读取，不代表覆盖真实异常码流。
 

@@ -83,7 +83,11 @@ def test_api_frame_preview_redacts_fixture_pixel_matrices(monkeypatch, tmp_path)
         json.dumps(
             {
                 "timestamp": "2026-01-01T00:00:00Z",
-                "payload": {"gray": [[1, 2], [3, 4]], "objects": []},
+                "payload": {
+                    "gray": [[1, 2], [3, 4]],
+                    "bgr": [[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]],
+                    "objects": [],
+                },
             }
         )
         + "\n",
@@ -101,6 +105,10 @@ def test_api_frame_preview_redacts_fixture_pixel_matrices(monkeypatch, tmp_path)
     assert payload["gray"] == {
         "encoding": "redacted-grayscale",
         "shape": [2, 2],
+    }
+    assert payload["bgr"] == {
+        "encoding": "redacted-bgr",
+        "shape": [2, 2, 3],
     }
     assert payload["objects"] == []
 

@@ -149,8 +149,9 @@ class OpenCVFrameProvider:
     """Optional local video provider for common file containers.
 
     OpenCV is imported lazily so the service still starts in minimal
-    environments. The payload carries one grayscale ndarray for detector
-    providers; API responses summarize it instead of serializing pixels.
+    environments. The payload carries the decoded BGR image for model
+    providers plus a list-based grayscale helper for the CPU motion baseline;
+    API responses summarize both instead of serializing pixels.
     """
 
     extensions = {".mp4", ".avi", ".mov", ".mkv", ".webm", ".m4v"}
@@ -208,11 +209,25 @@ class OpenCVFrameProvider:
                     frame_timestamp = start + frame_offset
                 except OverflowError as exc:
                     raise FramePipelineError("OpenCV frame timestamp exceeds the supported range") from exc
+                image_shape = getattr(image, "shape", None) or getattr(gray, "shape", None)
+                if not isinstance(image_shape, (list, tuple)) or len(image_shape) < 2:
+                    raise FramePipelineError("OpenCV frame has no usable image shape")
+                try:
+                    height, width = int(image_shape[0]), int(image_shape[1])
+                except (TypeError, ValueError, OverflowError) as exc:
+                    raise FramePipelineError("OpenCV frame shape is invalid") from exc
+                gray_payload = gray.tolist() if callable(getattr(gray, "tolist", None)) else gray
+                channels = int(image_shape[2]) if len(image_shape) >= 3 else 1
                 yield Frame(
                     source_id=source,
                     frame_index=emitted,
                     timestamp=frame_timestamp,
-                    payload={"image": gray, "shape": [int(gray.shape[0]), int(gray.shape[1])]},
+                    payload={
+                        "image": image,
+                        "gray": gray_payload,
+                        "shape": [height, width],
+                        "channels": channels,
+                    },
                     metadata={"provider": "opencv", "fps": fps, "read_index": read_index},
                 )
                 emitted += 1

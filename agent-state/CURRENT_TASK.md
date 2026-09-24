@@ -556,3 +556,14 @@ Phase 0–3 已完成可验证骨架；当前环境缺少 Cargo、FFmpeg 和 .NE
 - [x] Re-synchronized the provider and tests into `workspace/submission/`.
 - [x] R1 targeted provider tests returned `10 passed`; full source suite returned `369 passed`; curated verifier returned `VERIFY_OK` / `369 passed`.
 - [ ] Master review of PR #2 remains pending; do not choose TASK-0002.
+
+
+## TASK-0002 checkpoint — local video BGR/gray pixel bridge (2026-09-24)
+
+- [x] OpenCV local-video frames now expose BGR `payload["image"]`, list-based grayscale `payload["gray"]`, `shape` and `channels`.
+- [x] MotionDetector continues using the grayscale helper; timestamp/FPS/PTS behavior is unchanged.
+- [x] Added deterministic OpenCV payload contract and OpenCV-style frame → fake Ultralytics provider → normalized fact integration coverage.
+- [x] Added BGR/gray public preview privacy regression and preserved existing metadata/storage redaction behavior.
+- [x] Source full suite returned `371 passed`; curated verifier returned `VERIFY_OK` / `371 passed`.
+- [x] Real model runtime remains unverified by design; no weights or runtime dependency were added.
+- [ ] Master review and PR handoff remain pending; do not choose TASK-0003.

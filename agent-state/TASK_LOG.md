@@ -476,3 +476,19 @@
 - R1 fix commit `e5f6180` pushed to the existing task branch and PR #2.
 - Registry now wires the documented `AI_ULTRALYTICS_MODEL_PATH`; offline regression and full verification pass (`369 passed`, `VERIFY_OK`).
 - State returned to `WAITING_FOR_MASTER`, `next_actor=chatgpt`, lock released. No TASK-0002 selected.
+
+
+## 2026-09-24 — TASK-0002 local video pixel bridge
+
+- Claimed TASK-0002 from latest `main` after TASK-0001 PR #2 was merged. Created `codex/task-0002-local-video-pixel-bridge`.
+- Changed OpenCV payload to preserve BGR image for model providers and list-based gray helper for MotionDetector; kept timing fallback behavior.
+- Added deterministic payload, fake Ultralytics integration and BGR/gray privacy tests.
+- Full source suite: `371 passed`; curated VERIFY: `VERIFY_OK`, `371 passed`.
+- Real model remains unverified; no weights/downloads. Pending commit, PR and Master handoff.
+
+
+## 2026-09-24 — TASK-0002 PR handoff
+
+- Commit `fe12552` pushed on `codex/task-0002-local-video-pixel-bridge`.
+- Opened [PR #3](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/3) targeting `main`.
+- Updated `.ai/CODEX_REPORT.md`, run record, state and heartbeat; released the lock and handed control to Master. No TASK-0003 selected.
