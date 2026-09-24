@@ -1,8 +1,8 @@
 {
-  "task_id": "TASK-0004",
+  "task_id": "TASK-0005",
   "task_version": 1,
-  "task_hash": "sha256:858e7e5b3cf7e6f4d2fec336a7a40f7177c281d1a269d1987e38b401f8a86dfd",
-  "commit": "ba5b242de6f87b4d84c6af944c10cf3a718a21db",
-  "note": "M1 complete. TASK-0004 accepted: real local-video OpenCV → real Ultralytics → tracker/fact smoke; 8 person facts from 2 frames; 371 passed / VERIFY_OK.",
-  "recorded_at": "2026-09-24T13:35:00Z"
+  "task_hash": "sha256:09cc8a1afcbf1a30ee0a3b2647433693ddd5786c9ff12ce78b7c9f25a1304f43",
+  "commit": "0b979d5a669a627ec6db0fbb1224da2eb8ef12f4",
+  "note": "TASK-0005 accepted: truthful Real API frontend connection state; AI suite remains 371 passed / VERIFY_OK. Frontend now paused pending AI algorithm freeze.",
+  "recorded_at": "2026-09-24T14:12:00Z"
 }
