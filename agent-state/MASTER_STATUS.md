@@ -25,3 +25,10 @@ Latest AI verification (2026-09-24): source and curated submission suites return
 - Excluded: original PDF/DOCX attachments, `workspace/source-snapshots`, `agent-state/rollback`, runtime databases, uploads, caches, Node dependencies, build output, model weights, secrets and local handoff prompts with machine-specific paths.
 - Repository verification: `363 passed`; `workspace/submission/VERIFY.ps1 -SkipFrontendBuild` returned `VERIFY_OK` before repository initialization and after repository documentation changes.
 - Current next task: pause AI feature expansion and wait for the next user review or repository collaboration request.
+
+
+## Master automation checkpoint (2026-09-24)
+- Collaboration: ChatGPT Web Master → GitHub → Codex Worker → PR → Master review.
+- `.ai/` controls automation; `agent-state/` remains detailed evidence/history.
+- Phase: M1 Real Vision Path. First task: `TASK-0001` optional real person/pose provider adapter.
+- Bootstrap files do not create new AI runtime evidence.

@@ -439,3 +439,10 @@
 - Kept AI source/tests, frontend source, docs, submission package and current agent-state. Excluded unpublished PDF/DOCX materials, source snapshots, rollback copies, runtime/cache/dependency/build output, model weights and secrets.
 - Staged audit found 245 tracked files, no non-example `.env`, no credential/private-key patterns and no tracked file above 10 MB. Existing AI verification remains `363 passed` / `VERIFY_OK`.
 - Next action is repository review and collaboration; do not extend AI functionality until the user asks.
+
+
+## 2026-09-24 — initialize Master × GitHub × Codex automation
+- Adopted the uploaded automation template for this private repository.
+- Preserved `agent-state/`; added `.ai/` as the task/state/lock/heartbeat/review control plane.
+- First bounded target: real visual person/pose provider adapter because the current baseline explicitly lacks real pose inference.
+- Bootstrap is control/documentation only and does not itself claim new model capability.

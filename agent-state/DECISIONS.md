@@ -207,3 +207,17 @@
 - Reason: Python treats bool as int, while math.isfinite/string comparisons can leak TypeError; silent acceptance makes configuration semantics inconsistent across algorithms.
 - Alternatives: Coerce strings and booleans, or rely on type hints only; not adopted.
 - Consequences: Callers must parse configuration to typed numbers before constructing detectors, trackers, relations, or temporal reasoners.
+
+
+## DEC-AUTO-001
+- Date: 2026-09-24
+- Status: active
+- Decision: Add root `.ai/` as automation control plane while preserving `agent-state/` as historical/evidence store.
+- Reason: Avoid context loss without destroying extensive existing evidence.
+- Consequences: `.ai/CURRENT_STATE.json` controls current actor/task; `agent-state/` keeps detailed prior evidence.
+
+## DEC-AUTO-002
+- Date: 2026-09-24
+- Status: active
+- Decision: First Worker task is a real visual pose-provider adapter path rather than more open-ended rule expansion.
+- Reason: Current baseline explicitly lacks real pose-model inference.

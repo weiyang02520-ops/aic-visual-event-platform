@@ -12,3 +12,9 @@
 | REQ-006 | 机器人是实际应用与后续融合方向，不是当前假设的完整控制系统 | handoff plan | adopted | 等老师和机器人文档确认协议与能力 |
 | REQ-007 | 代码、测试、文档和提交包必须区分；不得伪造实验结果 | handoff plan | adopted | 未验证内容必须标注为设计目标、Mock 或待验证 |
 | REQ-008 | 用户不参与普通技术选型，希望把任务交给 Codex 自主调查、实现、测试、整理和交付 | user/shared conversation | active | 只有外部资料、账号、付费、硬件权限或不可逆决定才需要打扰用户 |
+
+
+## 2026-09-24 Automation collaboration update
+- REQ-AUTO-001: GitHub is the shared long-term collaboration surface for ChatGPT Master and Codex Worker.
+- REQ-AUTO-002: Important task state must be persisted in repository files; do not depend on long chat context.
+- REQ-AUTO-003: Master plans/reviews; Codex executes bounded Task Packets; ordinary implementation details should not repeatedly interrupt the user.
