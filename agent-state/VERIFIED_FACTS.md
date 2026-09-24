@@ -538,3 +538,11 @@ Makerverse 与 livestream-rs 的静态仓库事实已在 Phase 0 以本目录内
 - File/URL: `workspace/ai-engine/src/visual_event_ai/frame_pipeline.py`, `tests/test_frame_pipeline.py`, `tests/test_ultralytics_provider.py`, `workspace/docs/AI_FRAME_PIPELINE_PHASE2.md`.
 - Limitation: Stub OpenCV only; codec-specific channel behavior and real model runtime are unverified.
 - Confidence: high for the local payload contract and existing pipeline integration; low for external media/model behavior.
+
+
+### FACT-078
+- Claim: The optional Ultralytics pose path has one truthful real-runtime smoke through the project adapter.
+- Evidence: In project `.venv` (`ultralytics 8.4.161`, `torch 2.14.0+cpu`), `UltralyticsProvider` loaded official `yolo11n-pose.pt` and normalized official `bus.jpg` into 4 person detections; every detection carried nose, left_wrist and right_wrist keypoints. Source suite returned 371 passed and curated verification returned VERIFY_OK / 371 passed.
+- File/URL: `workspace/docs/REAL_RUNTIME_SMOKE_TASK-0003.md`; official model/sample URLs are recorded there.
+- Limitation: One public sample is a smoke only; it does not establish accuracy, identity continuity, occlusion handling, temporal action quality, privacy-source processing, camera validation or robot behavior.
+- Confidence: high for the package/model/provider call and normalized output observed in this run; low for generalization and performance.

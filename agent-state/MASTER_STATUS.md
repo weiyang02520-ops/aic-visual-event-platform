@@ -57,3 +57,12 @@ Latest AI verification (2026-09-24): source and curated submission suites return
 - Added OpenCV payload, fake-provider integration and BGR/gray privacy regressions.
 - Source and curated suites return `371 passed`, `VERIFY_OK`; no real model smoke was run.
 - Awaiting PR handoff and Master review; no next task selected.
+
+
+## TASK-0003 real runtime smoke checkpoint (2026-09-24)
+
+- Authorized official Ultralytics `yolo11n-pose.pt` and `bus.jpg` were stored only in ignored local runtime paths.
+- `UltralyticsProvider` loaded the actual model on CPU and normalized 4 person detections; each included nose and both wrist keypoints.
+- Source suite returned `371 passed`; curated verifier returned `VERIFY_OK` / `371 passed`.
+- Evidence class is `REAL_RUNTIME_SMOKE`; accuracy, production, camera privacy and robot evidence remain open.
+- Codex is handing control back to Master; no next task was selected.

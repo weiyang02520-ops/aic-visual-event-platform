@@ -600,3 +600,14 @@
 - Privacy evidence: API frame preview regression confirms BGR and gray arrays are summarized; existing fact/job/event/SQLite redaction tests remain green.
 - Real smoke: not run; model weights/runtime dependency absent by task design.
 - Cleanup: project-local basetemp children were removed.
+
+
+## 2026-09-24 — TASK-0003 real runtime smoke
+
+- Runtime identity: Python 3.12.10, `ultralytics 8.4.161`, `torch 2.14.0+cpu`, OpenCV 5.0.0, CPU.
+- Official `yolo11n-pose.pt` loaded from the ignored project runtime path and ran through `UltralyticsProvider` on official `bus.jpg`; 4 normalized `person` detections were returned, all with `nose`, `left_wrist` and `right_wrist`.
+- Evidence class: `REAL_RUNTIME_SMOKE`; one-sample wall-clock time was about 1.438 seconds and is not a benchmark.
+- Full source command used an absolute project-local basetemp under `workspace\ai-engine`: `371 passed`, 1 non-blocking warning.
+- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `371 passed`, 616 non-blocking warnings; contamination scan passed.
+- The project-local basetemp was removed after verification. Model weights/sample media/venv/runtime caches remain ignored and untracked.
+- This does not establish accuracy, real-video metrics, privacy-source processing, production deployment or robot evidence.
