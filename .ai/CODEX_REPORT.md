@@ -56,4 +56,6 @@ Review the offline pixel bridge and PR. If accepted, Master may schedule a later
 
 ## Commit / PR
 
-To be filled after the task branch commit and pull request are created.
+- Commit: `fe12552` (`feat(ai): bridge opencv bgr and grayscale frames`)
+- PR: [#3](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/3) targeting `main`
+- PR state at handoff: `OPEN`, merge state pending GitHub refresh

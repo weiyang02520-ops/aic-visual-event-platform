@@ -54,3 +54,12 @@ TASK-0002
 CODEX_RUNNING -> CODEX_VALIDATING
 actor: codex-luna
 notes: Added OpenCV BGR+gray local-video payload bridge, fake-provider integration and BGR/gray privacy coverage. Source suite 371 passed; curated VERIFY_OK.
+
+
+2026-09-24T12:17:41Z
+TASK-0002
+CODEX_VALIDATING -> WAITING_FOR_MASTER
+actor: codex-luna
+commit: fe12552
+pr: https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/3
+notes: OpenCV BGR+gray bridge complete; source suite 371 passed; curated VERIFY_OK; lock released.

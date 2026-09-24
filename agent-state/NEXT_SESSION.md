@@ -111,3 +111,11 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - OpenCV BGR+gray payload bridge and privacy/integration tests are implemented; source/curated suites are `371 passed` / `VERIFY_OK`.
 - Real model runtime remains unverified; no weights or runtime dependency were added.
 - Read `.ai/CODEX_REPORT.md`, the TASK-0002 run record and PR before Master review. Do not start TASK-0003 or merge on your own.
+
+
+## TASK-0002 PR handoff (2026-09-24)
+
+- Branch: `codex/task-0002-local-video-pixel-bridge`; commit `fe12552`.
+- PR: [#3](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/3) targeting `main`.
+- State: `WAITING_FOR_MASTER`; lock released; next actor `chatgpt-master`.
+- Do not start TASK-0003 or merge from Codex.

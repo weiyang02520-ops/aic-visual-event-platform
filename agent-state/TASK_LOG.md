@@ -485,3 +485,10 @@
 - Added deterministic payload, fake Ultralytics integration and BGR/gray privacy tests.
 - Full source suite: `371 passed`; curated VERIFY: `VERIFY_OK`, `371 passed`.
 - Real model remains unverified; no weights/downloads. Pending commit, PR and Master handoff.
+
+
+## 2026-09-24 — TASK-0002 PR handoff
+
+- Commit `fe12552` pushed on `codex/task-0002-local-video-pixel-bridge`.
+- Opened [PR #3](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/3) targeting `main`.
+- Updated `.ai/CODEX_REPORT.md`, run record, state and heartbeat; released the lock and handed control to Master. No TASK-0003 selected.

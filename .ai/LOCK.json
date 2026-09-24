@@ -1,9 +1,9 @@
 {
-  "owner": "codex-luna",
-  "resource": "TASK-0002",
-  "run_id": "codex-task-0002-20260924T121454Z",
-  "token": "2991eab1-975c-44ad-9aa5-0bbea48c75a7",
-  "acquired_at": "2026-09-24T12:14:54Z",
-  "expires_at": "2026-09-24T12:44:54Z",
-  "heartbeat_at": "2026-09-24T12:16:24Z"
+  "owner": null,
+  "resource": null,
+  "run_id": null,
+  "token": null,
+  "acquired_at": null,
+  "expires_at": null,
+  "heartbeat_at": null
 }
