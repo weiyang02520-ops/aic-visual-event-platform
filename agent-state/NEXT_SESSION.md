@@ -151,3 +151,19 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - Commit: `f2b9e7505c16d6a979bfe25d8cefcfb9722f8a7e`; PR [#5](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/5) targets `main` and is `OPEN` / `CLEAN`.
 - State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`.
 - Review the local-video source-to-fact evidence before any next task; Codex must not choose TASK-0005.
+
+
+## TASK-0005 checkpoint (2026-09-24)
+
+- Branch: `codex/task-0005-frontend-real-connection-state`; task hash verified; frontend connection evidence is recorded in the run/report files and frontend design docs.
+- Real source loading requires `/health` plus initial resources; switching clears old data and stale responses; offline actions do not call Mock.
+- `npm run build` passed; local AI service `npm run smoke:real` passed; source suite `371 passed`; curated `VERIFY_OK`.
+- No browser executable was present for click-through validation; direct unreachable API probe returned `fetch failed`.
+- State will return to `WAITING_FOR_MASTER`, `next_actor=chatgpt`; Codex must not choose TASK-0006.
+
+
+## TASK-0005 PR handoff (2026-09-24)
+
+- Commit: `08f0b7bf191d09ad8d22f51033e7d0e33a473363`; PR [#6](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/6) targets `main` and is `OPEN` / `CLEAN`.
+- State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`.
+- Review Real connection/offline behavior and the browser-validation limitation before any next task; Codex must not choose TASK-0006.

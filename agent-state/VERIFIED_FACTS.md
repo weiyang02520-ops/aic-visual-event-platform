@@ -554,3 +554,11 @@ Makerverse 与 livestream-rs 的静态仓库事实已在 Phase 0 以本目录内
 - File/URL: `workspace/docs/REAL_LOCAL_VIDEO_SMOKE_TASK-0004.md`; model and sample provenance are recorded in the TASK-0003 evidence document.
 - Limitation: The video is a controlled two-frame derivative of a static public image; this does not establish local-video generalization, pose accuracy, identity stability, temporal actions, scene events, camera privacy or robot behavior.
 - Confidence: high for this source-to-fact runtime path and observed metadata preservation; low for generalization and performance.
+
+
+### FACT-080
+- Claim: Frontend Real API mode now exposes truthful connection/failure semantics without stale Mock data or silent Mock fallback.
+- Evidence: `Repository.health()` is required for both implementations; App clears source-owned arrays before the health/resource `Promise.all`, ignores stale effect responses, sets explicit loading/online/offline/Mock state, guards Real-only actions, and labels Real media as unconnected until a Makerverse session resolves. Frontend build passed; local `npm run smoke:real` passed; AI suite returned 371 passed and curated verification returned VERIFY_OK / 371 passed.
+- File/URL: `workspace/frontend/src/types.ts`, `repository.ts`, `App.tsx`, `styles.css`, `workspace/docs/FRONTEND_SYSTEM_DESIGN.md`.
+- Limitation: Browser click-through was not run because no browser executable is available; media playback and Makerverse remain separate integration boundaries.
+- Confidence: high for the implemented state transitions and API contract path; browser rendering and live media behavior remain pending environment/deployment verification.

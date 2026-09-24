@@ -624,3 +624,14 @@
 - Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `371 passed`, 616 non-blocking warnings; contamination scan passed.
 - The project-local basetemp was removed after verification; video/model/image/venv/runtime artifacts remain ignored and untracked.
 - Evidence class: `REAL_RUNTIME_SMOKE`; no accuracy, scene-event, camera privacy or robot claim.
+
+
+## 2026-09-24 — TASK-0005 frontend Real connection state
+
+- Frontend `npm run build`: passed (`tsc -b` and Vite). Build `dist/` was removed afterward.
+- Local AI service used only the ignored project runtime DB; `npm run smoke:real` returned `health=ok`, 2 plugins, 0 events/objects/persons, `evidence=fixture`, `selectedDetector=motion_cpu`, 0 registry matches. Runtime DB was removed.
+- Direct fetch to the intentionally unused Real URL `http://127.0.0.1:8199/health` returned `fetch failed`; App source clears previous source arrays before loading and sets offline state on the same request path.
+- Full source command used an absolute project-local basetemp under `workspace\ai-engine`: `371 passed`, 1 non-blocking warning.
+- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `371 passed`, 616 non-blocking warnings; full verifier also passed and skipped frontend build because submission node_modules is absent.
+- Source/submission frontend and docs hashes match; no node_modules, dist, DB, secrets or local paths were tracked.
+- Browser click-through remains unverified because the worker has no browser executable.

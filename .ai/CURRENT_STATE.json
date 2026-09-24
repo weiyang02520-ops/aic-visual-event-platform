@@ -6,12 +6,12 @@
   "task_version": 1,
   "task_hash": "sha256:09cc8a1afcbf1a30ee0a3b2647433693ddd5786c9ff12ce78b7c9f25a1304f43",
   "iteration": 5,
-  "status": "READY_FOR_CODEX",
-  "last_actor": "chatgpt-master",
-  "next_actor": "codex",
-  "active_branch": null,
-  "active_pr": null,
-  "last_commit": "ba5b242de6f87b4d84c6af944c10cf3a718a21db",
+  "status": "WAITING_FOR_MASTER",
+  "last_actor": "codex",
+  "next_actor": "chatgpt",
+  "active_branch": "codex/task-0005-frontend-real-connection-state",
+  "active_pr": 6,
+  "last_commit": "08f0b7bf191d09ad8d22f51033e7d0e33a473363",
   "retry_count": 0,
   "review_round": 0,
   "consecutive_failures": 0,
@@ -20,5 +20,5 @@
   "lock_owner": null,
   "lock_token": null,
   "lock_expires_at": null,
-  "updated_at": "2026-09-24T13:35:00Z"
+  "updated_at": "2026-09-24T14:00:09Z"
 }

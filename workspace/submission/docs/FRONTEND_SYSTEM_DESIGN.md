@@ -6,7 +6,7 @@
 
 ## 2. Repository 抽象
 
-`Repository` 统一提供插件、事件、复核、分析任务、对象和人员 API。Mock repository 使用确定性内存数据；Real repository 使用 `VITE_AI_API_URL` 请求 FastAPI。分析任务在 Real 模式按 `job_id` 轮询终态后刷新事件，停止状态不会显示为完成。
+`Repository` 统一提供 health、插件、事件、复核、分析任务、对象和人员 API。Mock repository 使用确定性内存数据；Real repository 使用 `VITE_AI_API_URL` 请求 FastAPI。切换数据源时 App 先清空上一来源的数据，再并行请求 `/health` 和首屏资源；Real 请求失败进入 offline 状态并保留空列表，不回退到 Mock。分析任务在 Real 模式按 `job_id` 轮询终态后刷新事件，停止状态不会显示为完成。
 
 ## 3. Monitor 与媒体
 
@@ -24,7 +24,7 @@ Makerverse adapter 请求在线直播和 endpoint，归一化 PascalCase/lowerCa
 
 ## 6. 状态与错误
 
-所有 Real 请求都应有 loading、空列表、网络错误和降级文案。Mock 事件明确标注为演示/fixture。机器人区域当前为 adapter 占位，不把尚未提供的型号、控制协议或动作能力写入界面。
+所有 Real 请求都有 loading、空列表和 offline 错误状态。复核、插件启停、分析任务和登记操作在 offline/loading 时直接提示并停止，不会调用 Mock repository。Mock 事件明确标注为演示/fixture。机器人区域当前为 adapter 占位，不把尚未提供的型号、控制协议或动作能力写入界面。
 
 ## 7. 构建与验收
 

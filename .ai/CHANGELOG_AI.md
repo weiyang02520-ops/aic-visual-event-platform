@@ -143,3 +143,19 @@ PLANNING → READY_FOR_CODEX
 actor: chatgpt-master
 task_hash: sha256:09cc8a1afcbf1a30ee0a3b2647433693ddd5786c9ff12ce78b7c9f25a1304f43
 notes: Start M2 by making frontend Real API connection state truthful and clearing stale Mock data on failure.
+
+
+2026-09-24T13:56:15Z
+TASK-0005
+CODEX_RUNNING -> CODEX_VALIDATING
+actor: codex-luna
+notes: Added truthful frontend Real API connection state, source-switch clearing/stale-response protection, guarded Real actions and truthful media status; npm build and real API smoke passed; AI suite 371 passed and curated VERIFY_OK.
+
+
+2026-09-24T14:00:09Z
+TASK-0005
+CODEX_VALIDATING -> WAITING_FOR_MASTER
+actor: codex-luna
+commit: 08f0b7bf191d09ad8d22f51033e7d0e33a473363
+pr: https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/6
+notes: Truthful frontend Real API connection state complete; npm build and real API smoke passed; source suite 371 passed; curated VERIFY_OK; PR is OPEN/CLEAN; lock released and next_actor set to chatgpt. Browser click-through remains pending because no browser executable is available.
