@@ -96,3 +96,10 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - PR: [#2](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/2)
 - State: `WAITING_FOR_MASTER`; lock released; next actor is `chatgpt-master`.
 - Do not start another task or merge this PR from Codex.
+
+## TASK-0001 R1 PR handoff (2026-09-24)
+
+- R1 fix commit: `e5f6180`; PR [#2](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/2) remains open against `main`.
+- Master blocker fixed: registry-created Ultralytics provider reads `AI_ULTRALYTICS_MODEL_PATH` and exposes selection/status offline.
+- Verification: source/curated `369 passed`, `VERIFY_OK`; real runtime remains unverified.
+- State is `WAITING_FOR_MASTER`, lock is released, and Codex must not choose TASK-0002.

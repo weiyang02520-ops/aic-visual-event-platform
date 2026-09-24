@@ -57,10 +57,11 @@ R1 fix wired `AI_ULTRALYTICS_MODEL_PATH` into the registry-created provider and 
 
 ## Master decision needed
 
-Review the offline adapter contract and PR. If accepted, Master may merge and issue a follow-up task for an authorized model/runtime smoke test. Do not treat this PR as real-model accuracy evidence.
+R1 blocker is fixed: registry-created providers now read `AI_ULTRALYTICS_MODEL_PATH`, with offline selection/status regression coverage. Review the offline adapter contract and PR. If accepted, Master may merge and issue a follow-up task for an authorized model/runtime smoke test. Do not treat this PR as real-model accuracy evidence.
 
 ## Commit / PR
 
-- Commit: `d819e5a44fd8854e58e8a26d25adb04632f3751a`
+- Implementation commit: `d819e5a44fd8854e58e8a26d25adb04632f3751a`
+- R1 fix commit: `e5f6180` (`fix(ai): wire ultralytics model path from environment`)
 - PR: [#2](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/2) targeting `main`
 - PR state at handoff: `OPEN`, merge state `CLEAN`

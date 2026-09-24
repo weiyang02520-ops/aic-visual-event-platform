@@ -2,7 +2,7 @@
   "run_id": "codex-task-0001-20260924T110609Z",
   "actor": "codex-luna",
   "task_id": "TASK-0001",
-  "status": "RUNNING",
-  "stage": "r1-fix-env-wiring",
-  "last_heartbeat": "2026-09-24T11:42:04Z"
+  "status": "IDLE",
+  "stage": "waiting-for-master",
+  "last_heartbeat": "2026-09-24T11:43:29Z"
 }

@@ -470,3 +470,9 @@
 - Fixed provider environment-path wiring and added offline registry selection/status regression.
 - R1 targeted tests: `10 passed`; source full suite: `369 passed`; curated VERIFY: `VERIFY_OK`, `369 passed`.
 - Real model remains unverified; no weights/downloads. PR #2 remains open for Master review.
+
+## 2026-09-24 — TASK-0001 R1 PR handoff
+
+- R1 fix commit `e5f6180` pushed to the existing task branch and PR #2.
+- Registry now wires the documented `AI_ULTRALYTICS_MODEL_PATH`; offline regression and full verification pass (`369 passed`, `VERIFY_OK`).
+- State returned to `WAITING_FOR_MASTER`, `next_actor=chatgpt`, lock released. No TASK-0002 selected.
