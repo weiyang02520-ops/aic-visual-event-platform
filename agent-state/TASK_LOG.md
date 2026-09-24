@@ -462,3 +462,11 @@
 - Commit `d819e5a44fd8854e58e8a26d25adb04632f3751a` pushed on `codex/task-0001-real-vision-provider`.
 - Opened [PR #2](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/2) targeting `main`; GitHub reports `OPEN` and merge state `CLEAN`.
 - Updated `.ai/CODEX_REPORT.md`, run record, state and heartbeat; released the task lock and handed control to Master.
+
+
+## 2026-09-24 — TASK-0001 R1 fix
+
+- Read Master review R1 from the latest remote branch: documented `AI_ULTRALYTICS_MODEL_PATH` was not wired into registry-created providers.
+- Fixed provider environment-path wiring and added offline registry selection/status regression.
+- R1 targeted tests: `10 passed`; source full suite: `369 passed`; curated VERIFY: `VERIFY_OK`, `369 passed`.
+- Real model remains unverified; no weights/downloads. PR #2 remains open for Master review.

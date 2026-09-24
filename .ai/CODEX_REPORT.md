@@ -6,7 +6,7 @@
 
 Implemented an optional Ultralytics-compatible person/pose provider adapter without changing downstream tracking, relation, keypoint-action, temporal-reasoner, plugin, event, storage or frontend semantics.
 
-The environment has no `ultralytics` package and no `AI_ULTRALYTICS_MODEL_PATH`; no model was downloaded and no real-runtime smoke was claimed. Fake-result and local frame/fact integration tests pass.
+R1 fix wired `AI_ULTRALYTICS_MODEL_PATH` into the registry-created provider and added a regression proving env-path selection/status. The environment has no `ultralytics` package and no `AI_ULTRALYTICS_MODEL_PATH`; no model was downloaded and no real-runtime smoke was claimed. Fake-result and local frame/fact integration tests pass.
 
 ## Task identity
 
@@ -42,9 +42,9 @@ The environment has no `ultralytics` package and no `AI_ULTRALYTICS_MODEL_PATH`;
 
 ## Tests and evidence
 
-- Targeted provider/API/fact tests: `35 passed`.
-- Full source suite: `368 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette deprecation warnings.
-- Curated verifier: `VERIFY_OK`, `368 passed`.
+- Targeted provider/API/fact tests: `36 passed`.
+- Full source suite: `369 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette deprecation warnings.
+- Curated verifier: `VERIFY_OK`, `369 passed`.
 - Real runtime smoke: **not run**; package and model path are absent.
 - Model weights: none added.
 - Privacy/source/timestamp/continuity boundaries: existing tests remain green.

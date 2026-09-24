@@ -522,3 +522,11 @@ Makerverse 与 livestream-rs 的静态仓库事实已在 Phase 0 以本目录内
 - File/URL: `workspace/ai-engine/src/visual_event_ai/ultralytics_provider.py`, `model_providers.py`, `tests/test_ultralytics_provider.py`, `tests/test_model_providers.py`, `tests/test_fact_pipeline.py`, `workspace/docs/MODEL_PROVIDER_CONTRACT.md`.
 - Limitation: `ultralytics` is not installed, no model weights are present, and no real inference/accuracy/latency evidence exists.
 - Confidence: high for offline adapter normalization and integration contracts; unverified for any concrete model runtime.
+
+
+### FACT-076
+- Claim: The documented Ultralytics model path is now wired through `DetectorProviderRegistry` and can select the optional provider when dependency/model availability is simulated.
+- Evidence: `test_ultralytics_registry_wires_env_model_path_and_selects_provider` sets `AI_DETECTOR_PROVIDER=ultralytics`, `AI_ULTRALYTICS_MODEL_PATH` to a temporary placeholder and stubs package discovery; registry selection/status reports `ultralytics` available and selected with the configured path. R1 targeted tests returned `10 passed`; source and curated suites returned `369 passed` / `VERIFY_OK`.
+- File/URL: `workspace/ai-engine/src/visual_event_ai/ultralytics_provider.py`, `model_providers.py`, `tests/test_model_providers.py`, corresponding submission files.
+- Limitation: The test does not load a real model or measure inference; dependency, weights, accuracy and latency remain unverified.
+- Confidence: high for environment-to-registry wiring and offline status behavior; low for real model runtime until authorized weights/runtime exist.

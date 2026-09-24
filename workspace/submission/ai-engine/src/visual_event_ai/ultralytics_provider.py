@@ -116,7 +116,8 @@ class UltralyticsProvider:
         person_class_ids: tuple[int, ...] = (0,),
         keypoint_indices: Mapping[str, int] | None = None,
     ) -> None:
-        self.model_path = Path(model_path) if model_path else None
+        configured_path = model_path or os.getenv("AI_ULTRALYTICS_MODEL_PATH")
+        self.model_path = Path(configured_path) if configured_path else None
         self._model = model
         self._model_loader = model_loader
         self._load_error: str | None = None

@@ -6,8 +6,8 @@
   "task_version": 1,
   "task_hash": "sha256:8521f4af6a1617f75ab85a0cd22dfe181775be6a6e6e1980152243a061273b40",
   "iteration": 1,
-  "status": "CHANGES_REQUIRED",
-  "last_actor": "chatgpt-master",
+  "status": "CODEX_RUNNING",
+  "last_actor": "codex",
   "next_actor": "codex",
   "active_branch": "codex/task-0001-real-vision-provider",
   "active_pr": 2,
@@ -17,8 +17,8 @@
   "consecutive_failures": 0,
   "human_required": false,
   "blocked_reason": "R1: AI_ULTRALYTICS_MODEL_PATH is documented but not wired into the registry-created UltralyticsProvider; add env-path wiring and regression coverage.",
-  "lock_owner": null,
-  "lock_token": null,
-  "lock_expires_at": null,
-  "updated_at": "2026-09-24T11:25:00Z"
+  "lock_owner": "codex-luna",
+  "lock_token": "80be3fc8-547c-4036-9a62-9883f9ec2f61",
+  "lock_expires_at": "2026-09-24T12:12:04Z",
+  "updated_at": "2026-09-24T11:42:04Z"
 }
