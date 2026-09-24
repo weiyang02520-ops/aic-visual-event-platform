@@ -1,0 +1,7 @@
+\section{系统总体架构}
+
+系统由 livestream-rs/Makerverse、独立 AI 服务、证据存储和 React 前端组成。直播服务负责媒体，AI 服务负责帧和事件，前端负责展示与人工复核。机器人通过可替换 adapter 接入，当前不假设具体硬件。
+
+\begin{equation}
+\text{Frame} \rightarrow \text{Observation} \rightarrow \text{Fact} \rightarrow \text{Event} \rightarrow \text{Evidence}
+\end{equation}

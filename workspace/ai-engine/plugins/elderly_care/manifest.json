@@ -1,0 +1,8 @@
+{
+  "plugin_id": "elderly_care",
+  "name": "智慧养老辅助判断",
+  "version": "0.1.0",
+  "description": "Combines medication-box and hand-to-face facts into a reviewable suspected medication event.",
+  "entrypoint": "plugin.py",
+  "enabled_by_default": true
+}

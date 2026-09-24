@@ -1,0 +1,72 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*credentials*
+*credential*
+*secret*
+*token*
+
+# Python environments and generated files
+venv/
+.venv/
+**/__pycache__/
+*.py[cod]
+**/.pytest_cache/
+coverage/
+htmlcov/
+*.coverage
+*.log
+
+# Runtime state, local databases and uploads
+**/runtime/
+**/uploads/
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite3-journal
+
+# Frontend dependencies and build output
+**/node_modules/
+**/dist/
+**/build/
+**/.vite/
+*.local
+
+# Model downloads and large weights
+*.onnx
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+**/models/
+**/checkpoints/
+**/model-cache/
+
+# Local IDE and operating-system files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Local third-party source snapshots are integration references, not part of
+# this AI development repository.
+workspace/source-snapshots/
+
+# Rollback copies are local recovery material, not the current project state.
+agent-state/rollback/
+
+# Unpublished competition attachments and reference works stay local by default.
+算法精英/
+*.pdf
+
+# Local handoff prompts and delivery-index notes contain machine-specific paths;
+# the durable, sanitized state is kept under agent-state/ instead.
+/Codex_*
+/项目交付索引.md

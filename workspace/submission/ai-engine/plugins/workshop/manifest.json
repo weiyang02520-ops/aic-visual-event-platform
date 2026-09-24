@@ -1,0 +1,8 @@
+{
+  "plugin_id": "workshop",
+  "name": "工作室物品管理",
+  "version": "0.1.0",
+  "description": "Uses time-ordered removal, same-zone return, and observed-timeout facts to create reviewable workshop events.",
+  "entrypoint": "plugin.py",
+  "enabled_by_default": true
+}
