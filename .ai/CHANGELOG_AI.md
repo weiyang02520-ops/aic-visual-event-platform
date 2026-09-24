@@ -63,3 +63,19 @@ actor: codex-luna
 commit: fe12552
 pr: https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/3
 notes: OpenCV BGR+gray bridge complete; source suite 371 passed; curated VERIFY_OK; lock released.
+
+
+2026-09-24T12:35:00Z
+TASK-0002
+MASTER_REVIEWING → PASS
+actor: chatgpt-master
+pr: #3
+merge_commit: fdfb0afca7ed8f31dcd982ab5adbdfd3b516f33d
+notes: Local BGR+gray video bridge and privacy regressions accepted; real model runtime remains unverified.
+
+2026-09-24T12:35:00Z
+TASK-0003
+PLANNING → READY_FOR_CODEX
+actor: chatgpt-master
+task_hash: sha256:921598f99bbb8e5d7f70f5b60007b93d5c4009c40d6f433c02f6feab16f1b515
+notes: Authorized real Ultralytics pose runtime smoke using official public lightweight model/sample in ignored runtime paths.
