@@ -4,7 +4,7 @@
 Status: COMPLETE after bootstrap merge. Preserve baseline, initialize .ai, freeze acceptance, issue TASK-0001.
 
 ## M1 — Real Vision Path
-Status: ACTIVE. Add genuine optional visual-model provider path while preserving fixture/CPU fallback and evidence honesty.
+Status: ACTIVE. TASK-0001 merged the optional Ultralytics pose adapter. TASK-0002 now connects model-ready BGR pixels from local OpenCV video while preserving the CPU gray path and privacy boundaries.
 
 ## M2 — Frontend Quality + AI Integration
 Polish core pages, complete Mock story, connect Real AI adapter, validate plugin/review UX.
