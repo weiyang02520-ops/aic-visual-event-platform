@@ -1,0 +1,8 @@
+{
+  "run_id": null,
+  "actor": null,
+  "task_id": "TASK-0001",
+  "status": "IDLE",
+  "stage": "awaiting-codex",
+  "last_heartbeat": null
+}
