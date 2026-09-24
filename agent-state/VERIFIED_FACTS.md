@@ -546,3 +546,11 @@ Makerverse 与 livestream-rs 的静态仓库事实已在 Phase 0 以本目录内
 - File/URL: `workspace/docs/REAL_RUNTIME_SMOKE_TASK-0003.md`; official model/sample URLs are recorded there.
 - Limitation: One public sample is a smoke only; it does not establish accuracy, identity continuity, occlusion handling, temporal action quality, privacy-source processing, camera validation or robot behavior.
 - Confidence: high for the package/model/provider call and normalized output observed in this run; low for generalization and performance.
+
+
+### FACT-079
+- Claim: The real local-video path reaches person facts through OpenCV, the real Ultralytics provider, tracking and frame-to-fact normalization.
+- Evidence: A two-frame ignored AVI generated from official `bus.jpg` was decoded by `OpenCVFrameProvider`; `DetectorProviderRegistry` selected the real `UltralyticsProvider`; `FrameFactExtractor` returned 8 person `object_detected` facts with tracker IDs, nose/left_wrist/right_wrist keypoints, source ID `runtime/samples/task-0004-bus.avi` and timezone-aware timestamps. Source suite returned 371 passed and curated verification returned VERIFY_OK / 371 passed.
+- File/URL: `workspace/docs/REAL_LOCAL_VIDEO_SMOKE_TASK-0004.md`; model and sample provenance are recorded in the TASK-0003 evidence document.
+- Limitation: The video is a controlled two-frame derivative of a static public image; this does not establish local-video generalization, pose accuracy, identity stability, temporal actions, scene events, camera privacy or robot behavior.
+- Confidence: high for this source-to-fact runtime path and observed metadata preservation; low for generalization and performance.

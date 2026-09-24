@@ -135,3 +135,19 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - Commit: `23396f639322e1d37cd77ef822b42aa4a9356a52`; PR [#4](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/4) targets `main` and is `OPEN` / `CLEAN`.
 - State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`.
 - Review the runtime evidence before any next task; Codex must not choose TASK-0004.
+
+
+## TASK-0004 checkpoint (2026-09-24)
+
+- Branch: `codex/task-0004-real-local-video-pose-smoke`; task hash verified; evidence is in `workspace/docs/REAL_LOCAL_VIDEO_SMOKE_TASK-0004.md`.
+- Real two-frame local AVI → OpenCV BGR → real Ultralytics → tracker/normalization → `object_detected` facts succeeded: 2 decoded frames and 8 person facts.
+- All person facts preserved provider keypoints, source ID and timezone-aware UTC timestamps; no raw pixel keys were present in fact metadata.
+- Source and curated suites: `371 passed`; curated `VERIFY_OK`; project-local basetemp cleaned.
+- State will return to `WAITING_FOR_MASTER`, `next_actor=chatgpt`; Codex must not choose TASK-0005.
+
+
+## TASK-0004 PR handoff (2026-09-24)
+
+- Commit: `f2b9e7505c16d6a979bfe25d8cefcfb9722f8a7e`; PR [#5](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/5) targets `main` and is `OPEN` / `CLEAN`.
+- State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`.
+- Review the local-video source-to-fact evidence before any next task; Codex must not choose TASK-0005.

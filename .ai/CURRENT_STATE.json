@@ -6,12 +6,12 @@
   "task_version": 1,
   "task_hash": "sha256:858e7e5b3cf7e6f4d2fec336a7a40f7177c281d1a269d1987e38b401f8a86dfd",
   "iteration": 4,
-  "status": "READY_FOR_CODEX",
-  "last_actor": "chatgpt-master",
-  "next_actor": "codex",
-  "active_branch": null,
-  "active_pr": null,
-  "last_commit": "7dfcdc12f9665e6803ffac347243eeb16ec69a4e",
+  "status": "WAITING_FOR_MASTER",
+  "last_actor": "codex",
+  "next_actor": "chatgpt",
+  "active_branch": "codex/task-0004-real-local-video-pose-smoke",
+  "active_pr": 5,
+  "last_commit": "f2b9e7505c16d6a979bfe25d8cefcfb9722f8a7e",
   "retry_count": 0,
   "review_round": 0,
   "consecutive_failures": 0,
@@ -20,5 +20,5 @@
   "lock_owner": null,
   "lock_token": null,
   "lock_expires_at": null,
-  "updated_at": "2026-09-24T13:12:00Z"
+  "updated_at": "2026-09-24T13:22:27Z"
 }

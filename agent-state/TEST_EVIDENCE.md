@@ -611,3 +611,16 @@
 - Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `371 passed`, 616 non-blocking warnings; contamination scan passed.
 - The project-local basetemp was removed after verification. Model weights/sample media/venv/runtime caches remain ignored and untracked.
 - This does not establish accuracy, real-video metrics, privacy-source processing, production deployment or robot evidence.
+
+
+## 2026-09-24 — TASK-0004 real local-video source-to-fact smoke
+
+- Input: ignored project-local two-frame `runtime/samples/task-0004-bus.avi`, generated from official public `bus.jpg` solely to exercise OpenCV.
+- `FramePipeline` decoded 2 frames through `OpenCVFrameProvider`, and BGR payloads reached the registry-selected real `UltralyticsProvider`.
+- `FrameFactExtractor` produced 8 person `object_detected` facts with tracker IDs 1–4 on each frame; every fact retained nose, left_wrist and right_wrist keypoints.
+- Source ID remained `runtime/samples/task-0004-bus.avi`; all timestamps were timezone-aware UTC; fact metadata had no raw pixel keys.
+- Runtime identity: Python 3.12.10, `ultralytics 8.4.161`, `torch 2.14.0+cpu`, OpenCV 5.0.0, CPU. Decode and full-path timings were about 0.078 s and 3.074 s, explicitly non-benchmark.
+- Full source command used an absolute project-local basetemp under `workspace\ai-engine`: `371 passed`, 1 non-blocking warning.
+- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `371 passed`, 616 non-blocking warnings; contamination scan passed.
+- The project-local basetemp was removed after verification; video/model/image/venv/runtime artifacts remain ignored and untracked.
+- Evidence class: `REAL_RUNTIME_SMOKE`; no accuracy, scene-event, camera privacy or robot claim.
