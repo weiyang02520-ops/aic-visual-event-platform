@@ -1,8 +1,8 @@
 {
-  "task_id": null,
-  "task_version": null,
-  "task_hash": null,
-  "commit": "4f1403e646a4f8897c4ba42bf9e02c6295484207",
-  "note": "Pre-automation checkpoint; AI baseline reported 363 passed / VERIFY_OK.",
-  "recorded_at": "2026-09-24T10:45:00Z"
+  "task_id": "TASK-0001",
+  "task_version": 1,
+  "task_hash": "sha256:8521f4af6a1617f75ab85a0cd22dfe181775be6a6e1980152243a061273b40",
+  "commit": "29b78c8b85aff188884d9564165c80248011c375",
+  "note": "TASK-0001 accepted by Master R2: optional Ultralytics pose adapter + env-path wiring; 369 passed / VERIFY_OK recorded; real model runtime unverified.",
+  "recorded_at": "2026-09-24T11:55:00Z"
 }
