@@ -1,8 +1,8 @@
 {
-  "task_id": "TASK-0002",
+  "task_id": "TASK-0003",
   "task_version": 1,
-  "task_hash": "sha256:72199024e2a6fe1fbac8a5e70be6572c08784455cf138c30dc0278c277f36f01",
-  "commit": "fdfb0afca7ed8f31dcd982ab5adbdfd3b516f33d",
-  "note": "TASK-0002 accepted: OpenCV BGR+gray local video bridge; 371 passed / VERIFY_OK recorded; fake provider integration and pixel privacy regression passed.",
-  "recorded_at": "2026-09-24T12:35:00Z"
+  "task_hash": "sha256:921598f99bbb8e5d7f70f5b60007b93d5c4009c40d6f433c02f6feab16f1b515",
+  "commit": "7dfcdc12f9665e6803ffac347243eeb16ec69a4e",
+  "note": "TASK-0003 accepted: real Ultralytics CPU runtime smoke via project provider; official yolo11n-pose.pt + bus.jpg; 4 person detections with required keypoints; 371 passed / VERIFY_OK.",
+  "recorded_at": "2026-09-24T13:12:00Z"
 }
