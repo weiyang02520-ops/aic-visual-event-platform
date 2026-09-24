@@ -514,3 +514,11 @@ Makerverse 与 livestream-rs 的静态仓库事实已在 Phase 0 以本目录内
 - Verification: staged content scan found no tracked non-example `.env`, credential pattern, private key, model weight or >10 MB tracked file; the AI verifier returned `VERIFY_OK` / `363 passed`.
 - Limitation: GitHub access is private to the authenticated account/team; repository contents do not prove real model, camera, sensor or robot performance.
 - Confidence: high for repository initialization, staged-file exclusions and remote branch identity.
+
+
+### FACT-075
+- Claim: TASK-0001 adds an optional real-model provider path without changing downstream scene semantics.
+- Evidence: `UltralyticsProvider` normalizes fake Ultralytics-style results to person `Detection` objects with bbox/confidence and COCO17 nose/wrist keypoints; frame-to-fact integration preserves source metadata and keypoints. Malformed boxes fail closed, missing package/model reports unavailable, and the provider appears in registry/API statuses. Source suite returned `368 passed`; curated verification returned `VERIFY_OK` / `368 passed`.
+- File/URL: `workspace/ai-engine/src/visual_event_ai/ultralytics_provider.py`, `model_providers.py`, `tests/test_ultralytics_provider.py`, `tests/test_model_providers.py`, `tests/test_fact_pipeline.py`, `workspace/docs/MODEL_PROVIDER_CONTRACT.md`.
+- Limitation: `ultralytics` is not installed, no model weights are present, and no real inference/accuracy/latency evidence exists.
+- Confidence: high for offline adapter normalization and integration contracts; unverified for any concrete model runtime.

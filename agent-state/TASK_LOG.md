@@ -446,3 +446,13 @@
 - Preserved `agent-state/`; added `.ai/` as the task/state/lock/heartbeat/review control plane.
 - First bounded target: real visual person/pose provider adapter because the current baseline explicitly lacks real pose inference.
 - Bootstrap is control/documentation only and does not itself claim new model capability.
+
+
+## 2026-09-24 — TASK-0001 optional real vision provider
+
+- Claimed `TASK-0001` from the latest `main` state after verifying status `READY_FOR_CODEX`, task version/hash and an empty lock. Created branch `codex/task-0001-real-vision-provider`.
+- Added optional `ultralytics` extra and `UltralyticsProvider`; kept model loading lazy and unavailable when dependency/model is absent.
+- Added deterministic fake-result normalization, malformed-output, unavailable-runtime, API registry and frame/fact integration tests.
+- Source full suite: `368 passed`; curated verifier: `VERIFY_OK`, `368 passed`.
+- Real runtime smoke was not performed because the optional package and model path are absent; no weights were downloaded.
+- Pending: commit, push, PR and Master review. Do not select TASK-0002.

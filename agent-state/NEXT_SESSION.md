@@ -80,3 +80,11 @@ Continue the AI recognition algorithm audit and locally verifiable implementatio
 
 ## Automation handoff update (2026-09-24)
 Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state is READY_FOR_CODEX and next_actor is codex, execute only the named Task Packet. Adapter tests are not accuracy evidence.
+
+
+## TASK-0001 handoff checkpoint (2026-09-24)
+
+- Active branch: `codex/task-0001-real-vision-provider`.
+- Optional `ultralytics` provider adapter is implemented and tested offline; source/curated suites are `368 passed` / `VERIFY_OK`.
+- Real runtime smoke is unverified because `ultralytics` and model weights are absent.
+- Read `.ai/CODEX_REPORT.md`, the Task-0001 run record and PR before Master review. Do not start TASK-0002 or merge on your own.

@@ -71,7 +71,7 @@ def test_api_health_plugins_and_job(monkeypatch, tmp_path):
     assert evidence.json()["status"] == "fixture"
 
     providers = client.get("/api/v1/providers/detectors").json()
-    assert {item["provider_id"] for item in providers} == {"motion_cpu", "fixture", "onnx"}
+    assert {item["provider_id"] for item in providers} == {"motion_cpu", "fixture", "onnx", "ultralytics"}
     assert any(item["provider_id"] == "motion_cpu" and item["selected"] for item in providers)
 
 

@@ -537,3 +537,13 @@ Phase 0–3 已完成可验证骨架；当前环境缺少 Cargo、FFmpeg 和 .NE
 - [x] Source full suite returned `363 passed` with `616` non-blocking Python 3.14 FastAPI/Starlette deprecation warnings; curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild` returned `VERIFY_OK` / `363 passed`.
 - [x] Synchronized quality source/tests/docs and the curated AI submission.
 - Evidence is software-level quality metadata and fixture behavior; no real audio/thermal/event-camera timing, sensor calibration, channel ablation or hardware evidence is claimed.
+
+
+## TASK-0001 checkpoint — optional Ultralytics person/pose provider (2026-09-24)
+
+- [x] Added optional `ultralytics` provider adapter with truthful dependency/model availability and explicit fallback behavior.
+- [x] Normalized person bbox/confidence and optional COCO17 `nose`, `left_wrist`, `right_wrist` keypoints into the existing Detection/Observation/PrimitiveFact path.
+- [x] Added deterministic fake-result tests, malformed-output fail-closed tests, unavailable-runtime tests and a frame-to-fact integration test.
+- [x] Existing provider, API, relation, temporal, privacy and quality tests remain green; source suite returned `368 passed`, curated verifier returned `VERIFY_OK` / `368 passed`.
+- [x] No model package or weights were installed/downloaded; real runtime, accuracy and latency remain explicitly unverified.
+- [ ] Master review and PR merge remain pending; Codex must not choose TASK-0002.
