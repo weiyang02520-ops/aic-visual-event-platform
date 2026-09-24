@@ -95,3 +95,19 @@ actor: codex-luna
 commit: 23396f639322e1d37cd77ef822b42aa4a9356a52
 pr: https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/4
 notes: Real Ultralytics pose smoke recorded; source suite 371 passed; curated VERIFY_OK; PR is OPEN/CLEAN; lock released and next_actor set to chatgpt.
+
+
+2026-09-24T13:12:00Z
+TASK-0003
+MASTER_REVIEWING → PASS
+actor: chatgpt-master
+pr: #4
+merge_commit: 7dfcdc12f9665e6803ffac347243eeb16ec69a4e
+notes: Real Ultralytics CPU runtime smoke accepted; official model/sample used through project provider; evidence remains non-benchmark.
+
+2026-09-24T13:12:00Z
+TASK-0004
+PLANNING → READY_FOR_CODEX
+actor: chatgpt-master
+task_hash: sha256:858e7e5b3cf7e6f4d2fec336a7a40f7177c281d1a269d1987e38b401f8a86dfd
+notes: Real local-video → OpenCV → real Ultralytics → fact smoke.
