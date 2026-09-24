@@ -67,3 +67,12 @@ Continue the AI recognition algorithm audit and locally verifiable implementatio
 ## Next AI-only action
 
 - Resume only when a new concrete P0–P3 code issue or authorized AI sample appears. Preserve fixture/CPU versus real evidence labels and do not add hardware work.
+
+## GitHub repository handoff (2026-09-24)
+
+- Development repository: `https://github.com/weiyang02520-ops/aic-visual-event-platform`
+- Visibility: Private; default branch: `main`.
+- Initial checkpoint commit: `9481004b94e983faa2dd8780c021b6fa6c0806a8`.
+- The repository keeps the existing `workspace/` layout plus root `agent-state/`; current AI source, tests, docs and submission package are available for Codex/ChatGPT/human review.
+- Original competition attachments, third-party snapshots, rollback copies, runtime/cache/dependency/build output, model weights and secrets were not pushed.
+- AI feature work is paused. On the next session, first read this file, `MASTER_STATUS.md`, the root `README.md`, and the GitHub remote status; wait for user direction before coding.

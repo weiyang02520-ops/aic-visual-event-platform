@@ -505,3 +505,12 @@ Makerverse 与 livestream-rs 的静态仓库事实已在 Phase 0 以本目录内
 - File/URL: `workspace/ai-engine/src/visual_event_ai/quality.py`, `workspace/ai-engine/src/visual_event_ai/fact_pipeline.py`, `workspace/ai-engine/tests/test_quality.py`, `workspace/ai-engine/tests/test_fact_pipeline.py`, `workspace/docs/AI_ALGORITHM_ANALYSIS_PLAN.md`, `workspace/docs/AI_ALGORITHM_DESIGN.md`.
 - Limitation: No physical audio/thermal/event-camera stream, clock synchronization, channel calibration or ablation is present; scores are provider-supplied metadata and are not sensor measurements.
 - Confidence: high for the software contract and fixture fail-closed behavior; external multimodal performance remains unverified.
+
+### FACT-074
+- Claim: The existing AIC project was initialized and pushed as a private GitHub development repository without replacing the existing project contents.
+- Evidence: `gh repo view` reports `weiyang02520-ops/aic-visual-event-platform`, `PRIVATE`, default branch `main`; `git ls-remote --heads origin main` reports `9481004b94e983faa2dd8780c021b6fa6c0806a8`, matching local `main`. The initial commit message is `chore: initialize AIC visual event AI development repository`.
+- Included paths: root `README.md`, `workspace/ai-engine`, `workspace/frontend` source, `workspace/docs`, `workspace/submission` and current `agent-state` Markdown.
+- Excluded paths: unpublished root PDF/DOCX material, `workspace/source-snapshots`, `agent-state/rollback`, runtime/cache/build/dependency directories, model weights and secret-bearing files according to the root `.gitignore` and staged-file audit.
+- Verification: staged content scan found no tracked non-example `.env`, credential pattern, private key, model weight or >10 MB tracked file; the AI verifier returned `VERIFY_OK` / `363 passed`.
+- Limitation: GitHub access is private to the authenticated account/team; repository contents do not prove real model, camera, sensor or robot performance.
+- Confidence: high for repository initialization, staged-file exclusions and remote branch identity.
