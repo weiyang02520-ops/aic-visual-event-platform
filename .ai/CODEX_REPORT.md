@@ -57,4 +57,6 @@ Review the real local-video source-to-fact evidence and PR. If accepted, Master 
 ## Commit / PR
 
 - Claim commit: `de6650e`
-- Feature commit and PR: pending handoff after final state update
+- Feature commit: `f2b9e75` (`feat(ai): record local video pose fact smoke`)
+- PR: [#5](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/5) targeting `main`
+- PR state at handoff: `OPEN`, merge state `CLEAN`; state returned to `WAITING_FOR_MASTER` and lock released

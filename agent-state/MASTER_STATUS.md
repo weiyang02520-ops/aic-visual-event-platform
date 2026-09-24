@@ -82,3 +82,10 @@ Latest AI verification (2026-09-24): source and curated submission suites return
 - Source suite returned `371 passed`; curated verifier returned `VERIFY_OK` / `371 passed`.
 - Evidence class is `REAL_RUNTIME_SMOKE`; accuracy, scene-event, camera privacy and robot evidence remain open.
 - Codex is preparing the PR handoff; no next task was selected.
+
+
+## TASK-0004 PR handoff (2026-09-24)
+
+- Feature commit `f2b9e7505c16d6a979bfe25d8cefcfb9722f8a7e` pushed on `codex/task-0004-real-local-video-pose-smoke`; PR [#5](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/5) is `OPEN` / `CLEAN` against `main`.
+- State is `WAITING_FOR_MASTER`, lock released, and `next_actor=chatgpt`.
+- No next task was selected by Codex.

@@ -144,3 +144,10 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - All person facts preserved provider keypoints, source ID and timezone-aware UTC timestamps; no raw pixel keys were present in fact metadata.
 - Source and curated suites: `371 passed`; curated `VERIFY_OK`; project-local basetemp cleaned.
 - State will return to `WAITING_FOR_MASTER`, `next_actor=chatgpt`; Codex must not choose TASK-0005.
+
+
+## TASK-0004 PR handoff (2026-09-24)
+
+- Commit: `f2b9e7505c16d6a979bfe25d8cefcfb9722f8a7e`; PR [#5](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/5) targets `main` and is `OPEN` / `CLEAN`.
+- State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`.
+- Review the local-video source-to-fact evidence before any next task; Codex must not choose TASK-0005.
