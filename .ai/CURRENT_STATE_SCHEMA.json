@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "project_id",
+    "phase",
+    "task_id",
+    "task_version",
+    "task_hash",
+    "iteration",
+    "status",
+    "last_actor",
+    "next_actor",
+    "retry_count",
+    "review_round",
+    "consecutive_failures",
+    "human_required",
+    "updated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "phase": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "task_version": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "task_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "iteration": {
+      "type": "integer"
+    },
+    "status": {
+      "enum": [
+        "PLANNING",
+        "READY_FOR_CODEX",
+        "CODEX_CLAIMING",
+        "CODEX_RUNNING",
+        "CODEX_VALIDATING",
+        "WAITING_FOR_MASTER",
+        "MASTER_REVIEWING",
+        "CHANGES_REQUIRED",
+        "BLOCKED",
+        "HUMAN_REQUIRED",
+        "DONE"
+      ]
+    },
+    "last_actor": {
+      "enum": [
+        "chatgpt-master",
+        "codex",
+        "human",
+        "system"
+      ]
+    },
+    "next_actor": {
+      "enum": [
+        "chatgpt",
+        "codex",
+        "human",
+        "none"
+      ]
+    },
+    "active_branch": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "active_pr": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "last_commit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "retry_count": {
+      "type": "integer"
+    },
+    "review_round": {
+      "type": "integer"
+    },
+    "consecutive_failures": {
+      "type": "integer"
+    },
+    "human_required": {
+      "type": "boolean"
+    },
+    "blocked_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "lock_owner": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "lock_token": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "lock_expires_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "updated_at": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
