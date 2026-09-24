@@ -55,4 +55,6 @@ Review the runtime evidence and PR. If accepted, Master may decide the next task
 ## Commit / PR
 
 - Claim commit: `0cf5c10`
-- Feature commit and PR: pending handoff after final state update
+- Feature commit: `23396f6` (`feat(ai): record real ultralytics pose smoke`)
+- PR: [#4](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/4) targeting `main`
+- PR state at handoff: `OPEN`, merge state `CLEAN`; state returned to `WAITING_FOR_MASTER` and lock released

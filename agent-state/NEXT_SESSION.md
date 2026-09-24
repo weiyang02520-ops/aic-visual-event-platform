@@ -128,3 +128,10 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - Source and curated suites: `371 passed`; curated `VERIFY_OK`.
 - Weights, sample, venv and runtime caches are ignored and absent from the Git change.
 - State returns to `WAITING_FOR_MASTER`, `next_actor=chatgpt`; Codex must not choose the next task.
+
+
+## TASK-0003 PR handoff (2026-09-24)
+
+- Commit: `23396f639322e1d37cd77ef822b42aa4a9356a52`; PR [#4](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/4) targets `main` and is `OPEN` / `CLEAN`.
+- State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`.
+- Review the runtime evidence before any next task; Codex must not choose TASK-0004.
