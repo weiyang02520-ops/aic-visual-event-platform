@@ -73,3 +73,12 @@ Latest AI verification (2026-09-24): source and curated submission suites return
 - Feature commit `23396f639322e1d37cd77ef822b42aa4a9356a52` pushed on `codex/task-0003-real-ultralytics-pose-runtime-smoke`; PR [#4](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/4) is `OPEN` / `CLEAN` against `main`.
 - State is `WAITING_FOR_MASTER`, lock released, and `next_actor=chatgpt`.
 - No next task was selected by Codex.
+
+
+## TASK-0004 real local-video source-to-fact checkpoint (2026-09-24)
+
+- A two-frame AVI generated from the authorized official bus sample was decoded by OpenCV and sent through the real Ultralytics provider.
+- The tracker/observation/fact path produced 8 person `object_detected` facts with tracker IDs, COCO17 nose/wrist keypoints, source ID and timezone-aware timestamps.
+- Source suite returned `371 passed`; curated verifier returned `VERIFY_OK` / `371 passed`.
+- Evidence class is `REAL_RUNTIME_SMOKE`; accuracy, scene-event, camera privacy and robot evidence remain open.
+- Codex is preparing the PR handoff; no next task was selected.

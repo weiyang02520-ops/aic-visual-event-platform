@@ -502,3 +502,14 @@
 - Evidence is explicitly `REAL_RUNTIME_SMOKE`, not accuracy, production, camera or robot validation.
 - Full source suite: `371 passed`; curated verifier: `VERIFY_OK`, `371 passed`; project-local basetemp cleaned.
 - No adapter bug was found; no AI source/test change was required.
+
+
+## 2026-09-24 — TASK-0004 real local-video to fact smoke
+
+- Claimed the Master-dispatched TASK-0004 packet after verifying its LF-normalized hash and created the task branch.
+- Reused the ignored official model/runtime and generated a two-frame AVI from official `bus.jpg` solely to exercise the OpenCV decoder.
+- The real OpenCV BGR frames passed through the registry-selected real Ultralytics provider, CentroidTracker, observation normalization and FrameFactExtractor.
+- 2 frames decoded and 8 person `object_detected` facts returned; track IDs, keypoints, source ID and timezone-aware timestamps were preserved.
+- Evidence is `REAL_RUNTIME_SMOKE`, not accuracy, scene-event, camera or robot validation.
+- Full source suite: `371 passed`; curated verifier: `VERIFY_OK`, `371 passed`; project-local basetemp cleaned.
+- No adapter/pipeline bug was found; no AI source/test change was required.

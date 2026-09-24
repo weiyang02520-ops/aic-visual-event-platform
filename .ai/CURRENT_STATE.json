@@ -6,12 +6,12 @@
   "task_version": 1,
   "task_hash": "sha256:858e7e5b3cf7e6f4d2fec336a7a40f7177c281d1a269d1987e38b401f8a86dfd",
   "iteration": 4,
-  "status": "CODEX_RUNNING",
+  "status": "CODEX_VALIDATING",
   "last_actor": "codex",
   "next_actor": "codex",
   "active_branch": "codex/task-0004-real-local-video-pose-smoke",
   "active_pr": null,
-  "last_commit": "7dfcdc12f9665e6803ffac347243eeb16ec69a4e",
+  "last_commit": "de6650e",
   "retry_count": 0,
   "review_round": 0,
   "consecutive_failures": 0,
@@ -20,5 +20,5 @@
   "lock_owner": "codex-luna",
   "lock_token": "a1c4b74f-6b3a-45b4-a18a-9a70de342f7d",
   "lock_expires_at": "2026-09-24T13:42:19Z",
-  "updated_at": "2026-09-24T13:12:19Z"
+  "updated_at": "2026-09-24T13:18:01Z"
 }

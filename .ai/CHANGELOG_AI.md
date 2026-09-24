@@ -111,3 +111,10 @@ PLANNING → READY_FOR_CODEX
 actor: chatgpt-master
 task_hash: sha256:858e7e5b3cf7e6f4d2fec336a7a40f7177c281d1a269d1987e38b401f8a86dfd
 notes: Real local-video → OpenCV → real Ultralytics → fact smoke.
+
+
+2026-09-24T13:18:01Z
+TASK-0004
+CODEX_RUNNING -> CODEX_VALIDATING
+actor: codex-luna
+notes: Real two-frame local AVI decoded by OpenCV and passed through the real Ultralytics provider, tracker, observation normalization and FrameFactExtractor; 8 person facts with keypoints/source/timestamps; source suite 371 passed and curated VERIFY_OK.

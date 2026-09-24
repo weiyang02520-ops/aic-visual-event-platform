@@ -579,3 +579,15 @@ Phase 0–3 已完成可验证骨架；当前环境缺少 Cargo、FFmpeg 和 .NE
 - [x] Full source suite returned `371 passed`; curated verifier returned `VERIFY_OK` / `371 passed`; project-local basetemp cleanup passed.
 - [x] No adapter bug was exposed; no source/test changes were necessary.
 - [ ] Master review and PR merge remain pending; Codex must not choose TASK-0004.
+
+
+## TASK-0004 checkpoint — real local-video pose-to-fact smoke (2026-09-24)
+
+- [x] Verified the Task Packet hash and claimed the task on `codex/task-0004-real-local-video-pose-smoke`.
+- [x] Reused the authorized official model/runtime and generated only an ignored two-frame AVI from `bus.jpg` for decoder coverage.
+- [x] Fed the video through `FramePipeline`/`OpenCVFrameProvider`, real `UltralyticsProvider`, tracker, observation normalization and `FrameFactExtractor`.
+- [x] Observed 2 decoded BGR frames and 8 person `object_detected` facts with tracker IDs, keypoints, source ID and timezone-aware timestamps.
+- [x] Confirmed fact metadata had no raw pixel keys; recorded sanitized `REAL_RUNTIME_SMOKE` evidence.
+- [x] Full source suite returned `371 passed`; curated verifier returned `VERIFY_OK` / `371 passed`; project-local basetemp cleanup passed.
+- [x] No adapter/pipeline bug was exposed; no source/test changes were necessary.
+- [ ] Master review and PR handoff remain pending; Codex must not choose TASK-0005.
