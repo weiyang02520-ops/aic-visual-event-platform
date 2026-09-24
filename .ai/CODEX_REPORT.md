@@ -1,61 +1,60 @@
-# Codex Completion Report — TASK-0002
+# Codex Completion Report — TASK-0003
 
 ## Result
 
-`PASS_OFFLINE_PIXEL_BRIDGE_UNVERIFIED_REAL_RUNTIME`
+`PASS_REAL_RUNTIME_SMOKE`
 
-Implemented the local OpenCV pixel bridge required by the current Task Packet. Sampled local-video frames now expose model-ready BGR `payload["image"]` and a list-based grayscale `payload["gray"]` helper, while the existing MotionDetector continues to consume the grayscale path. A fake Ultralytics provider consumes an OpenCV-style frame and reaches the existing fact pipeline with source/timestamp/keypoint metadata preserved.
+The authorized real-runtime smoke completed successfully. The project virtual environment installed the existing optional `pose` and `media` extras, the official lightweight `yolo11n-pose.pt` model loaded on CPU, and the model ran through the project's `UltralyticsProvider` normalization path on the official public `bus.jpg` sample.
 
-No real model was run, no weights were downloaded, and no real runtime/accuracy/latency claim is made.
+This is one runtime smoke only. It is not an accuracy benchmark, dataset evaluation, production deployment, real camera validation, privacy-source validation or robot validation.
 
 ## Task identity
 
-- Task: `TASK-0002`
+- Task: `TASK-0003`
 - Task version: `1`
-- Task hash: `sha256:72199024e2a6fe1fbac8a5e70be6572c08784455cf138c30dc0278c277f36f01`
-- Branch: `codex/task-0002-local-video-pixel-bridge`
-- Base commit: `2f13de8` (`origin/main` at task claim)
-- Run: `codex-task-0002-20260924T121454Z`
+- Task hash: `sha256:921598f99bbb8e5d7f70f5b60007b93d5c4009c40d6f433c02f6feab16f1b515`
+- Branch: `codex/task-0003-real-ultralytics-pose-runtime-smoke`
+- Base commit: `fdfb0afca7ed8f31dcd982ab5adbdfd3b516f33d` (`origin/main` at task claim)
+- Run: `codex-task-0003-20260924T124315Z`
 
 ## Changed files
 
-- `workspace/ai-engine/src/visual_event_ai/frame_pipeline.py`
-- `workspace/ai-engine/tests/test_frame_pipeline.py`
-- `workspace/ai-engine/tests/test_ultralytics_provider.py`
-- `workspace/ai-engine/tests/test_api.py`
+- `workspace/docs/REAL_RUNTIME_SMOKE_TASK-0003.md`
+- `workspace/docs/AI_PROVIDERS_PHASE3.md`
 - `workspace/ai-engine/README.md`
-- `workspace/docs/AI_FRAME_PIPELINE_PHASE2.md`
-- `workspace/docs/AI_ALGORITHM_DESIGN.md`
-- Corresponding files synchronized under `workspace/submission/`
+- Corresponding provider documentation and README copies under `workspace/submission/`
+- `.ai/` report, run, heartbeat and state records
+- `agent-state/` evidence and handoff records
 
-## Behavior
+No source adapter bug was exposed, so no AI Python source or deterministic test code changed. Downloaded weights, sample media, virtual environment files and runtime settings remain under ignored local paths and are not staged.
 
-- OpenCV frames retain the decoded BGR object in `payload["image"]`.
-- OpenCV frames expose a list-based `payload["gray"]` helper for MotionDetector.
-- Payload includes safe `shape` and `channels` metadata.
-- Existing FPS/PTS/timestamp fallback behavior is unchanged.
-- Public frame preview recursively summarizes BGR/gray arrays; raw pixels are not emitted in public preview or persisted event metadata.
-- Fake Ultralytics integration consumes the BGR object and preserves source, timestamp and keypoints through normalized facts.
+## Runtime evidence
 
-## Tests and evidence
+- Python `3.12.10`; `ultralytics 8.4.161`; `torch 2.14.0+cpu`; OpenCV `5.0.0`.
+- Model `yolo11n-pose.pt` from the official Ultralytics assets release; local ignored path `workspace/ai-engine/runtime/models/`.
+- Sample `bus.jpg` from the official Ultralytics assets release; local ignored path `workspace/ai-engine/runtime/samples/`.
+- `UltralyticsProvider.available()` was true before loading and `provider.reason()` was null after loading.
+- The provider returned 4 normalized `person` detections; all four carried `nose`, `left_wrist` and `right_wrist` keypoints.
+- One-sample wall-clock time was about `1.438 s`, explicitly non-benchmark.
+- The complete sanitized evidence is in `workspace/docs/REAL_RUNTIME_SMOKE_TASK-0003.md`.
 
-- Targeted frame/provider/Ultralytics/fact/API/privacy tests: `57 passed`.
-- Full source suite: `371 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette deprecation warnings.
-- Curated verifier: `VERIFY_OK`, `371 passed`.
-- Real runtime smoke: **not run**, by Task Packet design; no model weights or runtime dependency were installed.
+## Tests and verification
 
-## Deviations and risks
+- Full source suite in the project `.venv`, with an absolute project-local basetemp: `371 passed`, 1 non-blocking Starlette deprecation warning.
+- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `371 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette deprecation warnings.
+- The verifier contamination scan passed. The verified project-local pytest temp directory was removed after each run.
 
-- OpenCV remains optional; the deterministic tests use a stub `cv2` module and do not prove every codec's channel layout.
-- The BGR object is transient model input. Any provider that copies it into metadata would violate the existing privacy boundary; current provider/fact/API/storage tests keep pixel arrays out of persisted/public metadata.
-- Real model inference, accuracy, latency and memory remain unverified.
+## Evidence limits
+
+The smoke does not establish pose accuracy, recall, precision, identity stability, occlusion handling, temporal action recognition, medication reasoning quality, camera-side skeletonization, real video metrics or hardware behavior. No raw image pixels, weights, sample media or caches are part of the Git change.
 
 ## Master decision needed
 
-Review the offline pixel bridge and PR. If accepted, Master may schedule a later authorized real-runtime smoke task. Do not treat this PR as real-model accuracy evidence.
+Review the runtime evidence and PR. If accepted, Master may decide the next task; Codex must not select one.
 
 ## Commit / PR
 
-- Commit: `fe12552` (`feat(ai): bridge opencv bgr and grayscale frames`)
-- PR: [#3](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/3) targeting `main`
-- PR state at handoff: `OPEN`, merge state pending GitHub refresh
+- Claim commit: `0cf5c10`
+- Feature commit: `23396f6` (`feat(ai): record real ultralytics pose smoke`)
+- PR: [#4](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/4) targeting `main`
+- PR state at handoff: `OPEN`, merge state `CLEAN`; state returned to `WAITING_FOR_MASTER` and lock released

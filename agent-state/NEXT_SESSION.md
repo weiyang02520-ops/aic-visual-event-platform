@@ -119,3 +119,19 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - PR: [#3](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/3) targeting `main`.
 - State: `WAITING_FOR_MASTER`; lock released; next actor `chatgpt-master`.
 - Do not start TASK-0003 or merge from Codex.
+
+
+## TASK-0003 handoff checkpoint (2026-09-24)
+
+- Branch: `codex/task-0003-real-ultralytics-pose-runtime-smoke`; task hash verified; real runtime smoke evidence is in `workspace/docs/REAL_RUNTIME_SMOKE_TASK-0003.md`.
+- Official `yolo11n-pose.pt` + `bus.jpg` ran through `UltralyticsProvider` on CPU: 4 person detections and nose/left_wrist/right_wrist keypoints.
+- Source and curated suites: `371 passed`; curated `VERIFY_OK`.
+- Weights, sample, venv and runtime caches are ignored and absent from the Git change.
+- State returns to `WAITING_FOR_MASTER`, `next_actor=chatgpt`; Codex must not choose the next task.
+
+
+## TASK-0003 PR handoff (2026-09-24)
+
+- Commit: `23396f639322e1d37cd77ef822b42aa4a9356a52`; PR [#4](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/4) targets `main` and is `OPEN` / `CLEAN`.
+- State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`.
+- Review the runtime evidence before any next task; Codex must not choose TASK-0004.

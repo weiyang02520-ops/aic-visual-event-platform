@@ -68,12 +68,14 @@ curl http://127.0.0.1:8010/api/v1/events
 可选真实视觉 provider：
 
 ```powershell
-python -m pip install -e ".[pose]"
+python -m pip install -e ".[pose,media]"
 $env:AI_DETECTOR_PROVIDER = "ultralytics"
 $env:AI_ULTRALYTICS_MODEL_PATH = "C:\path\to\verified-pose-model.pt"
 ```
 
 `ultralytics` provider 只归一化 person bbox/confidence 和 COCO17 `nose`、`left_wrist`、`right_wrist` keypoints；缺少依赖、模型文件或合法输入时明确 unavailable/fail closed。当前仓库不包含模型权重；fake-result 和本地 frame/fact contract tests 已覆盖 adapter，真实模型运行和准确率仍未验证。
+
+TASK-0003 已在项目内忽略的 runtime 路径完成一次官方 `yolo11n-pose.pt` + `bus.jpg` CPU 冒烟，结果标记为 `REAL_RUNTIME_SMOKE`，不是准确率、性能、真实摄像头或机器人验收。身份、来源和边界记录在 `../docs/REAL_RUNTIME_SMOKE_TASK-0003.md`。
 
 注册对象/人员可保存一个数值 embedding；`embeddings.py` 提供灰度矩阵 baseline、归一化和余弦相似度匹配。它是可解释的 CPU heuristic，默认保留 unknown/ambiguous，不宣称人脸识别或比赛准确率。
 

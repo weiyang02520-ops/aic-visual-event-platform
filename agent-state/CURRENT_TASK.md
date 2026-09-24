@@ -567,3 +567,15 @@ Phase 0–3 已完成可验证骨架；当前环境缺少 Cargo、FFmpeg 和 .NE
 - [x] Source full suite returned `371 passed`; curated verifier returned `VERIFY_OK` / `371 passed`.
 - [x] Real model runtime remains unverified by design; no weights or runtime dependency were added.
 - [ ] Master review and PR handoff remain pending; do not choose TASK-0003.
+
+
+## TASK-0003 checkpoint — real Ultralytics pose runtime smoke (2026-09-24)
+
+- [x] Verified the Task Packet hash and claimed the task on `codex/task-0003-real-ultralytics-pose-runtime-smoke`.
+- [x] Installed the existing optional `pose` and `media` extras into the project virtual environment.
+- [x] Downloaded official `yolo11n-pose.pt` and `bus.jpg` only to ignored project runtime paths.
+- [x] Ran the actual model through `UltralyticsProvider` with OpenCV BGR input: 4 person detections, each with nose and both wrist keypoints.
+- [x] Recorded sanitized `REAL_RUNTIME_SMOKE` evidence without raw pixels or weights.
+- [x] Full source suite returned `371 passed`; curated verifier returned `VERIFY_OK` / `371 passed`; project-local basetemp cleanup passed.
+- [x] No adapter bug was exposed; no source/test changes were necessary.
+- [ ] Master review and PR merge remain pending; Codex must not choose TASK-0004.

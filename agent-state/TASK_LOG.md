@@ -492,3 +492,13 @@
 - Commit `fe12552` pushed on `codex/task-0002-local-video-pixel-bridge`.
 - Opened [PR #3](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/3) targeting `main`.
 - Updated `.ai/CODEX_REPORT.md`, run record, state and heartbeat; released the lock and handed control to Master. No TASK-0003 selected.
+
+
+## 2026-09-24 — TASK-0003 real Ultralytics pose runtime smoke
+
+- Claimed `sha256:921598f99bbb8e5d7f70f5b60007b93d5c4009c40d6f433c02f6feab16f1b515` from `origin/main` after Master dispatched TASK-0003; created `codex/task-0003-real-ultralytics-pose-runtime-smoke` and recorded the lock/run.
+- Installed existing `pose`/`media` extras in the project `.venv`; downloaded only official `yolo11n-pose.pt` and `bus.jpg` into ignored project runtime paths.
+- Ran the actual model through `UltralyticsProvider` with OpenCV BGR input. It returned 4 normalized person detections and the required nose/left/right wrist keypoints.
+- Evidence is explicitly `REAL_RUNTIME_SMOKE`, not accuracy, production, camera or robot validation.
+- Full source suite: `371 passed`; curated verifier: `VERIFY_OK`, `371 passed`; project-local basetemp cleaned.
+- No adapter bug was found; no AI source/test change was required.

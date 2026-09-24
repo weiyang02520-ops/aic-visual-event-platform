@@ -79,3 +79,19 @@ PLANNING → READY_FOR_CODEX
 actor: chatgpt-master
 task_hash: sha256:921598f99bbb8e5d7f70f5b60007b93d5c4009c40d6f433c02f6feab16f1b515
 notes: Authorized real Ultralytics pose runtime smoke using official public lightweight model/sample in ignored runtime paths.
+
+
+2026-09-24T12:55:43Z
+TASK-0003
+CODEX_RUNNING -> CODEX_VALIDATING
+actor: codex-luna
+notes: Installed authorized pose/media extras, ran the official Ultralytics yolo11n-pose model through UltralyticsProvider on bus.jpg, recorded REAL_RUNTIME_SMOKE, source suite 371 passed and curated VERIFY_OK.
+
+
+2026-09-24T12:59:25Z
+TASK-0003
+CODEX_VALIDATING -> WAITING_FOR_MASTER
+actor: codex-luna
+commit: 23396f639322e1d37cd77ef822b42aa4a9356a52
+pr: https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/4
+notes: Real Ultralytics pose smoke recorded; source suite 371 passed; curated VERIFY_OK; PR is OPEN/CLEAN; lock released and next_actor set to chatgpt.

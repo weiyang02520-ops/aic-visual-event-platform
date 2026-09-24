@@ -57,3 +57,19 @@ Latest AI verification (2026-09-24): source and curated submission suites return
 - Added OpenCV payload, fake-provider integration and BGR/gray privacy regressions.
 - Source and curated suites return `371 passed`, `VERIFY_OK`; no real model smoke was run.
 - Awaiting PR handoff and Master review; no next task selected.
+
+
+## TASK-0003 real runtime smoke checkpoint (2026-09-24)
+
+- Authorized official Ultralytics `yolo11n-pose.pt` and `bus.jpg` were stored only in ignored local runtime paths.
+- `UltralyticsProvider` loaded the actual model on CPU and normalized 4 person detections; each included nose and both wrist keypoints.
+- Source suite returned `371 passed`; curated verifier returned `VERIFY_OK` / `371 passed`.
+- Evidence class is `REAL_RUNTIME_SMOKE`; accuracy, production, camera privacy and robot evidence remain open.
+- Codex is handing control back to Master; no next task was selected.
+
+
+## TASK-0003 PR handoff (2026-09-24)
+
+- Feature commit `23396f639322e1d37cd77ef822b42aa4a9356a52` pushed on `codex/task-0003-real-ultralytics-pose-runtime-smoke`; PR [#4](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/4) is `OPEN` / `CLEAN` against `main`.
+- State is `WAITING_FOR_MASTER`, lock released, and `next_actor=chatgpt`.
+- No next task was selected by Codex.

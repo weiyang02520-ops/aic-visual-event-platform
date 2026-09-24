@@ -14,13 +14,14 @@
 - `CentroidTracker`：先按类别和最大距离门控，再做最大有效匹配数下的最小总距离分配，输出 track id；人物类别复用共享分类器，其他标签按大小写不敏感的完整类别匹配；交叉、遮挡和快速移动时仍可能发生 ID switch；
 - `normalize_observations`：统一输出 source_id、timestamp、fact_type、confidence、subject/object 和 metadata；对相同类别与相同 bbox 的重复检测逐个分配 track，避免 dictionary 覆盖导致观察共用同一个 ID；
 - FastAPI：`/api/v1/vision/preview` 支持 `fixture` 或 `motion` provider 预览。
+- 可选 `UltralyticsProvider` 已完成一次 `REAL_RUNTIME_SMOKE`：项目内 `.venv` 安装 `pose`/`media` extras 后，使用官方 `yolo11n-pose.pt` 和官方公开 `bus.jpg`，通过现有 BGR 输入与归一化路径得到 4 个 `person` 检测，检测均带 `nose`、`left_wrist`、`right_wrist`。详细身份、哈希、来源和运行边界见 `REAL_RUNTIME_SMOKE_TASK-0003.md`；这不是准确率或性能评测。
 
 ## 不应误读的部分
 
 MotionDetector 是可解释的算法基线，不是已经训练好的老人服药识别模型，也没有准确率结论。全局光照变化也可能被当成大面积运动。CentroidTracker 的全局分配只优化通过距离门控后的总质心距离，未实现运动模型、外观/ReID 特征或遮挡推理。两者只证明本地接口和合成行为；真正的物体/动作模型须等赛道和授权数据确定后验证。
 
-`KeypointActionExtractor` 消费 provider/fixture 显式给出的鼻部和手腕坐标，生成同一人物/药品关系上的 `hand_to_face` 几何规则事实。它不运行姿态模型，不从灰度帧推断关键点，也没有真实视频指标。
+`KeypointActionExtractor` 消费 provider/fixture 显式给出的鼻部和手腕坐标，生成同一人物/药品关系上的 `hand_to_face` 几何规则事实。当前真实运行时冒烟证明姿态 provider 可以提供这些关键点，但不证明跨帧跟踪、动作识别、场景准确率或真实视频指标。
 
 ## 验收证据
 
-针对检测/跟踪、关系、时序推理与插件的定向测试覆盖帧差区域、来源/任务状态隔离、坏矩阵、重复 bbox、track ID 保持、门控匹配数量和全局最小距离分配、区域关系和场景事件，以及恢复间隙和显式来源隔离后的状态配对；当前全量测试为 `363 passed`，结果见根目录 `agent-state/TEST_EVIDENCE.md`。
+针对检测/跟踪、关系、时序推理与插件的定向测试覆盖帧差区域、来源/任务状态隔离、坏矩阵、重复 bbox、track ID 保持、门控匹配数量和全局最小距离分配、区域关系和场景事件，以及恢复间隙和显式来源隔离后的状态配对；当前全量测试和本次运行结果见根目录 `agent-state/TEST_EVIDENCE.md` 与 `REAL_RUNTIME_SMOKE_TASK-0003.md`。测试仍是软件契约证据，真实冒烟单独标记为 `REAL_RUNTIME_SMOKE`。
