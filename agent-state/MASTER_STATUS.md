@@ -98,3 +98,10 @@ Latest AI verification (2026-09-24): source and curated submission suites return
 - Sidebar/dashboard/monitor/settings derive connection status; Real API online does not claim a live media stream.
 - Frontend build passed; local `smoke:real` passed; AI suite returned `371 passed`; curated verifier returned `VERIFY_OK`.
 - Browser click-through remains pending because no browser executable is available in the worker environment.
+
+
+## TASK-0005 PR handoff (2026-09-24)
+
+- Feature commit `08f0b7bf191d09ad8d22f51033e7d0e33a473363` pushed on `codex/task-0005-frontend-real-connection-state`; PR [#6](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/6) is `OPEN` / `CLEAN` against `main`.
+- State is `WAITING_FOR_MASTER`, lock released, and `next_actor=chatgpt`.
+- No next task was selected by Codex.

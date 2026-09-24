@@ -60,4 +60,6 @@ Review the connection-state behavior and PR. If accepted, Master may decide the 
 ## Commit / PR
 
 - Claim commit: `6eccacc`
-- Feature commit and PR: pending handoff after final state update
+- Feature commit: `08f0b7b` (`feat(frontend): make real connection state truthful`)
+- PR: [#6](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/6) targeting `main`
+- PR state at handoff: `OPEN`, merge state `CLEAN`; state returned to `WAITING_FOR_MASTER` and lock released

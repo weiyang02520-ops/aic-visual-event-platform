@@ -160,3 +160,10 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - `npm run build` passed; local AI service `npm run smoke:real` passed; source suite `371 passed`; curated `VERIFY_OK`.
 - No browser executable was present for click-through validation; direct unreachable API probe returned `fetch failed`.
 - State will return to `WAITING_FOR_MASTER`, `next_actor=chatgpt`; Codex must not choose TASK-0006.
+
+
+## TASK-0005 PR handoff (2026-09-24)
+
+- Commit: `08f0b7bf191d09ad8d22f51033e7d0e33a473363`; PR [#6](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/6) targets `main` and is `OPEN` / `CLEAN`.
+- State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`.
+- Review Real connection/offline behavior and the browser-validation limitation before any next task; Codex must not choose TASK-0006.
