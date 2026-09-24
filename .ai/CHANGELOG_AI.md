@@ -127,3 +127,19 @@ actor: codex-luna
 commit: f2b9e7505c16d6a979bfe25d8cefcfb9722f8a7e
 pr: https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/5
 notes: Real local AVI to OpenCV BGR to Ultralytics to tracker/fact smoke recorded; source suite 371 passed; curated VERIFY_OK; PR is OPEN/CLEAN; lock released and next_actor set to chatgpt.
+
+
+2026-09-24T13:35:00Z
+TASK-0004
+MASTER_REVIEWING → PASS
+actor: chatgpt-master
+pr: #5
+merge_commit: ba5b242de6f87b4d84c6af944c10cf3a718a21db
+notes: Real local-video → OpenCV → real Ultralytics → tracker/fact smoke accepted. M1 complete.
+
+2026-09-24T13:35:00Z
+TASK-0005
+PLANNING → READY_FOR_CODEX
+actor: chatgpt-master
+task_hash: sha256:09cc8a1afcbf1a30ee0a3b2647433693ddd5786c9ff12ce78b7c9f25a1304f43
+notes: Start M2 by making frontend Real API connection state truthful and clearing stale Mock data on failure.
