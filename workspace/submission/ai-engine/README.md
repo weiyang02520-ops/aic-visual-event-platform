@@ -65,6 +65,16 @@ curl http://127.0.0.1:8010/api/v1/events
 
 `FramePipeline` 将 source 路由到 Mock/JSONL provider；`MotionDetector`、`FixtureDetector`、`CentroidTracker` 和 `RelationEngine` 位于独立模块，可被真实模型或机器人适配器替换。当前 `/api/v1/vision/preview` 是预览接口，不是最终生产推理吞吐基准。
 
+可选真实视觉 provider：
+
+```powershell
+python -m pip install -e ".[pose]"
+$env:AI_DETECTOR_PROVIDER = "ultralytics"
+$env:AI_ULTRALYTICS_MODEL_PATH = "C:\path\to\verified-pose-model.pt"
+```
+
+`ultralytics` provider 只归一化 person bbox/confidence 和 COCO17 `nose`、`left_wrist`、`right_wrist` keypoints；缺少依赖、模型文件或合法输入时明确 unavailable/fail closed。当前仓库不包含模型权重；fake-result 和本地 frame/fact contract tests 已覆盖 adapter，真实模型运行和准确率仍未验证。
+
 注册对象/人员可保存一个数值 embedding；`embeddings.py` 提供灰度矩阵 baseline、归一化和余弦相似度匹配。它是可解释的 CPU heuristic，默认保留 unknown/ambiguous，不宣称人脸识别或比赛准确率。
 
 ## 可选区域配置

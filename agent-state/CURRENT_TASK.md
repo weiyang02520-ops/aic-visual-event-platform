@@ -537,3 +537,22 @@ Phase 0–3 已完成可验证骨架；当前环境缺少 Cargo、FFmpeg 和 .NE
 - [x] Source full suite returned `363 passed` with `616` non-blocking Python 3.14 FastAPI/Starlette deprecation warnings; curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild` returned `VERIFY_OK` / `363 passed`.
 - [x] Synchronized quality source/tests/docs and the curated AI submission.
 - Evidence is software-level quality metadata and fixture behavior; no real audio/thermal/event-camera timing, sensor calibration, channel ablation or hardware evidence is claimed.
+
+
+## TASK-0001 checkpoint — optional Ultralytics person/pose provider (2026-09-24)
+
+- [x] Added optional `ultralytics` provider adapter with truthful dependency/model availability and explicit fallback behavior.
+- [x] Normalized person bbox/confidence and optional COCO17 `nose`, `left_wrist`, `right_wrist` keypoints into the existing Detection/Observation/PrimitiveFact path.
+- [x] Added deterministic fake-result tests, malformed-output fail-closed tests, unavailable-runtime tests and a frame-to-fact integration test.
+- [x] Existing provider, API, relation, temporal, privacy and quality tests remain green; source suite returned `368 passed`, curated verifier returned `VERIFY_OK` / `368 passed`.
+- [x] No model package or weights were installed/downloaded; real runtime, accuracy and latency remain explicitly unverified.
+- [ ] Master review and PR merge remain pending; Codex must not choose TASK-0002.
+
+
+## TASK-0001 R1 fix checkpoint (2026-09-24)
+
+- [x] Addressed Master R1 blocker: `UltralyticsProvider` now reads `AI_ULTRALYTICS_MODEL_PATH` when constructed by `DetectorProviderRegistry`.
+- [x] Added offline registry regression proving `AI_DETECTOR_PROVIDER=ultralytics` selects the provider and reports the configured temporary model path/status without loading weights.
+- [x] Re-synchronized the provider and tests into `workspace/submission/`.
+- [x] R1 targeted provider tests returned `10 passed`; full source suite returned `369 passed`; curated verifier returned `VERIFY_OK` / `369 passed`.
+- [ ] Master review of PR #2 remains pending; do not choose TASK-0002.

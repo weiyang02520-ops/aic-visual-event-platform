@@ -32,3 +32,20 @@ Latest AI verification (2026-09-24): source and curated submission suites return
 - `.ai/` controls automation; `agent-state/` remains detailed evidence/history.
 - Phase: M1 Real Vision Path. First task: `TASK-0001` optional real person/pose provider adapter.
 - Bootstrap files do not create new AI runtime evidence.
+
+
+## TASK-0001 Codex checkpoint (2026-09-24)
+
+- Branch: `codex/task-0001-real-vision-provider`
+- Added an optional Ultralytics-compatible person/pose provider adapter while preserving existing downstream contracts.
+- Provider tests and frame/fact integration pass; source and curated suites return `368 passed`, `VERIFY_OK`.
+- `ultralytics` and model weights are absent in the environment; no real runtime or performance evidence is claimed.
+- Awaiting Master review through the task PR; no follow-up task selected.
+
+
+## TASK-0001 R1 fix checkpoint (2026-09-24)
+
+- Wired the documented `AI_ULTRALYTICS_MODEL_PATH` environment setting into registry-created `UltralyticsProvider` instances.
+- Added offline selection/status regression; no weights or real runtime were used.
+- Source and curated suites now return `369 passed`, `VERIFY_OK`.
+- PR #2 remains open for Master review; no next task selected.

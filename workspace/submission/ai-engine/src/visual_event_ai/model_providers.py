@@ -8,6 +8,7 @@ from typing import Protocol
 
 from .frame_pipeline import Frame
 from .providers import Detection, FixtureDetector, MotionDetector
+from .ultralytics_provider import UltralyticsProvider
 
 
 class DetectorProvider(Protocol):
@@ -108,6 +109,7 @@ class DetectorProviderRegistry:
             "motion_cpu": MotionCPUProvider(),
             "fixture": FixtureProvider(),
             "onnx": OnnxProvider(),
+            "ultralytics": UltralyticsProvider(),
         }
 
     def for_source(self, source: str) -> DetectorProvider:

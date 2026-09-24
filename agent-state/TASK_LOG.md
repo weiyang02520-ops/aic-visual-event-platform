@@ -446,3 +446,33 @@
 - Preserved `agent-state/`; added `.ai/` as the task/state/lock/heartbeat/review control plane.
 - First bounded target: real visual person/pose provider adapter because the current baseline explicitly lacks real pose inference.
 - Bootstrap is control/documentation only and does not itself claim new model capability.
+
+
+## 2026-09-24 — TASK-0001 optional real vision provider
+
+- Claimed `TASK-0001` from the latest `main` state after verifying status `READY_FOR_CODEX`, task version/hash and an empty lock. Created branch `codex/task-0001-real-vision-provider`.
+- Added optional `ultralytics` extra and `UltralyticsProvider`; kept model loading lazy and unavailable when dependency/model is absent.
+- Added deterministic fake-result normalization, malformed-output, unavailable-runtime, API registry and frame/fact integration tests.
+- Source full suite: `368 passed`; curated verifier: `VERIFY_OK`, `368 passed`.
+- Real runtime smoke was not performed because the optional package and model path are absent; no weights were downloaded.
+- Pending: commit, push, PR and Master review. Do not select TASK-0002.
+
+## 2026-09-24 — TASK-0001 PR handoff
+
+- Commit `d819e5a44fd8854e58e8a26d25adb04632f3751a` pushed on `codex/task-0001-real-vision-provider`.
+- Opened [PR #2](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/2) targeting `main`; GitHub reports `OPEN` and merge state `CLEAN`.
+- Updated `.ai/CODEX_REPORT.md`, run record, state and heartbeat; released the task lock and handed control to Master.
+
+
+## 2026-09-24 — TASK-0001 R1 fix
+
+- Read Master review R1 from the latest remote branch: documented `AI_ULTRALYTICS_MODEL_PATH` was not wired into registry-created providers.
+- Fixed provider environment-path wiring and added offline registry selection/status regression.
+- R1 targeted tests: `10 passed`; source full suite: `369 passed`; curated VERIFY: `VERIFY_OK`, `369 passed`.
+- Real model remains unverified; no weights/downloads. PR #2 remains open for Master review.
+
+## 2026-09-24 — TASK-0001 R1 PR handoff
+
+- R1 fix commit `e5f6180` pushed to the existing task branch and PR #2.
+- Registry now wires the documented `AI_ULTRALYTICS_MODEL_PATH`; offline regression and full verification pass (`369 passed`, `VERIFY_OK`).
+- State returned to `WAITING_FOR_MASTER`, `next_actor=chatgpt`, lock released. No TASK-0002 selected.

@@ -51,3 +51,20 @@ def test_onnx_never_claims_available_without_verified_adapter(monkeypatch, tmp_p
     assert registry.providers["onnx"].available() is False
     assert "adapter" in (registry.providers["onnx"].reason() or "")
     assert any(item.provider_id == "motion_cpu" and item.selected for item in registry.statuses())
+
+
+def test_ultralytics_registry_wires_env_model_path_and_selects_provider(monkeypatch, tmp_path):
+    model = tmp_path / "pose.pt"
+    model.write_bytes(b"offline-placeholder")
+    monkeypatch.setenv("AI_DETECTOR_PROVIDER", "ultralytics")
+    monkeypatch.setenv("AI_ULTRALYTICS_MODEL_PATH", str(model))
+    monkeypatch.setattr("visual_event_ai.ultralytics_provider.importlib.util.find_spec", lambda name: object())
+
+    registry = DetectorProviderRegistry()
+    selected = registry.for_source("camera.mp4")
+    statuses = {item.provider_id: item for item in registry.statuses("camera.mp4")}
+
+    assert selected.provider_id == "ultralytics"
+    assert statuses["ultralytics"].available is True
+    assert statuses["ultralytics"].selected is True
+    assert statuses["ultralytics"].model_path == str(model)

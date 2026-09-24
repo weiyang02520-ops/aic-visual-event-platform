@@ -1,8 +1,8 @@
 {
-  "run_id": null,
-  "actor": null,
+  "run_id": "codex-task-0001-20260924T110609Z",
+  "actor": "codex-luna",
   "task_id": "TASK-0001",
   "status": "IDLE",
-  "stage": "awaiting-codex",
-  "last_heartbeat": null
+  "stage": "waiting-for-master",
+  "last_heartbeat": "2026-09-24T11:43:29Z"
 }

@@ -514,3 +514,19 @@ Makerverse 与 livestream-rs 的静态仓库事实已在 Phase 0 以本目录内
 - Verification: staged content scan found no tracked non-example `.env`, credential pattern, private key, model weight or >10 MB tracked file; the AI verifier returned `VERIFY_OK` / `363 passed`.
 - Limitation: GitHub access is private to the authenticated account/team; repository contents do not prove real model, camera, sensor or robot performance.
 - Confidence: high for repository initialization, staged-file exclusions and remote branch identity.
+
+
+### FACT-075
+- Claim: TASK-0001 adds an optional real-model provider path without changing downstream scene semantics.
+- Evidence: `UltralyticsProvider` normalizes fake Ultralytics-style results to person `Detection` objects with bbox/confidence and COCO17 nose/wrist keypoints; frame-to-fact integration preserves source metadata and keypoints. Malformed boxes fail closed, missing package/model reports unavailable, and the provider appears in registry/API statuses. Source suite returned `368 passed`; curated verification returned `VERIFY_OK` / `368 passed`.
+- File/URL: `workspace/ai-engine/src/visual_event_ai/ultralytics_provider.py`, `model_providers.py`, `tests/test_ultralytics_provider.py`, `tests/test_model_providers.py`, `tests/test_fact_pipeline.py`, `workspace/docs/MODEL_PROVIDER_CONTRACT.md`.
+- Limitation: `ultralytics` is not installed, no model weights are present, and no real inference/accuracy/latency evidence exists.
+- Confidence: high for offline adapter normalization and integration contracts; unverified for any concrete model runtime.
+
+
+### FACT-076
+- Claim: The documented Ultralytics model path is now wired through `DetectorProviderRegistry` and can select the optional provider when dependency/model availability is simulated.
+- Evidence: `test_ultralytics_registry_wires_env_model_path_and_selects_provider` sets `AI_DETECTOR_PROVIDER=ultralytics`, `AI_ULTRALYTICS_MODEL_PATH` to a temporary placeholder and stubs package discovery; registry selection/status reports `ultralytics` available and selected with the configured path. R1 targeted tests returned `10 passed`; source and curated suites returned `369 passed` / `VERIFY_OK`.
+- File/URL: `workspace/ai-engine/src/visual_event_ai/ultralytics_provider.py`, `model_providers.py`, `tests/test_model_providers.py`, corresponding submission files.
+- Limitation: The test does not load a real model or measure inference; dependency, weights, accuracy and latency remain unverified.
+- Confidence: high for environment-to-registry wiring and offline status behavior; low for real model runtime until authorized weights/runtime exist.

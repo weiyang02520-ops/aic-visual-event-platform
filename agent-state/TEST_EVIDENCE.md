@@ -565,3 +565,26 @@
 - Curated command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\workspace\submission\VERIFY.ps1 -SkipFrontendBuild` → `VERIFY_OK`, curated suite `363 passed`, `616` warnings; contamination scan passed.
 - Cleanup: all quality-test basetemp children were absolute paths under `workspace\ai-engine` and were removed after each run.
 - Evidence class: `LOCAL_ONLY` / `MOCK_OR_LOCAL`; this is a software fallback contract, not real sensor quality or timestamp synchronization evidence.
+
+
+## 2026-09-24 — TASK-0001 optional Ultralytics provider
+
+- Branch: `codex/task-0001-real-vision-provider`; task hash verified against LF-normalized `.ai/tasks/TASK-0001.md`.
+- Adapter: optional `UltralyticsProvider` registered as `ultralytics`; normalizes person boxes/confidence and COCO17 nose/wrist keypoints into the existing detection path.
+- Targeted command: `python -B -m pytest -p no:cacheprovider tests/test_ultralytics_provider.py tests/test_model_providers.py tests/test_fact_pipeline.py tests/test_api.py -q --basetemp <project-root>\workspace\ai-engine\.codex-pytest-temp-task-0001` → `35 passed`.
+- Full source command: `python -B -m pytest -p no:cacheprovider -q --basetemp <project-root>\workspace\ai-engine\.codex-pytest-temp-task-0001-full` → `368 passed`, 616 non-blocking deprecation warnings.
+- Curated command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\workspace\submission\VERIFY.ps1 -SkipFrontendBuild` → `VERIFY_OK`, `368 passed`, 616 warnings.
+- Real smoke: `importlib.util.find_spec("ultralytics")` returned `None`; `AI_ULTRALYTICS_MODEL_PATH` was unset. No network download or model weight was used.
+- Cleanup: project-local basetemp children were removed after verification.
+- Evidence class: `LOCAL_ONLY` / offline fake-result contract; real model runtime remains `UNVERIFIED`.
+
+
+## 2026-09-24 — TASK-0001 R1 environment-path fix
+
+- Master R1 blocker: registry-created `UltralyticsProvider()` did not read documented `AI_ULTRALYTICS_MODEL_PATH`.
+- Fix: provider constructor now reads the environment path when no explicit path is passed; registry selection and status are covered with an offline temporary placeholder and stubbed package discovery.
+- Targeted command: `python -B -m pytest -p no:cacheprovider tests/test_model_providers.py tests/test_ultralytics_provider.py -q --basetemp <project-root>\workspace\ai-engine\.codex-pytest-temp-task-0001-r1` → `10 passed`.
+- Full source command: `python -B -m pytest -p no:cacheprovider -q --basetemp <project-root>\workspace\ai-engine\.codex-pytest-temp-task-0001-r1-full` → `369 passed`, 616 non-blocking warnings.
+- Curated command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\workspace\submission\VERIFY.ps1 -SkipFrontendBuild` → `VERIFY_OK`, `369 passed`, 616 warnings.
+- Real smoke: not run; optional package and model weights remain absent.
+- Cleanup: all R1 basetemp children were absolute project-local paths and were removed.
