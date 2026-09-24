@@ -102,3 +102,17 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\workspace\submission\VERIF
 
 详细完成情况见 [`workspace/docs/AI_ALGORITHM_COMPLETION_REPORT.md`](workspace/docs/AI_ALGORITHM_COMPLETION_REPORT.md)。
 
+
+
+## Master / Codex 自动协作
+
+本仓库现使用 GitHub 作为 ChatGPT Web Master 与 Codex Worker 的长期状态中心：
+
+- `CODEX_BOOTSTRAP.md`：Codex 新会话入口；
+- `.ai/CURRENT_STATE.json`：当前任务、状态和 next actor；
+- `.ai/tasks/`：Master 发布的边界明确 Task Packet；
+- `.ai/CODEX_REPORT.md`：Codex 完成任务后的交接报告；
+- `.ai/LOCK.json` / `.ai/HEARTBEAT.json`：防重复执行和长任务存活状态；
+- `agent-state/`：保留更详细的历史、测试证据和项目事实。
+
+普通开发任务使用 task branch + PR，不直接在 `main` 上并发修改。
