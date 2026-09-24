@@ -1,8 +1,8 @@
 {
-  "task_id": "TASK-0001",
+  "task_id": "TASK-0002",
   "task_version": 1,
-  "task_hash": "sha256:8521f4af6a1617f75ab85a0cd22dfe181775be6a6e1980152243a061273b40",
-  "commit": "29b78c8b85aff188884d9564165c80248011c375",
-  "note": "TASK-0001 accepted by Master R2: optional Ultralytics pose adapter + env-path wiring; 369 passed / VERIFY_OK recorded; real model runtime unverified.",
-  "recorded_at": "2026-09-24T11:55:00Z"
+  "task_hash": "sha256:72199024e2a6fe1fbac8a5e70be6572c08784455cf138c30dc0278c277f36f01",
+  "commit": "fdfb0afca7ed8f31dcd982ab5adbdfd3b516f33d",
+  "note": "TASK-0002 accepted: OpenCV BGR+gray local video bridge; 371 passed / VERIFY_OK recorded; fake provider integration and pixel privacy regression passed.",
+  "recorded_at": "2026-09-24T12:35:00Z"
 }
