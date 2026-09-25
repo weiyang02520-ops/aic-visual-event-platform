@@ -1,8 +1,8 @@
 {
-  "task_id": "TASK-0006",
+  "task_id": "TASK-0007",
   "task_version": 1,
-  "task_hash": "sha256:aa527e1f620ea9dbb9ab163860102ce46fd839e7034772bab7a96826d0f31cff",
-  "commit": "437e6db7df7eda65ac30baaf540bcd4ba6118472",
-  "note": "A1 complete: canonical COCO17 skeleton contract, full pose normalization, skeleton-only upper AI path; 380 passed / VERIFY_OK.",
-  "recorded_at": "2026-09-25T04:25:00Z"
+  "task_hash": "sha256:a8ec2f821222fbe86b5c438f33fcccb80ff300887ea9c2d24ffad603a8b78a5c",
+  "commit": "3c6b8e9190356efddd5eaf8e38f580df53526451",
+  "note": "A2 complete: generic object_in_zone facts and conservative source/continuity-local VisualMemory; 389 passed / VERIFY_OK.",
+  "recorded_at": "2026-09-25T04:55:00Z"
 }
