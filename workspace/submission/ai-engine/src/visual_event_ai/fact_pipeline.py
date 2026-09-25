@@ -14,6 +14,7 @@ from .providers import CentroidTracker, normalize_observations
 from .quality import evaluate_channel_quality
 from .relations import Entity, RelationEngine, Zone
 from .skeleton import SkeletonObservation
+from .temporal_memory import TemporalVisualMemory
 
 
 class FrameFactExtractor:
@@ -25,11 +26,13 @@ class FrameFactExtractor:
         detectors: DetectorProviderRegistry | None = None,
         registry_provider: Callable[[], Iterable[tuple[str, str, str, list[float]]]] | None = None,
         zones: Iterable[Zone] = (),
+        temporal_memory: TemporalVisualMemory | None = None,
     ) -> None:
         self.pipeline = pipeline or FramePipeline()
         self.detectors = detectors or DetectorProviderRegistry()
         self.registry_provider = registry_provider
         self.zones = tuple(zones)
+        self.temporal_memory = temporal_memory
 
     def extract(
         self,
@@ -218,4 +221,6 @@ class FrameFactExtractor:
                 if discontinuity_before:
                     action.metadata["frame_discontinuity_before"] = True
             facts.extend([*generic_action_facts, *action_facts])
+        if self.temporal_memory is not None:
+            self.temporal_memory.ingest(facts)
         return facts

@@ -139,3 +139,30 @@ return COMPLETED
 ## 11. 评估接口
 
 真实评估至少应报告检测 precision/recall、跟踪 IDF1/HOTA、事件级 precision/recall/F1、时间窗误差、端到端延迟、CPU/GPU 资源和停止响应时间。当前仓库没有授权数据集和真实评估结果，所有数值栏位必须保持“待测”。实验方案见 `EXPERIMENT_PLAN.md`。
+## 12. TASK-0009 implementation boundary
+
+The current AI path is:
+
+```text
+pose provider: person + COCO17 skeleton
+semantic object provider: non-person label + bbox
+combined perception
+  -> Centroid/Hungarian tracker
+  -> spatial relations
+  -> generic action primitives
+  -> VisualMemory (last-known object location)
+  -> TemporalVisualMemory (bounded recent evidence)
+  -> medication-plan review cues / scene reasoners
+```
+
+Pose and semantic object model paths are configured independently with
+`AI_ULTRALYTICS_POSE_MODEL_PATH` (legacy `AI_ULTRALYTICS_MODEL_PATH` remains a
+pose alias) and `AI_ULTRALYTICS_OBJECT_MODEL_PATH`. The object component is
+optional and its unavailable state is exposed; no custom medicine model or
+accuracy number is claimed. The tracker remains Centroid/Hungarian. ByteTrack
+and Kalman are future-compatible alternatives, not an unverified replacement.
+
+Temporal records preserve source, continuity, identity, timestamp, confidence
+and explainable geometry without raw pixels. Medication-plan outputs are
+review candidates only. Gait/ReID, 2S-AGCN/GNN, audio fusion, robot/navigation/
+manipulation and project mAP/F1/HOTA remain outside the implemented boundary.

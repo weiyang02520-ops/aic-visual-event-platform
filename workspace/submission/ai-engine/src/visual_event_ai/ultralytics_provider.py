@@ -17,7 +17,7 @@ from typing import Any
 
 from .entity_labels import is_person_label
 from .frame_pipeline import Frame
-from .providers import Detection
+from .providers import BBox, Detection
 from .skeleton import (
     COCO17_KEYPOINT_INDICES,
     COCO17_SCHEMA,
@@ -119,7 +119,10 @@ class UltralyticsProvider:
         person_class_ids: tuple[int, ...] = (0,),
         keypoint_indices: Mapping[str, int] | None = None,
     ) -> None:
-        configured_path = model_path or os.getenv("AI_ULTRALYTICS_MODEL_PATH")
+        # The legacy variable remains a pose-model alias.  Semantic objects
+        # have their own provider/configuration below so an object model can
+        # be added without replacing a working pose path.
+        configured_path = model_path or os.getenv("AI_ULTRALYTICS_POSE_MODEL_PATH") or os.getenv("AI_ULTRALYTICS_MODEL_PATH")
         self.model_path = Path(configured_path) if configured_path else None
         self._model = model
         self._model_loader = model_loader
@@ -169,7 +172,7 @@ class UltralyticsProvider:
         if self._load_error is not None:
             return self._load_error
         if self.model_path is None:
-            return "AI_ULTRALYTICS_MODEL_PATH is not configured"
+            return "AI_ULTRALYTICS_POSE_MODEL_PATH or AI_ULTRALYTICS_MODEL_PATH is not configured"
         if not self.model_path.is_file():
             return f"model file does not exist: {self.model_path}"
         if importlib.util.find_spec("ultralytics") is None:
@@ -313,3 +316,234 @@ class UltralyticsProvider:
         except Exception as exc:
             raise RuntimeError(f"Ultralytics inference failed: {exc}") from exc
         return self._normalize_results(results)
+
+
+class UltralyticsObjectProvider:
+    """Optional Ultralytics adapter for semantic non-person boxes.
+
+    It intentionally has no pose/keypoint handling.  Any class named as a
+    person is excluded so that a semantic model cannot create duplicate person
+    rows beside the pose provider.  The model and weights remain optional;
+    tests inject a small Ultralytics-compatible fake result.
+    """
+
+    provider_id = "ultralytics_objects"
+    version = "0.1.0"
+
+    def __init__(
+        self,
+        model_path: str | None = None,
+        *,
+        model: Any | None = None,
+        model_loader: Callable[[str], Any] | None = None,
+        person_class_ids: tuple[int, ...] = (0,),
+    ) -> None:
+        configured_path = model_path or os.getenv("AI_ULTRALYTICS_OBJECT_MODEL_PATH")
+        self.model_path = Path(configured_path) if configured_path else None
+        self._model = model
+        self._model_loader = model_loader
+        self._load_error: str | None = None
+        if any(isinstance(item, bool) or not isinstance(item, int) for item in person_class_ids):
+            raise ValueError("person_class_ids must contain integers")
+        self.person_class_ids = frozenset(person_class_ids)
+
+    def new_session(self) -> UltralyticsObjectProvider:
+        return self
+
+    def available(self) -> bool:
+        if self._model is not None:
+            return True
+        if self._load_error is not None:
+            return False
+        return bool(
+            self.model_path
+            and self.model_path.is_file()
+            and importlib.util.find_spec("ultralytics") is not None
+        )
+
+    def reason(self) -> str | None:
+        if self._model is not None:
+            return None
+        if self._load_error is not None:
+            return self._load_error
+        if self.model_path is None:
+            return "AI_ULTRALYTICS_OBJECT_MODEL_PATH is not configured"
+        if not self.model_path.is_file():
+            return f"model file does not exist: {self.model_path}"
+        if importlib.util.find_spec("ultralytics") is None:
+            return "ultralytics is not installed; install the optional pose extra"
+        return "Ultralytics object provider is available but has not loaded the model yet"
+
+    def _load_model(self) -> Any:
+        if self._model is not None:
+            return self._model
+        if not self.available():
+            raise RuntimeError(self.reason() or "Ultralytics object provider unavailable")
+        try:
+            if self._model_loader is not None:
+                model = self._model_loader(str(self.model_path))
+            else:
+                from ultralytics import YOLO  # type: ignore[import-not-found]
+
+                model = YOLO(str(self.model_path))
+            if model is None:
+                raise RuntimeError("model loader returned None")
+            self._model = model
+            return model
+        except Exception as exc:
+            self._load_error = f"Ultralytics object model load failed: {exc}"
+            raise RuntimeError(self._load_error) from exc
+
+    @staticmethod
+    def _frame_source(frame: Frame) -> Any:
+        return UltralyticsProvider._frame_source(frame)
+
+    def _normalize_results(self, results: Any) -> list[Detection]:
+        result_list = results if isinstance(results, (list, tuple)) else [results]
+        detections: list[Detection] = []
+        for result in result_list:
+            boxes = _attribute(result, "boxes")
+            if boxes is None:
+                raise ValueError("Ultralytics object result is missing boxes")
+            xy_rows = _rows(_attribute(boxes, "xyxy"))
+            confidence_rows = _vector(_attribute(boxes, "conf"), "object confidence")
+            class_rows = _vector(_attribute(boxes, "cls"), "object class")
+            names = _attribute(result, "names", {})
+            for row_index, coordinates in enumerate(xy_rows):
+                if not isinstance(coordinates, (list, tuple)) or len(coordinates) < 4:
+                    raise ValueError(f"Ultralytics object bbox row {row_index} is malformed")
+                class_id = _class_id(_row_value(class_rows, row_index, "object class"))
+                label = UltralyticsProvider._class_name(names, class_id)
+                if not label:
+                    raise ValueError(f"Ultralytics object class label row {row_index} is empty")
+                if class_id in self.person_class_ids or is_person_label(label):
+                    continue
+                x1 = _finite_number(coordinates[0], "object bbox x1")
+                y1 = _finite_number(coordinates[1], "object bbox y1")
+                x2 = _finite_number(coordinates[2], "object bbox x2")
+                y2 = _finite_number(coordinates[3], "object bbox y2")
+                if x2 <= x1 or y2 <= y1:
+                    raise ValueError(f"Ultralytics object bbox row {row_index} has non-positive extent")
+                confidence = _confidence(
+                    _row_value(confidence_rows, row_index, "object confidence"),
+                    "object detection confidence",
+                )
+                detections.append(
+                    Detection(
+                        label=label,
+                        confidence=confidence,
+                        bbox=(x1, y1, x2 - x1, y2 - y1),
+                        metadata={
+                            "provider": self.provider_id,
+                            "provider_version": self.version,
+                            "component": "semantic_object",
+                            "class_id": class_id,
+                        },
+                    )
+                )
+        return detections
+
+    def detect(self, frame: Frame) -> list[Detection]:
+        model = self._load_model()
+        source = self._frame_source(frame)
+        if source is None:
+            raise ValueError("Ultralytics object provider requires frame payload image/frame data")
+        try:
+            results = model.predict(source=source, verbose=False)
+        except Exception as exc:
+            raise RuntimeError(f"Ultralytics object inference failed: {exc}") from exc
+        return self._normalize_results(results)
+
+
+class CombinedUltralyticsProvider:
+    """Compose pose and optional semantic-object inference for one frame."""
+
+    provider_id = "ultralytics"
+    version = "0.2.0"
+
+    def __init__(
+        self,
+        pose_provider: UltralyticsProvider | None = None,
+        object_provider: UltralyticsObjectProvider | None = None,
+        *,
+        pose_model_path: str | None = None,
+        object_model_path: str | None = None,
+    ) -> None:
+        self.pose_provider = pose_provider or UltralyticsProvider(pose_model_path)
+        self.object_provider = object_provider or UltralyticsObjectProvider(object_model_path)
+
+    @property
+    def model_path(self) -> Path | None:
+        return self.pose_provider.model_path
+
+    @property
+    def object_model_path(self) -> Path | None:
+        return self.object_provider.model_path
+
+    def new_session(self) -> CombinedUltralyticsProvider:
+        return self
+
+    def available(self) -> bool:
+        # Pose is the proven primary path.  Semantic objects are optional and
+        # must not make a working pose provider unavailable.
+        return self.pose_provider.available()
+
+    def reason(self) -> str | None:
+        pose_reason = self.pose_provider.reason()
+        object_reason = self.object_provider.reason()
+        if pose_reason:
+            return pose_reason
+        if object_reason:
+            return f"pose available; semantic object component unavailable: {object_reason}"
+        return None
+
+    def component_status(self) -> dict[str, dict[str, Any]]:
+        return {
+            "pose": {
+                "available": self.pose_provider.available(),
+                "configured_path": str(self.pose_provider.model_path) if self.pose_provider.model_path else None,
+                "reason": self.pose_provider.reason(),
+            },
+            "semantic_object": {
+                "available": self.object_provider.available(),
+                "configured_path": str(self.object_provider.model_path) if self.object_provider.model_path else None,
+                "reason": self.object_provider.reason(),
+            },
+        }
+
+    def detect(self, frame: Frame) -> list[Detection]:
+        if not self.pose_provider.available():
+            raise RuntimeError(self.pose_provider.reason() or "Ultralytics pose provider unavailable")
+        detections = list(self.pose_provider.detect(frame))
+        if self.object_provider.available():
+            detections.extend(self.object_provider.detect(frame))
+        # Keep a deterministic person-first order and never allow the object
+        # model to create a second person row.
+        unique_people: dict[BBox, Detection] = {}
+        object_detections: list[Detection] = []
+        for detection in detections:
+            if is_person_label(detection.label):
+                # A semantic detector must not duplicate a pose person row;
+                # duplicate pose rows with the same geometry are also safely
+                # collapsed before tracking.
+                unique_people.setdefault(detection.bbox, detection)
+            else:
+                # Do not deduplicate non-person boxes: two same-label objects
+                # may legitimately share a bbox in a fixture or occlusion.
+                object_detections.append(detection)
+        unique = [*unique_people.values(), *object_detections]
+        return sorted(
+            unique,
+            key=lambda item: (
+                0 if is_person_label(item.label) else 1,
+                item.label.casefold(),
+                item.bbox,
+                -item.confidence,
+            ),
+        )
+
+
+# Names used by callers/tests can describe the same explicit composition.
+UltralyticsSemanticObjectProvider = UltralyticsObjectProvider
+UltralyticsCombinedProvider = CombinedUltralyticsProvider
+CombinedPerceptionProvider = CombinedUltralyticsProvider

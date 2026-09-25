@@ -9,13 +9,21 @@
 | `motion_cpu` | 纯 CPU 帧差连通区域基线 | 可用，解释性强，不代表训练模型准确率 |
 | `fixture` | 读取 JSONL 中的预计算 objects，并可转发显式 keypoints metadata | 可用，只用于规则/接口验收，不是姿态模型 |
 | `onnx` | 预留真实 ONNX 模型运行时 | 只有模型文件、`onnxruntime` 和输入/输出契约同时具备时才可用 |
-| `ultralytics` | 可选 person/pose provider adapter | 需要 `ultralytics`、`AI_ULTRALYTICS_MODEL_PATH` 和可加载的模型文件；没有这些条件时明确 unavailable |
+| `ultralytics` | 可选 person/pose + semantic object composition | pose 需要 `AI_ULTRALYTICS_POSE_MODEL_PATH`（兼容 `AI_ULTRALYTICS_MODEL_PATH`）；semantic object 可选，需要 `AI_ULTRALYTICS_OBJECT_MODEL_PATH`；每个组件独立报告 available/reason |
 
 ## 选择和降级
 
 `AI_DETECTOR_PROVIDER` 可请求 provider。若请求的 provider 不可用，registry 会选 `motion_cpu`，并在 `/api/v1/providers/detectors` 中返回 unavailable 原因、selected 状态和模型路径。JSONL 来源固定选择 `fixture`，避免把 fixture 当成模型推理。
 
 请求 `AI_DETECTOR_PROVIDER=ultralytics` 时，provider 接受本地帧 payload 中的 `image` / `frame` / `bgr` / `rgb`，调用 Ultralytics-compatible `model.predict()`，只把 person boxes 和可用的 COCO17 `nose`、`left_wrist`、`right_wrist` 关键点归一化为现有 `Detection` metadata。下游 tracker、relation、keypoint action 和 scene reasoner 不变。模型输出缺失、坐标非法或 confidence 越界时 fail closed。
+
+TASK-0009 增加了独立的 `UltralyticsObjectProvider` 和
+`CombinedUltralyticsProvider`：object model 的任意非人物 class label、class_id、
+bbox 与 confidence 会保留，不能生成 skeleton；组合 provider 不会把同标签框合成一个
+实体。`/api/v1/providers/detectors` 的 `ultralytics` 状态包含 `component`、
+`pose_available`、`object_available`、两条 model path 与 object failure reason。
+只有 pose component 可用时，组合 provider 仍保持 pose 主路径可用；这表示软件降级，
+不表示 semantic object 识别已经完成。
 
 安装可选 provider：
 
@@ -25,7 +33,7 @@ $env:AI_DETECTOR_PROVIDER = "ultralytics"
 $env:AI_ULTRALYTICS_MODEL_PATH = "C:\path\to\verified-pose-model.pt"
 ```
 
-当前工作树没有安装 `ultralytics`，也没有模型权重；因此 provider adapter 的 fake-result 和 frame/fact integration tests 已验证，真实模型运行、准确率和延迟仍是 `UNVERIFIED`。模型权重不进入 Git 仓库。
+当前工作树没有安装 `ultralytics`，也没有模型权重；因此 provider adapter 的 fake-result、组合感知和 frame/fact integration tests 已验证，真实模型运行、准确率和延迟仍是 `UNVERIFIED`。模型权重不进入 Git 仓库。
 
 即使 `AI_ONNX_MODEL_PATH` 指向文件且 `onnxruntime` 已安装，当前 ONNX provider 仍保持 unavailable，直到具体模型的输入/输出 adapter 被实现并测试；不会因为“文件存在”就把它选成可运行 provider。
 
