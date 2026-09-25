@@ -226,3 +226,10 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 2. If changes are requested, re-fetch `origin/main` first and use the exact state/task hash; continue the same task branch/PR.
 3. If accepted, Master may select the next task; Codex must not choose TASK-0010.
 4. Current evidence is fixture/CPU/software-contract evidence. No semantic object model weights or medical/robot accuracy claim exists.
+
+## TASK-0010 v1 handoff (2026-09-25T08:31:00Z)
+
+1. Master reviews PR #11, `AI_ALGORITHM_FINAL_REPORT.md`, `FRONTEND_AI_INTEGRATION_CONTRACT.md` and the 16-case matrix.
+2. Master decides whether A5 is accepted and may then mark `AI_ALGORITHM_FROZEN`; Codex must not self-declare it.
+3. If changes are requested, fetch `origin/main` first and continue the same task/PR.
+4. No TASK-0011 was selected; current evidence is software-contract/fixture/CPU plus recorded runtime-smoke only.

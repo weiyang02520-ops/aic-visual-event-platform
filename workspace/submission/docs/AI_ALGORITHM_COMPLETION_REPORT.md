@@ -26,9 +26,9 @@
 
 | 项目 | 结果 |
 |---|---|
-| 源码全量测试 | **363 passed** |
+| 源码全量测试 | **414 passed** |
 | `workspace/submission/VERIFY.ps1 -SkipFrontendBuild` | **VERIFY_OK** |
-| 提交暂存包 AI 测试 | **363 passed** |
+| 提交暂存包 AI 测试 | **414 passed** |
 | 非阻塞警告 | 616 条 Python 3.14 / FastAPI / Starlette 弃用提示 |
 | AI 源码/测试相关文件同步 | 45 个相关文件哈希一致 |
 | 文档比对 | 47 个文档参与比对，唯一差异是已知的 `PHASE0_AUDIT.md` |
@@ -590,3 +590,21 @@ right_wrist -> [x_px, y_px, confidence]
 - 哪些能力必须等真实模型、真实数据或外部资料到位后再声称。
 
 因此，按当前用户限定的 AI 代码范围，软件侧阶段性目标已经完成；后续只有在获得新的真实 AI 数据、模型输入契约或明确需求时，才需要继续扩大算法实现。
+
+## TASK-0010 final-audit addendum (2026-09-25)
+
+TASK-0009 v3 is now included in the current AI baseline. The implemented path is
+`privacy/quality boundary -> pose + semantic-object providers -> combined perception ->
+Centroid/Hungarian tracking -> relations -> generic action primitives -> VisualMemory ->
+TemporalVisualMemory -> medication/workshop review reasoners -> UnifiedEvent/frontend contract`.
+The semantic object model remains optional and no custom medicine weights or metrics are claimed.
+
+The current source and curated submission suites are **414 passed** before the TASK-0010
+acceptance-matrix additions; the final TASK-0010 run records the larger final count. The
+curated verifier is the source of truth for submission hygiene. Evidence is separated into
+REAL_RUNTIME_SMOKE (official pose adapter/local-video smoke) and LOCAL_ONLY/software-contract
+fixtures. Frontend, robot, camera-edge skeletonization, dataset accuracy, ReID, gait,
+2S-AGCN and audio-fusion claims remain outside this AI result.
+
+See `AI_ALGORITHM_FINAL_REPORT.md` for the final module/formula/evidence audit and
+`FRONTEND_AI_INTEGRATION_CONTRACT.md` for the frozen handoff contract.

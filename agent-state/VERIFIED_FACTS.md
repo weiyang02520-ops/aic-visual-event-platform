@@ -597,3 +597,14 @@ Makerverse 与 livestream-rs 的静态仓库事实已在 Phase 0 以本目录内
 - [x] Submission AI mirrors synchronized; project-local pytest temp directories cleaned; no weights/media/runtime DB/cache/venv/secrets tracked.
 - [x] PR #10 opened from `codex/task-0009-ai-perception-memory-plan`; state handed back to Master.
 - Limitation: semantic object model availability, medicine recognition accuracy and medical/robot/hardware evidence remain unverified.
+
+## TASK-0010 final audit checkpoint (2026-09-25T08:31:00Z)
+
+- [x] Fresh state/task/hash verified: TASK-0010 v1, `sha256:4c64a33d4b3ee7cf873a7bf63eae59eb8ac1bd0ba099d3230a36bcd5a5d5e04e`, READY_FOR_CODEX.
+- [x] Audited AI source boundaries and found no breaking public-contract defect; corrected stale current AI docs/counts/provider wording.
+- [x] Added final 16-case deterministic acceptance matrix.
+- [x] Added `workspace/docs/AI_ALGORITHM_FINAL_REPORT.md` and `FRONTEND_AI_INTEGRATION_CONTRACT.md`, mirrored under submission.
+- [x] Source full suite: 430 passed; curated VERIFY: VERIFY_OK / 430 passed; 616 non-blocking warnings.
+- [x] Finalization plan is `A5 READY_FOR_MASTER_FREEZE`; Codex did not self-declare AI_ALGORITHM_FROZEN.
+- [x] PR #11 opened; state handed back to Master with lock released.
+- Limitation: evidence remains software-contract, fixture/CPU and recorded runtime-smoke; no new dataset, hardware or robot evidence.

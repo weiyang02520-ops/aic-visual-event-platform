@@ -30,7 +30,8 @@ bbox 与 confidence 会保留，不能生成 skeleton；组合 provider 不会�
 ```powershell
 python -m pip install -e ".[pose]"
 $env:AI_DETECTOR_PROVIDER = "ultralytics"
-$env:AI_ULTRALYTICS_MODEL_PATH = "C:\path\to\verified-pose-model.pt"
+$env:AI_ULTRALYTICS_POSE_MODEL_PATH = "C:\path\to\verified-pose-model.pt"
+$env:AI_ULTRALYTICS_OBJECT_MODEL_PATH = "C:\path\to\verified-object-model.pt" # optional
 ```
 
 当前工作树没有安装 `ultralytics`，也没有模型权重；因此 provider adapter 的 fake-result、组合感知和 frame/fact integration tests 已验证，真实模型运行、准确率和延迟仍是 `UNVERIFIED`。模型权重不进入 Git 仓库。
@@ -50,4 +51,4 @@ $env:AI_ONNX_MODEL_PATH = "C:\path\to\verified-model.onnx"
 
 ## 验收
 
-AI 当前全套测试为 363 passed；其中 provider 契约覆盖 `motion_cpu`、JSONL `fixture`、ONNX 明确 fallback、Ultralytics adapter normalization 和 `/api/v1/providers/detectors` REST 状态。motion_cpu 接受 0–255 有限非布尔灰度值并保留小数强度；注册对象/人员 embedding 属于独立的 CPU baseline 契约，详见 `REGISTRY_EMBEDDINGS.md`。JSONL 恢复坏行会标记 observation gap 并重置跨帧状态；时序 reasoner 对显式 `source_id` 执行同源配对；全量测试不代表真实 detector 准确率。
+AI 当前全套测试为 414 passed；其中 provider 契约覆盖 `motion_cpu`、JSONL `fixture`、ONNX 明确 fallback、Ultralytics adapter normalization 和 `/api/v1/providers/detectors` REST 状态。motion_cpu 接受 0–255 有限非布尔灰度值并保留小数强度；注册对象/人员 embedding 属于独立的 CPU baseline 契约，详见 `REGISTRY_EMBEDDINGS.md`。JSONL 恢复坏行会标记 observation gap 并重置跨帧状态；时序 reasoner 对显式 `source_id` 执行同源配对；全量测试不代表真实 detector 准确率。

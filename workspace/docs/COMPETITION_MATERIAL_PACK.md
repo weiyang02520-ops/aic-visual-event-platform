@@ -81,7 +81,7 @@ EvidenceResolver ← UnifiedEvent ← Scene Plugins
 
 ## 12. 实验与验收
 
-最终实验应报告检测、跟踪、事件、时间窗、延迟、稳定性和注册匹配指标，并包含真实视频、故障注入、浏览器、直播和机器人验收证据。当前全量 AI 回归为 363 passed，仅完成 Mock、JSONL、短 AVI、本地 API 和前端 build/smoke 验证；这些属于 `MOCK_OR_LOCAL`，不能替代规则要求的真实效果验证。
+最终实验应报告检测、跟踪、事件、时间窗、延迟、稳定性和注册匹配指标，并包含真实视频、故障注入、浏览器、直播和机器人验收证据。当前全量 AI 回归为 414 passed，仅完成 Mock、JSONL、短 AVI、本地 API 和前端 build/smoke 验证；这些属于 `MOCK_OR_LOCAL`，不能替代规则要求的真实效果验证。
 
 ## 13. 风险与未来工作
 

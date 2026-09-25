@@ -20,7 +20,7 @@ $env:PYTHONDONTWRITEBYTECODE = "1"
 python -B -m pytest --basetemp=.codex-pytest-temp-deployment -p no:cacheprovider -q
 ```
 
-截至 2026-09-24，当前源码和提交暂存包均已验证 `363 passed`。新回归覆盖关系/动作输入缺口后的 cooldown 复位、有限坐标运算溢出防护、超大 JSON 整数几何/置信度/阈值统一 ValueError、非整数/布尔/负抽帧参数拒绝、OpenCV 非有限/超范围 FPS/PTS fallback、帧差灰度/抽样框原帧坐标、bbox/区域有限边界及并发 job 状态隔离、极大关键点值不使帧任务失败与带冒号 ID 的关系冷却键隔离、注册 embedding/API 输入校验、无 ID 药品标签级候选去重、明确非人物主体/药品储存设施/药品说明书文档标签拒绝服药推理；另有 PrimitiveFact 身份 ID/置信度严格校验、运行中帧提取取消、JSONL 恢复坏行后的 observation gap 与连续段状态隔离回归；相同时间戳的移出/返回事实无论输入顺序都不会误推归还；终态锁、事件与 completed 状态原子提交以及完成任务幂等重跑也有回归覆盖。弃用警告来自当前 Python/FastAPI 组合，不改变测试结果；fixture/CPU 结果不代表真实模型性能。
+截至 2026-09-25，当前源码和提交暂存包均已验证 `414 passed`。新回归覆盖关系/动作输入缺口后的 cooldown 复位、有限坐标运算溢出防护、超大 JSON 整数几何/置信度/阈值统一 ValueError、非整数/布尔/负抽帧参数拒绝、OpenCV 非有限/超范围 FPS/PTS fallback、帧差灰度/抽样框原帧坐标、bbox/区域有限边界及并发 job 状态隔离、极大关键点值不使帧任务失败与带冒号 ID 的关系冷却键隔离、注册 embedding/API 输入校验、无 ID 药品标签级候选去重、明确非人物主体/药品储存设施/药品说明书文档标签拒绝服药推理；另有 PrimitiveFact 身份 ID/置信度严格校验、运行中帧提取取消、JSONL 恢复坏行后的 observation gap 与连续段状态隔离回归；相同时间戳的移出/返回事实无论输入顺序都不会误推归还；终态锁、事件与 completed 状态原子提交以及完成任务幂等重跑也有回归覆盖。弃用警告来自当前 Python/FastAPI 组合，不改变测试结果；fixture/CPU 结果不代表真实模型性能。
 
 ## 3. 前端
 

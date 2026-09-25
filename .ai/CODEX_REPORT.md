@@ -1,57 +1,54 @@
-# Codex Completion Report — TASK-0009 v3
+# Codex Completion Report — TASK-0010 v1
 
 ## Result
 
-`PASS_TASK_0009_AI_PERCEPTION_MEMORY_PLAN`
+`READY_FOR_MASTER_FREEZE`
 
-TASK-0009 v3 is complete on the task branch. The AI path now has an optional semantic non-person object adapter and explicit pose/object composition, bounded temporal visual memory, and schedule-aware medication-plan review cues. These remain deterministic software contracts and review candidates; no real medicine model accuracy, medical conclusion, swallowing, dose correctness, robot behavior, or project metric is claimed.
+The final AI audit is complete. The source audit found no breaking public-contract defect requiring production-code refactoring. Concrete fixes were limited to stale AI-owned documentation/counts/provider wording, the final deterministic acceptance matrix, the canonical final AI report, the frontend-facing AI contract, and synchronized submission copies. `.ai/AI_ALGORITHM_FINALIZATION_PLAN.md` now says `A5 READY_FOR_MASTER_FREEZE`; Codex did not declare `AI_ALGORITHM_FROZEN`.
 
 ## Task identity
 
-- Task: `TASK-0009`
-- Task version: `3`
-- Task hash: `sha256:f7f72535c048bced69e307dd0b3a0a0dfff760336afc854a7436f3ede2e0da74`
-- Base lineage: `18bd62c` (`origin/main` after the required freshness fetch)
-- Branch: `codex/task-0009-ai-perception-memory-plan`
-- Claim commit: `58803bb`
-- Feature commit: `6434392`
-- Run: `codex-task-0009-20260925T071418Z`
-- Pull request: [#10](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/10)
+- Task: `TASK-0010`
+- Task version: `1`
+- Task hash: `sha256:4c64a33d4b3ee7cf873a7bf63eae59eb8ac1bd0ba099d3230a36bcd5a5d5e04e`
+- Base lineage: `bb994dc` (`origin/main` after freshness fetch)
+- Branch: `codex/task-0010-ai-final-audit-freeze-contract`
+- Claim commit: `865e72a`
+- Feature commit: `52ca81f`
+- Run: `codex-task-0010-20260925T082157Z`
+- Pull request: [#11](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/11)
 
-## Implemented packages
+## Completed packages
 
-### A — semantic object perception
+### A — source audit and acceptance matrix
 
-- Added `UltralyticsObjectProvider` / `UltralyticsSemanticObjectProvider` for arbitrary non-person labels, finite bbox/confidence, class IDs and provider provenance.
-- Added `CombinedUltralyticsProvider` / `CombinedPerceptionProvider` for deterministic pose-first composition. Person rows are not duplicated; same-label non-person boxes remain separate.
-- Added independent `AI_ULTRALYTICS_POSE_MODEL_PATH` and `AI_ULTRALYTICS_OBJECT_MODEL_PATH` configuration. The legacy `AI_ULTRALYTICS_MODEL_PATH` remains a pose alias.
-- Registry/API status exposes both component paths, availability and object failure reason. Object unavailability does not disable a working pose path.
+- Audited frame/source, privacy, quality, skeleton, providers, composition, tracker, relations, action primitives, VisualMemory, TemporalVisualMemory, medication/workshop reasoners, plugins, evidence, SQLite and API boundaries.
+- Added `tests/test_final_acceptance_matrix.py` with 16 deterministic regressions covering the required pose/object/action/memory/gap/plan/privacy/quality/workshop paths.
+- Confirmed no frontend feature, robot, gait/ReID, 2S-AGCN, audio-fusion, training or model-weight changes.
 
-### B — temporal visual memory
+### B — final algorithm report
 
-- Added `TemporalVisualMemory` / `TemporalMemory` with bounded records, strict positive limits and deterministic filters for source, continuity, subject/object ID, label and fact type.
-- Records preserve UTC time, confidence, identities, labels, zone/location, safe geometry and sanitized provenance. `recent_actions`, `last_action`, timelines and last-seen object candidates are available without a REST/UI change.
-- `FrameFactExtractor` accepts an optional temporal memory and can ingest its own output directly. Existing `VisualMemory` remains the last-known object-location authority.
+- Added `workspace/docs/AI_ALGORITHM_FINAL_REPORT.md` with implemented architecture, module contracts, formulas, thresholds, conservative choices, competition mapping, evidence classes and limitations.
+- Updated stale AI-owned counts/provider wording and synchronized the report into `workspace/submission/docs/`.
 
-### C — medication-plan review
+### C — frontend AI handoff
 
-- Added strict JSON-friendly `MedicationPlanEntry` / `MedicationPlan` contracts for explicit UTC timestamps or timezone-scoped local clock times, tolerances and optional configured note/dose text.
-- Added `MedicationPlanEvaluator` / `MedicationPlanReviewEvaluator` producing only `plan_match_candidate`, `early_candidate`, `late_candidate`, `wrong_item_candidate` and `unresolved_candidate` cues.
-- Same-source/continuity/identity boundaries, parallel-object ambiguity and repeat-action debounce are fail-closed; configured note/dose are echoed as plan metadata only.
+- Added `workspace/docs/FRONTEND_AI_INTEGRATION_CONTRACT.md` defining event/review fields, provenance, skeleton/object/memory/medication cues, provider/readiness/evidence states, privacy promises, optional fields and the frontend checklist.
+- No REST endpoint or React/TypeScript code was added.
 
-### D — documentation/submission
+### D — freeze readiness
 
-- Updated provider, temporal, algorithm design and AI README/config documentation with the implemented stack and evidence boundary.
-- Synchronized all intentional AI source/test/docs/config changes under `workspace/submission/`.
+- `.ai/AI_ALGORITHM_FINALIZATION_PLAN.md` is `A5 READY_FOR_MASTER_FREEZE`, not self-frozen.
+- Submission mirrors are synchronized; stale `363/389/398` current-count and person-only provider claims in AI-owned docs were corrected.
 
 ## Tests and verification
 
-- TASK-0009 bundle tests: `16 passed`.
-- Existing provider/action/fact/reasoner/plugin regression set: `159 passed` before the final bundle additions.
-- Full AI source suite with an absolute project-local basetemp: `414 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette deprecation warnings.
-- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `414 passed`, 616 non-blocking warnings.
-- Project-local pytest temp directories were removed after each verification. No model weights, media, runtime DB, cache, venv, raw pixels or secrets were added.
+- Final acceptance matrix: `16 passed`.
+- Full AI source suite with project-local absolute basetemp: `430 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette deprecation warnings.
+- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `430 passed`, 616 non-blocking warnings.
+- Mirror hash check passed for all intentional TASK-0010 AI test/report/contract/doc changes.
+- Contamination scan passed; project-local pytest temp/runtime artifacts were removed. No model weights, media, runtime DB, cache, venv or secrets were added.
 
 ## Handoff
 
-State is returned to `WAITING_FOR_MASTER` with `next_actor=chatgpt`; lock is released. No TASK-0010 was selected. PR #10 is the only active PR for this task.
+State is returned to `WAITING_FOR_MASTER` with `next_actor=chatgpt`; lock is released. PR #11 is the only active PR for this task. No TASK-0011 was selected. Master must review the report, contract and matrix before setting `AI_ALGORITHM_FROZEN`.
