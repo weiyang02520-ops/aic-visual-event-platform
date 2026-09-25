@@ -302,3 +302,23 @@ PLANNING → READY_FOR_CODEX
 actor: chatgpt-master
 task_hash: sha256:1f57b3316b6cb923c481289f60fbc0405b1e665cecdf358aacb0e23872454f46
 notes: Build bounded scene-independent temporal visual memory over generic action facts and existing VisualMemory, preserving source/continuity identity boundaries and plugin compatibility.
+
+
+2026-09-25T06:35:00Z
+TASK-0009 v1
+READY_FOR_CODEX → SUPERSEDED_BEFORE_CLAIM
+actor: chatgpt-master
+notes: No active branch/PR/lock. Competition-document review exposed a higher-priority real AI gap: the proven Ultralytics runtime currently emits person/pose only, while object-management algorithms require semantic non-person detections.
+
+2026-09-25T06:35:00Z
+TASK-0009 v2
+PLANNING → READY_FOR_CODEX
+actor: chatgpt-master
+task_hash: sha256:dbece8e59f72a5c8b5f43aa8b460797e55c568cbceae8aecdb1fc3a773847caa
+notes: Add a truthful semantic non-person Ultralytics-compatible object detection path and combine it with the proven person/pose stream. Custom medicine/tool weights are supported by contract but are not claimed as trained or validated.
+
+2026-09-25T06:35:00Z
+AI-DOCUMENT-ALIGNMENT
+PLAN_UPDATED
+actor: chatgpt-master
+notes: After TASK-0009, complete temporal visual memory, then schedule-aware medication review logic. 2S-AGCN/fall-violence and audio fusion remain documented extension boundaries unless model/data evidence is later supplied.
