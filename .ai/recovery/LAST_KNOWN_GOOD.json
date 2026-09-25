@@ -1,8 +1,8 @@
 {
-  "task_id": "TASK-0009",
-  "task_version": 3,
-  "task_hash": "sha256:f7f72535c048bced69e307dd0b3a0a0dfff760336afc854a7436f3ede2e0da74",
-  "commit": "ee7b3f72f9184d470e32135656cd4bf8144898f8",
-  "note": "A4.1–A4.3 complete: semantic non-person perception, bounded TemporalVisualMemory and schedule-aware medication review; 414 passed / VERIFY_OK.",
-  "recorded_at": "2026-09-25T07:55:00Z"
+  "task_id": "TASK-0010",
+  "task_version": 1,
+  "task_hash": "sha256:4c64a33d4b3ee7cf873a7bf63eae59eb8ac1bd0ba099d3230a36bcd5a5d5e04e",
+  "commit": "a9788b650ada0841f0d2c41128cf913870d45ce0",
+  "note": "AI_ALGORITHM_FROZEN after Master acceptance of TASK-0010. Final acceptance matrix 16 passed; full source and curated verifier 430 passed / VERIFY_OK. Frontend contract frozen; awaiting user-led M2 direction.",
+  "recorded_at": "2026-09-25T08:42:00Z"
 }
