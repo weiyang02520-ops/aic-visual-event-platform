@@ -245,3 +245,10 @@ PLANNING → READY_FOR_CODEX
 actor: chatgpt-master
 task_hash: sha256:d6ccb9643ce822b86a70ccb7016d896fc3cb37253f638bbec1dc0d84e248d74c
 notes: Generalize skeleton/object action extraction into scene-independent hand_near_object and hand_to_face primitives while preserving conservative pickup/putdown and medication compatibility.
+
+
+2026-09-25T05:42:34Z
+TASK-0008
+CODEX_RUNNING -> CODEX_VALIDATING
+actor: codex-luna
+notes: Added scene-independent hand_near_object/hand_to_face primitives with medication compatibility adapter; source suite 396 passed and curated VERIFY_OK.

@@ -137,3 +137,10 @@ Latest AI verification (2026-09-24): source and curated submission suites return
 - Feature commit `9e7021448869adf2fbc461b7a442342b030376f9` pushed on `codex/task-0007-visual-memory`; PR [#8](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/8) is `OPEN` / `CLEAN` against `main`.
 - State is `WAITING_FOR_MASTER`, lock released, and `next_actor=chatgpt`.
 - No next task was selected by Codex.
+
+
+## TASK-0008 generic action primitive checkpoint (2026-09-25)
+
+- Generic skeleton/object action extraction now emits `hand_near_object` and geometry-only `hand_to_face` without medication labels.
+- Legacy KeypointActionExtractor is a medication compatibility adapter; generic pipeline actions preserve provenance and conservative candidate semantics.
+- Source suite returned `396 passed`; curated verifier returned `VERIFY_OK` / `396 passed`.

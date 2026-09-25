@@ -625,3 +625,13 @@ Phase 0–3 已完成可验证骨架；当前环境缺少 Cargo、FFmpeg 和 .NE
 - [x] Added FrameFactExtractor + zones integration and memory identity tests; targeted 144 passed.
 - [x] Full source suite returned `389 passed`; curated verifier returned `VERIFY_OK` / `389 passed`.
 - [ ] Master review and PR handoff remain pending; Codex must not choose TASK-0008.
+
+
+## TASK-0008 checkpoint — generic action primitives (2026-09-25)
+
+- [x] Verified the Task Packet hash and resumed `codex/task-0008-generic-action-primitives` with a refreshed lock.
+- [x] Added generic `hand_near_object` and geometry-only `hand_to_face`; medication labels stay in the compatibility adapter.
+- [x] Integrated generic primitives into FrameFactExtractor and preserved existing medication sequence behavior.
+- [x] Added deterministic action/provenance/source/time/continuity/privacy tests; targeted 159 passed.
+- [x] Full source suite returned `396 passed`; curated verifier returned `VERIFY_OK` / `396 passed`.
+- [ ] Master review and PR handoff remain pending; Codex must not choose TASK-0009.

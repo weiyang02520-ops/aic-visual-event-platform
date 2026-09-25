@@ -546,3 +546,13 @@
 - Added integration and deterministic tests for zone movement, same-label parallel objects, cross-source/gap isolation, person exclusion and pixel-free records.
 - Fixed relation location propagation into PrimitiveFact; did not modify the Hungarian/centroid tracker.
 - Source suite: `389 passed`; curated verifier: `VERIFY_OK`, `389 passed`; project-local temp directories cleaned.
+
+
+## 2026-09-25 — TASK-0008 generic action primitives
+
+- Resumed the claimed TASK-0008 branch after the heartbeat lock expired and refreshed the lock.
+- Added scene-independent `GenericActionPrimitiveExtractor` for arbitrary non-person hand proximity and generic hand-to-face geometry.
+- Kept `KeypointActionExtractor` as a medication compatibility adapter; generic primitives do not call medication label helpers.
+- Integrated generic hand_near_object facts into FrameFactExtractor while preserving medication reasoner behavior and conservative pickup/putdown candidates.
+- Added deterministic arbitrary-object, missing/low-confidence, person-only, identity/provenance/privacy and pipeline tests.
+- Source suite: `396 passed`; curated verifier: `VERIFY_OK`, `396 passed`; project-local temp directories cleaned.

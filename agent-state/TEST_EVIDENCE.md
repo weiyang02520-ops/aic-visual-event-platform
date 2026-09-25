@@ -658,3 +658,13 @@
 - Full source suite: `389 passed`, 1 non-blocking warning.
 - Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `389 passed`, 616 non-blocking warnings.
 - Source/curated mirrors match; no model weights, media, runtime DB, venv, cache or secrets tracked.
+
+
+## 2026-09-25 — TASK-0008 generic action primitives
+
+- Targeted action/fact/core/reasoner command with absolute project-local basetemp: `159 passed`.
+- Generic extractor tests cover arbitrary tool/object hand proximity, far/low-confidence rejection, person-only hand-to-face, same-label identity, source/timestamp/continuity boundaries and no raw pixels.
+- FrameFactExtractor integration emits generic `hand_near_object`; existing medication sequence tests remain green through the compatibility adapter.
+- Full source suite: `396 passed`, 1 non-blocking warning.
+- Curated verifier: `VERIFY_OK`, `396 passed`, 616 non-blocking warnings.
+- Source/curated mirrors match; no model weights/media/runtime/cache files tracked.

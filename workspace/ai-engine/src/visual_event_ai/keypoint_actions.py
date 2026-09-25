@@ -29,8 +29,13 @@ def _finite_real(value: Any) -> float | None:
     return numeric if isfinite(numeric) else None
 
 
-class KeypointActionExtractor:
-    """Emit one ``hand_to_face`` fact per episode, tolerating brief keypoint loss."""
+class MedicationActionAdapter:
+    """Compatibility adapter that links generic actions to medication facts.
+
+    Geometry-only primitives live in :class:`GenericActionPrimitiveExtractor`.
+    This adapter keeps the existing medication reasoner contract and is the
+    only place where medication labels are consulted.
+    """
 
     _relation_types = {"near", "pickup_candidate"}
 
@@ -279,3 +284,8 @@ class KeypointActionExtractor:
             if frame_index - last_seen > self.max_missing_frames + 1:
                 del self._last_seen_frames[pair]
         return emitted
+
+
+# Existing callers keep the stable name while the implementation is explicit
+# about being a scene-specific compatibility adapter.
+KeypointActionExtractor = MedicationActionAdapter

@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from collections.abc import Callable, Iterable
 
+from .action_primitives import GenericActionPrimitiveExtractor
 from .embeddings import match_embeddings
 from .frame_pipeline import CancellationToken, FramePipeline
 from .keypoint_actions import KeypointActionExtractor
@@ -52,6 +53,7 @@ class FrameFactExtractor:
         tracker = CentroidTracker()
         relations = RelationEngine(cooldown_seconds=0)
         keypoint_actions = KeypointActionExtractor()
+        generic_actions = GenericActionPrimitiveExtractor(emit_hand_to_face=False)
         continuity_segment = 0
         facts: list[PrimitiveFact] = []
         for frame in self.pipeline.iter_frames(source, max_frames=max_frames, token=cancellation):
@@ -69,6 +71,7 @@ class FrameFactExtractor:
                 tracker = CentroidTracker()
                 relations.reset_after_discontinuity()
                 keypoint_actions = KeypointActionExtractor()
+                generic_actions = GenericActionPrimitiveExtractor(emit_hand_to_face=False)
                 gap_metadata = {
                     "continuity_segment": continuity_segment,
                     "reason": frame_metadata.get("discontinuity_reason", "provider_discontinuity"),
@@ -97,6 +100,7 @@ class FrameFactExtractor:
                 tracker = CentroidTracker()
                 relations.reset_after_discontinuity()
                 keypoint_actions = KeypointActionExtractor()
+                generic_actions = GenericActionPrimitiveExtractor(emit_hand_to_face=False)
                 facts.append(
                     PrimitiveFact(
                         fact_type="observation_gap",
@@ -196,17 +200,22 @@ class FrameFactExtractor:
                 )
                 facts.append(primitive)
                 frame_relation_facts.append(primitive)
+            generic_action_facts = generic_actions.extract(
+                observations,
+                frame_relation_facts,
+                frame_index=frame.frame_index,
+            )
             action_facts = keypoint_actions.extract(
                 observations,
                 frame_relation_facts,
                 frame_index=frame.frame_index,
             )
-            for action in action_facts:
+            for action in [*generic_action_facts, *action_facts]:
                 action.metadata["continuity_segment"] = continuity_segment
                 action.metadata["source_id"] = frame.source_id
                 if quality_summary is not None:
                     action.metadata["quality_gate"] = quality_summary
                 if discontinuity_before:
                     action.metadata["frame_discontinuity_before"] = True
-            facts.extend(action_facts)
+            facts.extend([*generic_action_facts, *action_facts])
         return facts

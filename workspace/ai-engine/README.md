@@ -104,3 +104,5 @@ OpenCV 本地视频帧的 payload 同时提供模型输入用的 BGR `image` 和
 若检测 provider 在人物对象中提供 canonical skeleton 的鼻部和手腕关键点，`KeypointActionExtractor` 可按几何距离生成启发式 `hand_to_face` 事实，并绑定同一人物附近的药品框；它容忍一个采样帧的关键点缺失以避免重复动作边缘。骨骼-only fixture 回归证明上层逻辑不需要 raw pixels；项目不会从普通像素帧伪造关键点。
 
 配置 zones 后，非人物对象会产生通用 `object_in_zone` 空间事实；`visual_memory.py` 按 source、continuity segment 和 track/entity ID 维护最后观察时间、bbox 和当前/最后位置。它不按标签合并对象，也不宣称跨摄像头 ReID。
+
+骨骼和对象进入空间关系后，`GenericActionPrimitiveExtractor` 输出 `hand_near_object`、generic `hand_to_face` 等观察；旧 `KeypointActionExtractor` 仅作为药品兼容适配器，场景解释仍由 temporal reasoner 完成。

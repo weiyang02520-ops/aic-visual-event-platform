@@ -197,3 +197,11 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - Commit: `9e7021448869adf2fbc461b7a442342b030376f9`; PR [#8](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/8) targets `main` and is `OPEN` / `CLEAN`.
 - State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`.
 - Review generic memory identity boundaries before any next task; Codex must not choose TASK-0008.
+
+
+## TASK-0008 checkpoint (2026-09-25)
+
+- Branch: `codex/task-0008-generic-action-primitives`; task hash verified; generic action evidence is in `action_primitives.py`, fact pipeline integration and tests.
+- Targeted tests: `159 passed`; source suite: `396 passed`; curated `VERIFY_OK`.
+- Medication behavior remains behind the compatibility adapter; no definitive grasp/carry or metrics claims.
+- State will return to `WAITING_FOR_MASTER`, `next_actor=chatgpt`; Codex must not choose TASK-0009.
