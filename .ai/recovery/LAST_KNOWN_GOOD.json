@@ -1,8 +1,8 @@
 {
-  "task_id": "TASK-0007",
+  "task_id": "TASK-0008",
   "task_version": 1,
-  "task_hash": "sha256:a8ec2f821222fbe86b5c438f33fcccb80ff300887ea9c2d24ffad603a8b78a5c",
-  "commit": "3c6b8e9190356efddd5eaf8e38f580df53526451",
-  "note": "A2 complete: generic object_in_zone facts and conservative source/continuity-local VisualMemory; 389 passed / VERIFY_OK.",
-  "recorded_at": "2026-09-25T04:55:00Z"
+  "task_hash": "sha256:d6ccb9643ce822b86a70ccb7016d896fc3cb37253f638bbec1dc0d84e248d74c",
+  "commit": "b39df674573196fa28669232cf3d3dc21eb46577",
+  "note": "A3 complete after R1/R2: scene-independent hand_near_object and hand_to_face primitives, medication compatibility isolated, observation-gap episode reset proven; 398 passed / VERIFY_OK.",
+  "recorded_at": "2026-09-25T06:20:00Z"
 }
