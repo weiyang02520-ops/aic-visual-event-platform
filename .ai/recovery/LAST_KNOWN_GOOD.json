@@ -1,8 +1,8 @@
 {
-  "task_id": "TASK-0005",
+  "task_id": "TASK-0006",
   "task_version": 1,
-  "task_hash": "sha256:09cc8a1afcbf1a30ee0a3b2647433693ddd5786c9ff12ce78b7c9f25a1304f43",
-  "commit": "0b979d5a669a627ec6db0fbb1224da2eb8ef12f4",
-  "note": "TASK-0005 accepted: truthful Real API frontend connection state; AI suite remains 371 passed / VERIFY_OK. Frontend now paused pending AI algorithm freeze.",
-  "recorded_at": "2026-09-24T14:12:00Z"
+  "task_hash": "sha256:aa527e1f620ea9dbb9ab163860102ce46fd839e7034772bab7a96826d0f31cff",
+  "commit": "437e6db7df7eda65ac30baaf540bcd4ba6118472",
+  "note": "A1 complete: canonical COCO17 skeleton contract, full pose normalization, skeleton-only upper AI path; 380 passed / VERIFY_OK.",
+  "recorded_at": "2026-09-25T04:25:00Z"
 }
