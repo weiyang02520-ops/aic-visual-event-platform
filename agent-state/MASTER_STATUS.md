@@ -130,3 +130,10 @@ Latest AI verification (2026-09-24): source and curated submission suites return
 - Same labels, cross-source tracks and post-gap tracks remain separate; persons and raw pixels are excluded.
 - FrameFactExtractor + zones integration and tracker identity audit are covered; Hungarian/centroid tracker unchanged.
 - Source suite returned `389 passed`; curated verifier returned `VERIFY_OK` / `389 passed`.
+
+
+## TASK-0007 PR handoff (2026-09-25)
+
+- Feature commit `9e7021448869adf2fbc461b7a442342b030376f9` pushed on `codex/task-0007-visual-memory`; PR [#8](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/8) is `OPEN` / `CLEAN` against `main`.
+- State is `WAITING_FOR_MASTER`, lock released, and `next_actor=chatgpt`.
+- No next task was selected by Codex.

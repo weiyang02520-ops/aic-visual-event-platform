@@ -52,4 +52,6 @@ Review the generic location fact, memory identity boundary and integration evide
 
 ## Commit / PR
 
-- Feature commit and PR: pending handoff after final state update
+- Feature commit: `9e70214` (`feat(ai): add generic visual memory`)
+- PR: [#8](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/8) targeting `main`
+- PR state at handoff: `OPEN`, merge state `CLEAN`; state returned to `WAITING_FOR_MASTER` and lock released

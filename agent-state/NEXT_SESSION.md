@@ -190,3 +190,10 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - Targeted tests: `144 passed`; source suite: `389 passed`; curated `VERIFY_OK`.
 - Identity remains source/continuity/track local; no ReID, gait, ByteTrack/Kalman or metrics claims.
 - State will return to `WAITING_FOR_MASTER`, `next_actor=chatgpt`; Codex must not choose TASK-0008.
+
+
+## TASK-0007 PR handoff (2026-09-25)
+
+- Commit: `9e7021448869adf2fbc461b7a442342b030376f9`; PR [#8](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/8) targets `main` and is `OPEN` / `CLEAN`.
+- State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`.
+- Review generic memory identity boundaries before any next task; Codex must not choose TASK-0008.
