@@ -3,8 +3,8 @@
   "project_id": "aic-visual-event-platform",
   "phase": "M1F",
   "task_id": "TASK-0009",
-  "task_version": 1,
-  "task_hash": "sha256:1f57b3316b6cb923c481289f60fbc0405b1e665cecdf358aacb0e23872454f46",
+  "task_version": 2,
+  "task_hash": "sha256:dbece8e59f72a5c8b5f43aa8b460797e55c568cbceae8aecdb1fc3a773847caa",
   "iteration": 9,
   "status": "READY_FOR_CODEX",
   "last_actor": "chatgpt-master",
@@ -20,5 +20,5 @@
   "lock_owner": null,
   "lock_token": null,
   "lock_expires_at": null,
-  "updated_at": "2026-09-25T06:20:00Z"
+  "updated_at": "2026-09-25T06:35:00Z"
 }
