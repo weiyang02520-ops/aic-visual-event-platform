@@ -2,6 +2,34 @@
 
 最后核验：2026-09-24
 
+## TASK-0009：通用时序视觉记忆与用药计划复核
+
+新增 `visual_event_ai.temporal_memory.TemporalVisualMemory`。它直接接受
+`FrameFactExtractor` 返回的 `PrimitiveFact` 列表，并组合已有 `VisualMemory`：
+`object_detected` 更新对象最后位置但不进入 action history；
+`hand_near_object`、`hand_to_face`、`pickup_candidate`、`putdown_candidate`、
+`motion`、`entered_zone`、`left_zone` 和 `object_in_zone` 作为可查询时序记录。
+
+每条 `TemporalFactRecord` 保留 fact type、UTC timestamp、confidence、
+`source_id`、`continuity_segment`、subject/object identity 与 label、zone/location、
+安全几何和 provider provenance。查询支持 source、continuity、subject/object ID、
+label、fact type、recent actions、last action 和 identity timeline；默认时间顺序为
+chronological，`recent_actions()` 明确返回 newest-first。记录数和单身份记录数有正整数
+上限，拒绝 Boolean-as-integer 配置；`observation_gap` 通过连续段隔离，label 只用于
+筛选，不能合并身份。记录和元数据经过 privacy sanitizer，不保存原始像素数组。
+
+新增 `visual_event_ai.medication_plan` 提供 JSON-friendly 的
+`MedicationPlanEntry` / `MedicationPlan` 与 `MedicationPlanEvaluator`。计划条目必须
+指定药品 label/identity，以及带明确时区的 UTC `scheduled_at` 或 local clock；early/late
+容差拒绝布尔值、NaN 和负数。评估器只输出
+`plan_match_candidate`、`early_candidate`、`late_candidate`、
+`wrong_item_candidate`、`unresolved_candidate` 等 review cue，保留 source/time/
+continuity/object evidence，不推断吞咽、剂量正确性或医学结论。相同 episode 的重复
+动作去重；同标签并行对象、跨来源和跨 continuity/gap 证据保持 unresolved 或分开处理。
+
+这仍是确定性 Python 规则和软件契约测试，不是药品模型准确率、医学判断或真实摄像头
+验收结果。
+
 ## 当前状态
 
 | 项 | 当前证据 | 状态 |

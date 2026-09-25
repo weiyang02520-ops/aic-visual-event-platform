@@ -572,3 +572,10 @@
 - Decoupled object wrist geometry from face geometry and added far-from-face/near-tool coverage.
 - Added real FrameFactExtractor discontinuity regression proving a fresh post-gap action episode.
 - Targeted 161 passed; full source 398 passed; curated VERIFY_OK. Same PR #9 returned for R2.
+
+## TASK-0009 v3 — completed (2026-09-25T07:36:00Z)
+
+- Implemented packages A–D: semantic object provider/composition, bounded temporal memory, schedule-aware medication review and documentation/submission synchronization.
+- Tests: task bundle 16 passed; final source 414 passed; curated VERIFY_OK / 414 passed.
+- PR #10: https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/10
+- Handoff: `WAITING_FOR_MASTER`, `next_actor=chatgpt`; no next task chosen.

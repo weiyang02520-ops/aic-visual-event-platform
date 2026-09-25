@@ -586,3 +586,14 @@ Makerverse 与 livestream-rs 的静态仓库事实已在 Phase 0 以本目录内
 - File/URL: `workspace/ai-engine/src/visual_event_ai/action_primitives.py`, `fact_pipeline.py`, `keypoint_actions.py`, `tests/test_action_primitives.py`, `workspace/docs/AI_ALGORITHM_DESIGN.md`.
 - Limitation: These are observation/candidate facts; no grasp/carry certainty, medical conclusion, gait/ReID, dataset metrics or hardware behavior is established.
 - Confidence: high for local geometry/provenance and compatibility behavior; low for real detector generalization.
+
+## TASK-0009 v3 checkpoint — AI perception, temporal memory and medication plan (2026-09-25)
+
+- [x] Verified fresh `origin/main` state: TASK-0009 v3, hash `sha256:f7f72535c048bced69e307dd0b3a0a0dfff760336afc854a7436f3ede2e0da74`, `READY_FOR_CODEX`, `next_actor=codex`; no pause/emergency marker.
+- [x] Added optional semantic non-person Ultralytics object adapter and explicit pose/object composition with separate model paths/status.
+- [x] Added bounded source/continuity/entity-scoped `TemporalVisualMemory` with deterministic recent/last/timeline queries and direct FrameFactExtractor ingestion.
+- [x] Added strict JSON-friendly medication plan schema/evaluator with conservative time-window review cues, identity/source/gap boundaries and debounce.
+- [x] Source full suite: 414 passed; curated VERIFY: VERIFY_OK / 414 passed; 616 non-blocking Python 3.14 FastAPI/Starlette warnings.
+- [x] Submission AI mirrors synchronized; project-local pytest temp directories cleaned; no weights/media/runtime DB/cache/venv/secrets tracked.
+- [x] PR #10 opened from `codex/task-0009-ai-perception-memory-plan`; state handed back to Master.
+- Limitation: semantic object model availability, medicine recognition accuracy and medical/robot/hardware evidence remain unverified.

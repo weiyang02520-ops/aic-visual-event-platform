@@ -70,10 +70,19 @@ curl http://127.0.0.1:8010/api/v1/events
 ```powershell
 python -m pip install -e ".[pose,media]"
 $env:AI_DETECTOR_PROVIDER = "ultralytics"
-$env:AI_ULTRALYTICS_MODEL_PATH = "C:\path\to\verified-pose-model.pt"
+$env:AI_ULTRALYTICS_POSE_MODEL_PATH = "C:\path\to\verified-pose-model.pt"
+$env:AI_ULTRALYTICS_OBJECT_MODEL_PATH = "C:\path\to\verified-object-model.pt" # optional
 ```
 
 `ultralytics` provider 使用 canonical COCO17 skeleton contract，归一化 person bbox/confidence 和所有可用 named keypoints；缺少依赖、模型文件或合法输入时明确 unavailable/fail closed。`SkeletonObservation` 还保留 schema/version、source、UTC timestamp、track 和 continuity provenance。当前仓库不包含模型权重；fake-result、本地 frame/fact contract tests 和真实运行冒烟已覆盖适配边界，准确率仍未验证。
+
+TASK-0009 增加独立的 semantic object adapter 和 pose/object composition：object
+model 只输出非人物 label、bbox、class_id 和 confidence，不伪造 skeleton；object
+component 不可用时 pose 仍可用，provider status 会分别显示两路 path、availability
+和 failure reason。`TemporalVisualMemory` 可直接 ingest `FrameFactExtractor` 的
+facts，提供 bounded recent-action/timeline 查询并复用 `VisualMemory` 的 last-known
+location。`MedicationPlanEvaluator` 只产生计划匹配/早到/晚到/错物品/待复核 cue，
+不推断吞咽、剂量正确性或医学结论。
 
 TASK-0003 已在项目内忽略的 runtime 路径完成一次官方 `yolo11n-pose.pt` + `bus.jpg` CPU 冒烟，结果标记为 `REAL_RUNTIME_SMOKE`，不是准确率、性能、真实摄像头或机器人验收。身份、来源和边界记录在 `../docs/REAL_RUNTIME_SMOKE_TASK-0003.md`。
 

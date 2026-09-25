@@ -20,6 +20,21 @@
 - 骨骼隐私部署有两个明确模式：Mode A 是当前本地 `RGB frame -> pose provider -> skeleton -> upper AI`；Mode B 是目标 `camera/edge pose -> skeleton-only payload -> upper AI`。Mode A 有真实 runtime smoke，Mode B 的上层 skeleton-only 合同有 fixture 回归；物理相机/边缘节点尚未硬件验证，卡通化展示属于 frontend/presentation。
 - TASK-0004 又把同一真实 provider 接到 `FramePipeline`/`OpenCVFrameProvider` 和 `FrameFactExtractor`：项目内两帧 AVI 经真实 OpenCV 解码后产生 8 个带 source_id、UTC 时间戳和 COCO17 鼻部/双腕关键点的 `object_detected` facts。详细来源、哈希和边界见 `REAL_LOCAL_VIDEO_SMOKE_TASK-0004.md`；这仍不是准确率或场景事件评测。
 
+## TASK-0009：组合感知路径（已实现的软件契约）
+
+`UltralyticsProvider` 仍只负责 person/pose 与 COCO17 关键点。新增的
+`UltralyticsObjectProvider` 使用独立的 `AI_ULTRALYTICS_OBJECT_MODEL_PATH`
+配置，把任意非人物类别归一化为 `Detection(label, confidence, bbox,
+class_id, provider/provider_version)`；它不伪造 keypoints，也会在归一化边界排除
+person 类别。`AI_ULTRALYTICS_POSE_MODEL_PATH` 是新的姿态路径，旧的
+`AI_ULTRALYTICS_MODEL_PATH` 继续作为姿态兼容别名。
+
+`CombinedUltralyticsProvider` 将两路结果按 person-first 的确定性顺序合并，重复
+person 几何只保留一行，同标签非人物框不按 label 合并。object provider 不可用时，
+pose provider 仍可运行；provider 状态同时报告 pose/object 的 configured path、
+availability 和 failure reason。组合结果直接进入现有 Centroid/Hungarian tracker、
+relations、generic action 和 VisualMemory；没有绑定或宣称已经存在的药品/工具模型。
+
 ## 不应误读的部分
 
 MotionDetector 是可解释的算法基线，不是已经训练好的老人服药识别模型，也没有准确率结论。全局光照变化也可能被当成大面积运动。CentroidTracker 的全局分配只优化通过距离门控后的总质心距离，未实现运动模型、外观/ReID 特征或遮挡推理。两者只证明本地接口和合成行为；真正的物体/动作模型须等赛道和授权数据确定后验证。

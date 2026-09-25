@@ -1,65 +1,57 @@
-# Codex Completion Report — TASK-0008
+# Codex Completion Report — TASK-0009 v3
 
 ## Result
 
-`PASS_GENERIC_ACTION_PRIMITIVES_R1`
+`PASS_TASK_0009_AI_PERCEPTION_MEMORY_PLAN`
 
-The low-level skeleton/object action stage now produces scene-independent action observations. Generic geometry emits `hand_near_object` for arbitrary non-person objects and generic `hand_to_face` from person skeleton geometry alone. The existing `KeypointActionExtractor` name remains as a compatibility adapter that adds medication context only for the medication temporal reasoner.
-
-These are observation/candidate facts, not medical or physical certainty. No grasp, carry, gait, GNN or accuracy claim is made.
+TASK-0009 v3 is complete on the task branch. The AI path now has an optional semantic non-person object adapter and explicit pose/object composition, bounded temporal visual memory, and schedule-aware medication-plan review cues. These remain deterministic software contracts and review candidates; no real medicine model accuracy, medical conclusion, swallowing, dose correctness, robot behavior, or project metric is claimed.
 
 ## Task identity
 
-- Task: `TASK-0008`
-- Task version: `1`
-- Task hash: `sha256:d6ccb9643ce822b86a70ccb7016d896fc3cb37253f638bbec1dc0d84e248d74c`
-- Branch: `codex/task-0008-generic-action-primitives`
-- Base lineage: `3c6b8e9190356efddd5eaf8e38f580df53526451` (`origin/main` at task dispatch)
-- Claim commit: `a18566f`
-- Resume commit: `2994f5e`
-- Run: `codex-task-0008-20260925T045238Z`
+- Task: `TASK-0009`
+- Task version: `3`
+- Task hash: `sha256:f7f72535c048bced69e307dd0b3a0a0dfff760336afc854a7436f3ede2e0da74`
+- Base lineage: `18bd62c` (`origin/main` after the required freshness fetch)
+- Branch: `codex/task-0009-ai-perception-memory-plan`
+- Claim commit: `58803bb`
+- Feature commit: `6434392`
+- Run: `codex-task-0009-20260925T071418Z`
+- Pull request: [#10](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/10)
 
-## Changed files
+## Implemented packages
 
-- `workspace/ai-engine/src/visual_event_ai/action_primitives.py`
-- `workspace/ai-engine/src/visual_event_ai/fact_pipeline.py`
-- `workspace/ai-engine/src/visual_event_ai/keypoint_actions.py` (compatibility adapter naming/contract)
-- `workspace/ai-engine/tests/test_action_primitives.py`
-- AI README, algorithm/action/provider docs and synchronized copies under `workspace/submission/`
-- `.ai/` report, run, heartbeat and state records
-- `agent-state/` evidence and handoff records
+### A — semantic object perception
 
-No frontend, hardware, Makerverse/livestream-rs, gait, GNN, model, training or dataset work changed.
+- Added `UltralyticsObjectProvider` / `UltralyticsSemanticObjectProvider` for arbitrary non-person labels, finite bbox/confidence, class IDs and provider provenance.
+- Added `CombinedUltralyticsProvider` / `CombinedPerceptionProvider` for deterministic pose-first composition. Person rows are not duplicated; same-label non-person boxes remain separate.
+- Added independent `AI_ULTRALYTICS_POSE_MODEL_PATH` and `AI_ULTRALYTICS_OBJECT_MODEL_PATH` configuration. The legacy `AI_ULTRALYTICS_MODEL_PATH` remains a pose alias.
+- Registry/API status exposes both component paths, availability and object failure reason. Object unavailability does not disable a working pose path.
 
-## Behavior
+### B — temporal visual memory
 
-- `GenericActionPrimitiveExtractor` consumes current-frame person skeletons, non-person objects and provenance; it emits geometry-only `hand_near_object` and generic `hand_to_face` facts.
-- Generic `hand_near_object` preserves person/object identities, wrist, distance, threshold, confidence, source, timestamp and continuity metadata. Person detections cannot become objects.
-- Generic face actions are independent of medication labels and retain deterministic debounce/source/timestamp/continuity behavior. `emit_hand_to_face=False` lets the normal pipeline add generic object actions without duplicating the medication compatibility fact.
-- `MedicationActionAdapter` (exported through the legacy `KeypointActionExtractor` name) links generic geometry to a same-frame/source/continuity medication relation for the existing reasoner; medication classification stays out of the generic layer.
-- Existing pickup/putdown relation facts remain candidates and no definitive grasp/carry semantics were added.
+- Added `TemporalVisualMemory` / `TemporalMemory` with bounded records, strict positive limits and deterministic filters for source, continuity, subject/object ID, label and fact type.
+- Records preserve UTC time, confidence, identities, labels, zone/location, safe geometry and sanitized provenance. `recent_actions`, `last_action`, timelines and last-seen object candidates are available without a REST/UI change.
+- `FrameFactExtractor` accepts an optional temporal memory and can ingest its own output directly. Existing `VisualMemory` remains the last-known object-location authority.
+
+### C — medication-plan review
+
+- Added strict JSON-friendly `MedicationPlanEntry` / `MedicationPlan` contracts for explicit UTC timestamps or timezone-scoped local clock times, tolerances and optional configured note/dose text.
+- Added `MedicationPlanEvaluator` / `MedicationPlanReviewEvaluator` producing only `plan_match_candidate`, `early_candidate`, `late_candidate`, `wrong_item_candidate` and `unresolved_candidate` cues.
+- Same-source/continuity/identity boundaries, parallel-object ambiguity and repeat-action debounce are fail-closed; configured note/dose are echoed as plan metadata only.
+
+### D — documentation/submission
+
+- Updated provider, temporal, algorithm design and AI README/config documentation with the implemented stack and evidence boundary.
+- Synchronized all intentional AI source/test/docs/config changes under `workspace/submission/`.
 
 ## Tests and verification
 
-- Targeted generic action/legacy action/fact/core/reasoner tests: `161 passed` (including the R1 regressions).
-- Full source suite with an absolute project-local basetemp: `398 passed`, 1 non-blocking Starlette deprecation warning.
-- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `398 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette deprecation warnings.
-- Source and curated AI mirrors were synchronized. Project-local pytest temp directories were removed.
-- No model weights, media, runtime DB, venv, cache, raw pixels or secrets are tracked.
+- TASK-0009 bundle tests: `16 passed`.
+- Existing provider/action/fact/reasoner/plugin regression set: `159 passed` before the final bundle additions.
+- Full AI source suite with an absolute project-local basetemp: `414 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette deprecation warnings.
+- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `414 passed`, 616 non-blocking warnings.
+- Project-local pytest temp directories were removed after each verification. No model weights, media, runtime DB, cache, venv, raw pixels or secrets were added.
 
-## R1 fixes
+## Handoff
 
-- `hand_near_object` now evaluates every valid/confident wrist against every non-person object independently of wrist-to-face geometry.
-- Added a regression where the wrist is far from the face but close to an arbitrary tool; it emits `hand_near_object` and does not emit `hand_to_face`.
-- Added a real `FrameFactExtractor` discontinuity regression: a valid post-`observation_gap` medication gesture emits a fresh action in the new continuity segment instead of reusing the pre-gap episode.
-- Same PR #9 remains in use for Master R2 review.
-
-## Master decision
-
-R2 PASS. PR #9 was accepted after the R1 fixes; final source and curated evidence are 398 passed / VERIFY_OK.
-
-## Commit / PR
-
-- Feature commit: `3c0a923` (`feat(ai): add generic action primitives`)
-- PR: [#9](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/9) targeting `main`
-- PR state at handoff: `OPEN`, merge state `CLEAN`; state returned to `WAITING_FOR_MASTER` and lock released
+State is returned to `WAITING_FOR_MASTER` with `next_actor=chatgpt`; lock is released. No TASK-0010 was selected. PR #10 is the only active PR for this task.

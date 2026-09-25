@@ -685,3 +685,10 @@
 - Real FrameFactExtractor discontinuity regression: pre-gap and post-gap medication actions both emit with continuity segments 0 and 1; old episode is not reused.
 - Targeted tests: `161 passed`. Full source suite: `398 passed`, 1 warning. Curated verifier: `VERIFY_OK`, `398 passed`, 616 warnings.
 - Same PR #9 returned for R2; no scope expansion or new task selected.
+
+## TASK-0009 v3 verification (2026-09-25T07:36:00Z)
+
+- Task bundle test: `16 passed`.
+- Full source command (project-local absolute basetemp): `414 passed`, 616 non-blocking warnings.
+- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `414 passed`, 616 non-blocking warnings.
+- Submission mirrors match the intentional AI source/tests/docs/config changes. Temp/runtime artifacts were cleaned after verification.

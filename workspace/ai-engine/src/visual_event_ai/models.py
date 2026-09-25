@@ -178,6 +178,11 @@ class DetectorProviderView(BaseModel):
     selected: bool
     reason: str | None = None
     model_path: str | None = None
+    object_model_path: str | None = None
+    component: str | None = None
+    pose_available: bool | None = None
+    object_available: bool | None = None
+    object_reason: str | None = None
 
 
 class AnalysisJobView(BaseModel):

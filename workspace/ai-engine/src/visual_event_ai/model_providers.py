@@ -8,7 +8,7 @@ from typing import Protocol
 
 from .frame_pipeline import Frame
 from .providers import Detection, FixtureDetector, MotionDetector
-from .ultralytics_provider import UltralyticsProvider
+from .ultralytics_provider import CombinedUltralyticsProvider, UltralyticsObjectProvider, UltralyticsProvider
 
 
 class DetectorProvider(Protocol):
@@ -30,6 +30,11 @@ class DetectorProviderStatus:
     selected: bool
     reason: str | None = None
     model_path: str | None = None
+    object_model_path: str | None = None
+    component: str | None = None
+    pose_available: bool | None = None
+    object_available: bool | None = None
+    object_reason: str | None = None
 
 
 class MotionCPUProvider:
@@ -105,11 +110,13 @@ class OnnxProvider:
 class DetectorProviderRegistry:
     def __init__(self, requested: str | None = None) -> None:
         self.requested = requested or os.getenv("AI_DETECTOR_PROVIDER", "motion_cpu")
+        pose_provider = UltralyticsProvider()
+        object_provider = UltralyticsObjectProvider()
         self.providers: dict[str, DetectorProvider] = {
             "motion_cpu": MotionCPUProvider(),
             "fixture": FixtureProvider(),
             "onnx": OnnxProvider(),
-            "ultralytics": UltralyticsProvider(),
+            "ultralytics": CombinedUltralyticsProvider(pose_provider, object_provider),
         }
 
     def for_source(self, source: str) -> DetectorProvider:
@@ -139,6 +146,11 @@ class DetectorProviderRegistry:
                 selected=provider is active,
                 reason=provider.reason(),
                 model_path=str(getattr(provider, "model_path", "")) or None,
+                object_model_path=str(getattr(provider, "object_model_path", "")) or None,
+                component=("pose+semantic_object" if isinstance(provider, CombinedUltralyticsProvider) else None),
+                pose_available=(provider.pose_provider.available() if isinstance(provider, CombinedUltralyticsProvider) else None),
+                object_available=(provider.object_provider.available() if isinstance(provider, CombinedUltralyticsProvider) else None),
+                object_reason=(provider.object_provider.reason() if isinstance(provider, CombinedUltralyticsProvider) else None),
             )
             for provider_id, provider in self.providers.items()
         ]
