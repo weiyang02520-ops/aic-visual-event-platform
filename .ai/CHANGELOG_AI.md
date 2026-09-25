@@ -197,3 +197,19 @@ actor: codex-luna
 commit: eadef5b97586ab0a82d4d93a6d6bd566b60ebbf9
 pr: https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/7
 notes: Canonical COCO17 skeleton contract and full pose normalization complete; source suite 380 passed; curated VERIFY_OK; PR is OPEN/CLEAN; lock released and next_actor set to chatgpt.
+
+
+2026-09-25T04:25:00Z
+TASK-0006
+MASTER_REVIEWING → PASS
+actor: chatgpt-master
+pr: #7
+merge_commit: 437e6db7df7eda65ac30baaf540bcd4ba6118472
+notes: Canonical COCO17 skeleton core and skeleton-only upper AI contract accepted. A1 complete.
+
+2026-09-25T04:25:00Z
+TASK-0007
+PLANNING → READY_FOR_CODEX
+actor: chatgpt-master
+task_hash: sha256:a8ec2f821222fbe86b5c438f33fcccb80ff300887ea9c2d24ffad603a8b78a5c
+notes: Build generic object-location visual memory with conservative source/continuity/track identity boundaries; do not add unjustified ReID or ByteTrack claims.
