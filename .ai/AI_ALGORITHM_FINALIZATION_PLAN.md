@@ -66,12 +66,13 @@ Status: COMPLETE after TASK-0007 (generic object_in_zone + conservative VisualMe
 - document ByteTrack/Kalman as an alternative if not implemented.
 
 ### A3 — Generic action primitives
-Status: ACTIVE via TASK-0008.
+Status: COMPLETE after TASK-0008 R1/R2 (scene-independent hand/object and hand/face primitives with medication compatibility isolated above the generic layer).
 - normalize reusable skeleton/object actions such as hand_near_object, object_picked/carried/put_down and hand_to_face;
 - keep confidence, source, UTC timestamp and continuity segment provenance;
 - avoid scene-specific conclusions at this layer.
 
 ### A4 — Temporal visual memory
+Status: ACTIVE via TASK-0009.
 - maintain queryable recent object-location and action-history state;
 - medication and object-memory plugins consume generic facts/memory;
 - do not merge evidence across source, discontinuity or incompatible identities.
