@@ -6,10 +6,10 @@
   "task_version": 3,
   "task_hash": "sha256:f7f72535c048bced69e307dd0b3a0a0dfff760336afc854a7436f3ede2e0da74",
   "iteration": 9,
-  "status": "READY_FOR_CODEX",
-  "last_actor": "chatgpt-master",
+  "status": "CODEX_RUNNING",
+  "last_actor": "codex",
   "next_actor": "codex",
-  "active_branch": null,
+  "active_branch": "codex/task-0009-ai-perception-memory-plan",
   "active_pr": null,
   "last_commit": "b39df674573196fa28669232cf3d3dc21eb46577",
   "retry_count": 0,
@@ -17,8 +17,8 @@
   "consecutive_failures": 0,
   "human_required": false,
   "blocked_reason": null,
-  "lock_owner": null,
-  "lock_token": null,
-  "lock_expires_at": null,
-  "updated_at": "2026-09-25T07:12:00Z"
+  "lock_owner": "codex-luna",
+  "lock_token": "39f357e8-c33d-4659-95e8-6e86903c42c2",
+  "lock_expires_at": "2026-09-25T07:44:18Z",
+  "updated_at": "2026-09-25T07:14:18Z"
 }
