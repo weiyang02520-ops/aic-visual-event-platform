@@ -349,3 +349,9 @@ AUTOMATION-RECOVERY
 STALE_WORKER_VIEW → TASK-0009_REDISPATCHED
 actor: chatgpt-master
 notes: Codex reported superseded TASK-0008 WAITING_FOR_MASTER even though origin/main is TASK-0009 v3 READY_FOR_CODEX. Cleared stale TASK-0008 heartbeat, refreshed dispatch timestamp, and documented mandatory origin/main freshness check before worker exit/claim decisions.
+
+## 2026-09-25 — TASK-0009 v3 completed
+
+- Added semantic non-person object perception/composition, bounded TemporalVisualMemory and schedule-aware medication-plan review cues.
+- Synchronized AI source/tests/docs/config into submission; full source and curated verifier both returned 414 passed / VERIFY_OK.
+- PR #10 opened from `codex/task-0009-ai-perception-memory-plan`; state returned to `WAITING_FOR_MASTER`, `next_actor=chatgpt`, lock released.

@@ -219,3 +219,10 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - Fix commit: `8fffbcdcf197f80241da8489beed863fe6f4dec4`; same PR [#9](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/9) returned for R2 review.
 - State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`; review round 1 addressed.
 - Codex must not select TASK-0009.
+
+## TASK-0009 v3 handoff (2026-09-25T07:36:00Z)
+
+1. Master should review PR #10 and accept/reject against TASK-0009 v3.
+2. If changes are requested, re-fetch `origin/main` first and use the exact state/task hash; continue the same task branch/PR.
+3. If accepted, Master may select the next task; Codex must not choose TASK-0010.
+4. Current evidence is fixture/CPU/software-contract evidence. No semantic object model weights or medical/robot accuracy claim exists.

@@ -158,3 +158,11 @@ Latest AI verification (2026-09-24): source and curated submission suites return
 - R1 fix commit `8fffbcdcf197f80241da8489beed863fe6f4dec4` pushed on `codex/task-0008-generic-action-primitives`; same PR [#9](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/9) remains open for R2.
 - Fixed independent wrist/object proximity and real continuity-gap action regression.
 - State is `WAITING_FOR_MASTER`, lock released, and `next_actor=chatgpt`.
+
+## TASK-0009 v3 handoff (2026-09-25T07:36:00Z)
+
+- Status: implementation complete; PR #10 open for Master review.
+- Branch: `codex/task-0009-ai-perception-memory-plan`; feature commit `6434392`; claim commit `58803bb`.
+- Full AI suite: 414 passed. Curated verifier: VERIFY_OK / 414 passed.
+- Current state is `WAITING_FOR_MASTER`, `next_actor=chatgpt`, lock released.
+- No TASK-0010 selected.

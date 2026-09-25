@@ -652,3 +652,9 @@ Phase 0–3 已完成可验证骨架；当前环境缺少 Cargo、FFmpeg 和 .NE
 - [x] Added real observation_gap/continuity action regression.
 - [x] Targeted tests 161 passed; full source 398 passed; curated VERIFY_OK.
 - [x] Same PR #9 returned for R2 review; no new task selected.
+
+## TASK-0009 v3 completed (2026-09-25T07:36:00Z)
+
+- Branch `codex/task-0009-ai-perception-memory-plan`, PR #10, feature commit `6434392`.
+- State: `WAITING_FOR_MASTER`; `next_actor=chatgpt`; lock released.
+- Full/curated evidence: 414 passed / VERIFY_OK.
