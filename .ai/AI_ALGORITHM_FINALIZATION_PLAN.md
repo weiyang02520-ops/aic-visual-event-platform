@@ -1,7 +1,7 @@
 # AI Algorithm Finalization Plan
 
-Status: A5 READY_FOR_MASTER_FREEZE
-Scope: AI algorithm only. Frontend feature expansion is paused until AI_ALGORITHM_FROZEN.
+Status: AI_ALGORITHM_FROZEN
+Scope: AI algorithm is frozen for frontend integration. Further AI changes require an explicit bug fix or user-approved new requirement.
 
 ## Goal
 
@@ -100,7 +100,7 @@ Status: DOCUMENTED EXTENSION, not an AI-freeze implementation requirement.
 - current implementation must not claim fall/violence accuracy or audio-fusion capability without model/data evidence.
 
 ### A5 — Algorithm freeze
-Status: READY_FOR_MASTER_FREEZE via TASK-0010 final audit/freeze bundle.
+Status: COMPLETE after TASK-0010 Master review; AI_ALGORITHM_FROZEN.
 - audit dead/redundant/test-only paths;
 - update algorithm architecture/design/completion documents to current real-pose runtime state;
 - record formulas, parameters, decision logic, complexity, alternatives, failure cases and future work;
