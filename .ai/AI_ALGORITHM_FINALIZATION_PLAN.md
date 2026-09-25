@@ -72,23 +72,23 @@ Status: COMPLETE after TASK-0008 R1/R2 (scene-independent hand/object and hand/f
 - avoid scene-specific conclusions at this layer.
 
 ### A4 — Competition-document AI alignment
-Status: ACTIVE.
+Status: COMPLETE after TASK-0009 v3.
 
 #### A4.1 — Real semantic object perception
-Status: ACTIVE via bundled TASK-0009 v3.
+Status: COMPLETE after TASK-0009 v3.
 - preserve the proven person/pose path;
 - add a real-model-compatible semantic non-person object provider;
 - combine person skeleton + semantic objects into the existing tracker/relation/action/memory pipeline;
 - support custom medicine/tool labels by contract without claiming trained custom weights.
 
 #### A4.2 — Temporal visual memory
-Status: INCLUDED in bundled TASK-0009 v3 after semantic object perception.
+Status: COMPLETE after TASK-0009 v3.
 - maintain queryable recent object-location and action-history state;
 - medication and object-memory plugins consume generic facts/memory;
 - do not merge evidence across source, discontinuity or incompatible identities.
 
 #### A4.3 — Schedule-aware medication review logic
-Status: INCLUDED in bundled TASK-0009 v3 after temporal memory.
+Status: COMPLETE after TASK-0009 v3.
 - accept a deterministic JSON medication-plan contract;
 - compare observed medication identity/time against the configured plan;
 - emit only reviewable plan-match / early / late / wrong-item / unresolved cues;
@@ -100,6 +100,7 @@ Status: DOCUMENTED EXTENSION, not an AI-freeze implementation requirement.
 - current implementation must not claim fall/violence accuracy or audio-fusion capability without model/data evidence.
 
 ### A5 — Algorithm freeze
+Status: ACTIVE via TASK-0010 final audit/freeze bundle.
 - audit dead/redundant/test-only paths;
 - update algorithm architecture/design/completion documents to current real-pose runtime state;
 - record formulas, parameters, decision logic, complexity, alternatives, failure cases and future work;
