@@ -51,6 +51,7 @@ These may be documented as future extensions, but must not be represented as imp
 ## Work packages
 
 ### A1 — Skeleton-first core
+Status: COMPLETE after TASK-0006 (canonical COCO17 + skeleton-only upper-pipeline contract).
 - canonical COCO17 keypoint names/schema;
 - full-keypoint normalization from the real Ultralytics pose adapter;
 - validated skeleton observation helper/contract;
@@ -58,6 +59,7 @@ These may be documented as future extensions, but must not be represented as imp
 - preserve existing nose/wrist medication-action semantics.
 
 ### A2 — Detection, tracking and object memory
+Status: ACTIVE via TASK-0007.
 - audit current Centroid/Hungarian tracker and object continuity;
 - define object state / last-known-location memory independent of scene plugin;
 - only add a new tracker adapter if it materially improves architecture without forcing dataset claims;
