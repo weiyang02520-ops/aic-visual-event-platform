@@ -7,10 +7,10 @@ Status: COMPLETE after bootstrap merge. Preserve baseline, initialize .ai, freez
 Status: COMPLETE. Optional pose adapter, model-ready OpenCV BGR path, actual Ultralytics CPU runtime, and real local-video-to-fact smoke are all recorded.
 
 ## M1F — AI Algorithm Finalization
-Status: ACTIVE. Frontend expansion is paused. Complete skeleton-first perception, generic visual memory/action reasoning, algorithm audit and freeze before returning to UI work.
+Status: COMPLETE. TASK-0010 passed Master review; AI_ALGORITHM_FROZEN. Final AI evidence: 430 passed / VERIFY_OK.
 
 ## M2 — Frontend Quality + AI Integration
-Status: PAUSED after TASK-0005 truthful Real API state. Resume only after AI_ALGORITHM_FROZEN.
+Status: READY / WAITING_FOR_USER. AI_ALGORITHM_FROZEN is complete, so frontend work may resume when the user explicitly chooses the next direction. No TASK-0011 is auto-dispatched.
 
 ## M3 — Existing Backend Integration
 Add evidence/playback adapters against existing contracts; avoid intrusive backend changes.
