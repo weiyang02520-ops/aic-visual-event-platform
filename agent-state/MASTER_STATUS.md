@@ -114,3 +114,10 @@ Latest AI verification (2026-09-24): source and curated submission suites return
 - Hand-to-face action behavior remains compatible; skeleton-only fixture flow and privacy preservation are covered.
 - Source suite returned `380 passed`; curated verifier returned `VERIFY_OK` / `380 passed`.
 - Mode A RGB→pose→skeleton is current/local runtime evidence; Mode B edge skeleton-only output remains software-tested but hardware-unverified.
+
+
+## TASK-0006 PR handoff (2026-09-25)
+
+- Feature commit `eadef5b97586ab0a82d4d93a6d6bd566b60ebbf9` pushed on `codex/task-0006-skeleton-contract`; PR [#7](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/7) is `OPEN` / `CLEAN` against `main`.
+- State is `WAITING_FOR_MASTER`, lock released, and `next_actor=chatgpt`.
+- No next task was selected by Codex.

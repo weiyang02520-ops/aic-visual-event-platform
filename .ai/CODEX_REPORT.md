@@ -62,4 +62,6 @@ Review the canonical skeleton contract and PR. If accepted, Master may decide th
 
 ## Commit / PR
 
-- Feature commit and PR: pending handoff after final state update
+- Feature commit: `eadef5b` (`feat(ai): add canonical skeleton contract`)
+- PR: [#7](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/7) targeting `main`
+- PR state at handoff: `OPEN`, merge state `CLEAN`; state returned to `WAITING_FOR_MASTER` and lock released

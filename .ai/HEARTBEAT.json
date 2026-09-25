@@ -2,7 +2,7 @@
   "run_id": "codex-task-0006-20260925T035313Z",
   "actor": "codex-luna",
   "task_id": "TASK-0006",
-  "status": "VALIDATING",
-  "stage": "tests-and-report-complete",
-  "last_heartbeat": "2026-09-25T03:59:50Z"
+  "status": "IDLE",
+  "stage": "waiting-for-master",
+  "last_heartbeat": "2026-09-25T04:02:01Z"
 }
