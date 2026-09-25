@@ -1,8 +1,8 @@
 {
-  "run_id": null,
-  "actor": "chatgpt-master",
+  "run_id": "codex-task-0010-20260925T082157Z",
+  "actor": "codex-luna",
   "task_id": "TASK-0010",
-  "status": "IDLE",
-  "stage": "ready-for-codex",
-  "last_heartbeat": "2026-09-25T07:55:00Z"
+  "status": "RUNNING",
+  "stage": "claimed",
+  "last_heartbeat": "2026-09-25T08:21:57Z"
 }

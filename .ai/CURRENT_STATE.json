@@ -6,10 +6,10 @@
   "task_version": 1,
   "task_hash": "sha256:4c64a33d4b3ee7cf873a7bf63eae59eb8ac1bd0ba099d3230a36bcd5a5d5e04e",
   "iteration": 10,
-  "status": "READY_FOR_CODEX",
-  "last_actor": "chatgpt-master",
+  "status": "CODEX_RUNNING",
+  "last_actor": "codex",
   "next_actor": "codex",
-  "active_branch": null,
+  "active_branch": "codex/task-0010-ai-final-audit-freeze-contract",
   "active_pr": null,
   "last_commit": "ee7b3f72f9184d470e32135656cd4bf8144898f8",
   "retry_count": 0,
@@ -17,8 +17,8 @@
   "consecutive_failures": 0,
   "human_required": false,
   "blocked_reason": null,
-  "lock_owner": null,
-  "lock_token": null,
-  "lock_expires_at": null,
-  "updated_at": "2026-09-25T07:55:00Z"
+  "lock_owner": "codex-luna",
+  "lock_token": "b1c27455-58a7-4de4-a14e-01082d227b6d",
+  "lock_expires_at": "2026-09-25T08:51:57Z",
+  "updated_at": "2026-09-25T08:21:57Z"
 }
