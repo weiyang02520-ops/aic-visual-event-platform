@@ -342,3 +342,10 @@ AUTOMATION-POLICY
 TASK_SIZING_UPDATED
 actor: chatgpt-master
 notes: Default future Codex packets should bundle 2–4 tightly related subgoals and target 45–120 minutes unless review risk/external dependency requires splitting.
+
+
+2026-09-25T07:12:00Z
+AUTOMATION-RECOVERY
+STALE_WORKER_VIEW → TASK-0009_REDISPATCHED
+actor: chatgpt-master
+notes: Codex reported superseded TASK-0008 WAITING_FOR_MASTER even though origin/main is TASK-0009 v3 READY_FOR_CODEX. Cleared stale TASK-0008 heartbeat, refreshed dispatch timestamp, and documented mandatory origin/main freshness check before worker exit/claim decisions.
