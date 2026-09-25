@@ -1,8 +1,8 @@
 {
-  "run_id": "codex-task-0007-20260925T043735Z",
+  "run_id": "codex-task-0008-20260925T045238Z",
   "actor": "codex-luna",
-  "task_id": "TASK-0007",
-  "status": "IDLE",
-  "stage": "waiting-for-master",
-  "last_heartbeat": "2026-09-25T04:45:27Z"
+  "task_id": "TASK-0008",
+  "status": "RUNNING",
+  "stage": "claimed",
+  "last_heartbeat": "2026-09-25T04:52:38Z"
 }

@@ -6,10 +6,10 @@
   "task_version": 1,
   "task_hash": "sha256:d6ccb9643ce822b86a70ccb7016d896fc3cb37253f638bbec1dc0d84e248d74c",
   "iteration": 8,
-  "status": "READY_FOR_CODEX",
-  "last_actor": "chatgpt-master",
+  "status": "CODEX_RUNNING",
+  "last_actor": "codex",
   "next_actor": "codex",
-  "active_branch": null,
+  "active_branch": "codex/task-0008-generic-action-primitives",
   "active_pr": null,
   "last_commit": "3c6b8e9190356efddd5eaf8e38f580df53526451",
   "retry_count": 0,
@@ -17,8 +17,8 @@
   "consecutive_failures": 0,
   "human_required": false,
   "blocked_reason": null,
-  "lock_owner": null,
-  "lock_token": null,
-  "lock_expires_at": null,
-  "updated_at": "2026-09-25T04:55:00Z"
+  "lock_owner": "codex-luna",
+  "lock_token": "fe3e5b9f-e6d4-4e88-8386-d79df0318b1d",
+  "lock_expires_at": "2026-09-25T05:22:38Z",
+  "updated_at": "2026-09-25T04:52:38Z"
 }
