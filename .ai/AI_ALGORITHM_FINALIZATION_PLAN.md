@@ -39,7 +39,7 @@ The same generic fact/memory core should support medication assistance and objec
 - collecting a real dataset;
 - reporting project mAP / F1 / HOTA / IDF1;
 - gait identity recognition;
-- GNN violence/danger-source classifier;
+- trained 2S-AGCN/GNN violence/fall classifier and audio-fusion runtime;
 - pi0.5 or other robot manipulation policy;
 - robot execution/control;
 - cartoon-avatar frontend rendering;
@@ -71,11 +71,33 @@ Status: COMPLETE after TASK-0008 R1/R2 (scene-independent hand/object and hand/f
 - keep confidence, source, UTC timestamp and continuity segment provenance;
 - avoid scene-specific conclusions at this layer.
 
-### A4 — Temporal visual memory
-Status: ACTIVE via TASK-0009.
+### A4 — Competition-document AI alignment
+Status: ACTIVE.
+
+#### A4.1 — Real semantic object perception
+Status: ACTIVE via TASK-0009 v2.
+- preserve the proven person/pose path;
+- add a real-model-compatible semantic non-person object provider;
+- combine person skeleton + semantic objects into the existing tracker/relation/action/memory pipeline;
+- support custom medicine/tool labels by contract without claiming trained custom weights.
+
+#### A4.2 — Temporal visual memory
+Status: PENDING after semantic object perception.
 - maintain queryable recent object-location and action-history state;
 - medication and object-memory plugins consume generic facts/memory;
 - do not merge evidence across source, discontinuity or incompatible identities.
+
+#### A4.3 — Schedule-aware medication review logic
+Status: PENDING after temporal memory.
+- accept a deterministic JSON medication-plan contract;
+- compare observed medication identity/time against the configured plan;
+- emit only reviewable plan-match / early / late / wrong-item / unresolved cues;
+- never infer dosage ingestion or medical correctness from vision alone.
+
+#### A4.4 — Skeleton abnormal-action extension boundary
+Status: DOCUMENTED EXTENSION, not an AI-freeze implementation requirement.
+- reserve a provider/interface boundary for skeleton-sequence classifiers such as 2S-AGCN;
+- current implementation must not claim fall/violence accuracy or audio-fusion capability without model/data evidence.
 
 ### A5 — Algorithm freeze
 - audit dead/redundant/test-only paths;
