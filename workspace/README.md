@@ -7,7 +7,8 @@
 3. AI 服务见 `ai-engine/README.md`；
 4. 前端见 `frontend/README.md`；
 5. 比赛文档材料见 `docs/COMPETITION_MATERIAL_PACK.md`；
-6. 可提交暂存包见 `submission/`。
+6. AI 最终报告见 `docs/AI_ALGORITHM_FINAL_REPORT.md`，前端交接契约见 `docs/FRONTEND_AI_INTEGRATION_CONTRACT.md`；
+7. 可提交暂存包见 `submission/`。
 
 ## 目录约定
 

@@ -22,7 +22,7 @@
 4. 关系和动作 primitives：人物—物体接近、`hand_near_object`、generic `hand_to_face`、区域进出、药品序列、工作室移出/归还/缺失、连续段边界；
 5. 工程边界：任务取消与原子完成、embedding 输入校验、REST 预览像素递归脱敏、插件集成和证据保留。
 
-当前全量源码与 curated submission 均为 `363 passed`、`VERIFY_OK`。结果属于 fixture/CPU/local API 证据。
+当前全量源码与 curated submission 均为 `414 passed`、`VERIFY_OK`。结果属于 fixture/CPU/local API 证据。
 
 ## 2.1 本轮执行范围
 
@@ -96,3 +96,13 @@
 ## 4. 当前下一步
 
 在真实姿态或多模态数据出现前，继续做本地算法审计与契约测试；不把参考文档中的 AlphaPose、YOLO、2S-AGCN、ByteTrack、PGSR、VLA 或指标直接加入当前实现。当前 P0/P1/P2 的来源、时间戳和状态隔离契约已有本地回归；P3 仅保留软件接口和失败降级设计，等授权通道出现后再做真实时间同步、质量门控和消融。P4 硬件/机器人验收按用户要求暂停。
+
+## TASK-0010 final audit status (2026-09-25)
+
+The final audit adds a deterministic acceptance matrix covering pose/object composition,
+privacy/quality gates, generic actions, VisualMemory, TemporalVisualMemory, medication-plan
+review and workshop conservatism. The current task must leave A5 as
+`READY_FOR_MASTER_FREEZE`; Master alone may change the marker to `AI_ALGORITHM_FROZEN`.
+
+Current AI evidence is software-contract, fixture/CPU and explicitly recorded runtime-smoke
+evidence. No frontend feature code is part of this task.

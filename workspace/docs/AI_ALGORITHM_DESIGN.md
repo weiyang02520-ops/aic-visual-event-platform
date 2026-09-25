@@ -23,11 +23,14 @@
 ```text
 VideoSourceAdapter
   -> FramePacket(timestamp/source_id/frame_index)
-  -> DetectorProvider
+  -> Privacy / quality boundary
+  -> Pose + semantic object providers
+  -> Combined perception
   -> Tracker
   -> RelationExtractor
-  -> PrimitiveFact
-  -> ScenePlugin
+  -> Generic action primitives
+  -> VisualMemory / TemporalVisualMemory
+  -> ScenePlugin / review reasoner
   -> UnifiedEvent
   -> EvidenceResolver
   -> SQLite + REST + Frontend
@@ -48,7 +51,7 @@ VideoSourceAdapter
 - `motion_cpu`：基于帧差/四邻域连通区域的可解释 CPU baseline，只检测变化区域，不输出人/药盒/工具语义类别；输入灰度值必须为有限非布尔数值且在 `[0,255]`，浮点强度会保留，不会截断或裁剪；非法样本会清空历史并跳过比较；大图抽样后的检测框会映射回原始帧像素坐标，原帧尺寸/抽样步长变化时重置比较历史；每次 `FrameFactExtractor` 分析提取都会创建独立 provider session，避免并发 job 共享帧差历史；首帧不产生检测，状态在来源变化或每个新分析任务的 `frame_index=0` 时清空；区域面积分数是启发式字段，不是校准概率；
 - `fixture`：用于确定性测试的检测输出；
 - `onnx`：只有在输入/输出 adapter 经过验证时才允许选择，否则保持 unavailable；
-- `ultralytics`：可选的 Ultralytics-compatible person/pose adapter。它使用 `skeleton.py` 的单一 COCO17 名称/索引定义，把本地 frame payload 的模型结果归一化为 person `Detection`、bbox、confidence 和所有可用的 COCO17 named keypoints；缺少点可省略，坐标/置信度不合法时 fail closed。检测 metadata 保留 `keypoint_schema`/version，观察和事实 metadata 还带 pixel-free `skeleton`（source、UTC timestamp、track、continuity provenance）。
+- `ultralytics`：可选的 Ultralytics-compatible pose + semantic-object composition。pose 分支使用 `skeleton.py` 的单一 COCO17 名称/索引定义，object 分支只归一化非人物 label、bbox、confidence 和 class_id；两路共享下游 tracker/relation/action/memory 契约，object 分支不可用时 pose 仍可用。缺少点或非法坐标/置信度时 fail closed，metadata 保留 provider/component、keypoint schema/version、source、UTC timestamp、track 和 continuity provenance。
 - 可扩展 provider：真实模型可在不改变下游 schema 的情况下接入。
 
 Tracker 输出 `track_id`、类别、置信度和中心/区域信息。当前 CentroidTracker 先按类别与最大质心距离门控（人物标签走共享人物分类，其他类别按大小写规范化后的完整标签匹配），再求最大匹配数下的最小总距离分配；这避免逐边贪心导致的无谓 ID 断裂，但没有运动模型、外观特征或遮挡推理，交叉目标和快速移动仍可能造成 ID switch。重复框的观察归一化会逐个分配 track。遮挡、多人、多物体和跨摄像头 ID 的真实性能需要专项数据集验证，当前测试只证明本地确定性行为。

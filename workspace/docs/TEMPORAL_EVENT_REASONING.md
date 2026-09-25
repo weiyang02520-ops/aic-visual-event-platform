@@ -81,7 +81,7 @@ continuity/object evidence，不推断吞咽、剂量正确性或医学结论。
 
 无法安全转换为有限浮点值的关键点/框坐标（例如超大 JSON 整数）同样按缺少动作证据处理，不应令整条帧分析任务异常失败。
 
-该几何规则已接入 JSONL fixture 帧管线，测试覆盖 wrist 远离 face、wrist 远离药品、关键点低置信度，以及最终 `suspected_medication` 事件。它证明“有可信关键点时能生成动作事实”的代码路径；项目当前没有真实姿态模型，因此不能声称原始视频能够产生这些关键点或报告动作准确率。
+该几何规则已接入 JSONL fixture 帧管线，测试覆盖 wrist 远离 face、wrist 远离药品、关键点低置信度，以及最终 `suspected_medication` 事件。它证明“有可信关键点时能生成动作事实”的代码路径；项目已有官方 Ultralytics pose runtime smoke，但没有自定义场景姿态模型、授权数据集或动作准确率，因此不能把 fixture 几何规则当作场景指标。
 
 ## 工作室物品状态
 
@@ -131,7 +131,7 @@ Detection/Entity 直接构造均要求非空 ID/标签、有限非布尔数值�
 - 工作室超时缺失需要上游显式提供 `scene_observed`，否则不会仅凭无关事实报警；
 - 事件 precision/recall/F1、误报率、时间窗误差和吞吐仍待授权视频及人工事件标注后评估。
 
-当前 reasoner/plugin 定向测试为 `103 passed`，AI 全量测试为 `363 passed`。新增回归覆盖恢复模式的 JSONL 坏行标记、FrameFactExtractor 的连续段重置、关系时间回归保护、显式来源隔离，以及服药/工作室推理不跨 `observation_gap` 或不一致连续段关联。证据仍是构造事实、Mock 和 JSONL/CPU fixture，不代表真实模型或摄像头准确率。
+当前 reasoner/plugin 定向测试为 `103 passed`，AI 全量测试为 `414 passed`。新增回归覆盖恢复模式的 JSONL 坏行标记、FrameFactExtractor 的连续段重置、关系时间回归保护、显式来源隔离，以及服药/工作室推理不跨 `observation_gap` 或不一致连续段关联。证据仍是构造事实、Mock 和 JSONL/CPU fixture，不代表真实模型或摄像头准确率。
 
 ## 本地验证
 

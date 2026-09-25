@@ -22,7 +22,7 @@
 
 ## TASK-0009：组合感知路径（已实现的软件契约）
 
-`UltralyticsProvider` 仍只负责 person/pose 与 COCO17 关键点。新增的
+`UltralyticsProvider` 的 pose 分支仍只负责 person/pose 与 COCO17 关键点；组合 provider 另接 semantic object 分支。新增的
 `UltralyticsObjectProvider` 使用独立的 `AI_ULTRALYTICS_OBJECT_MODEL_PATH`
 配置，把任意非人物类别归一化为 `Detection(label, confidence, bbox,
 class_id, provider/provider_version)`；它不伪造 keypoints，也会在归一化边界排除
