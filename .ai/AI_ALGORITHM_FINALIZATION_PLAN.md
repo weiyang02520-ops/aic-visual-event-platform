@@ -75,20 +75,20 @@ Status: COMPLETE after TASK-0008 R1/R2 (scene-independent hand/object and hand/f
 Status: ACTIVE.
 
 #### A4.1 — Real semantic object perception
-Status: ACTIVE via TASK-0009 v2.
+Status: ACTIVE via bundled TASK-0009 v3.
 - preserve the proven person/pose path;
 - add a real-model-compatible semantic non-person object provider;
 - combine person skeleton + semantic objects into the existing tracker/relation/action/memory pipeline;
 - support custom medicine/tool labels by contract without claiming trained custom weights.
 
 #### A4.2 — Temporal visual memory
-Status: PENDING after semantic object perception.
+Status: INCLUDED in bundled TASK-0009 v3 after semantic object perception.
 - maintain queryable recent object-location and action-history state;
 - medication and object-memory plugins consume generic facts/memory;
 - do not merge evidence across source, discontinuity or incompatible identities.
 
 #### A4.3 — Schedule-aware medication review logic
-Status: PENDING after temporal memory.
+Status: INCLUDED in bundled TASK-0009 v3 after temporal memory.
 - accept a deterministic JSON medication-plan contract;
 - compare observed medication identity/time against the configured plan;
 - emit only reviewable plan-match / early / late / wrong-item / unresolved cues;
