@@ -692,3 +692,10 @@
 - Full source command (project-local absolute basetemp): `414 passed`, 616 non-blocking warnings.
 - Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `414 passed`, 616 non-blocking warnings.
 - Submission mirrors match the intentional AI source/tests/docs/config changes. Temp/runtime artifacts were cleaned after verification.
+
+## TASK-0010 final verification (2026-09-25T08:31:00Z)
+
+- Final acceptance matrix: `16 passed`.
+- Full source: `430 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette warnings.
+- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `430 passed`, 616 warnings.
+- Source/submission mirror check passed for intentional final matrix/report/contract/docs changes; contamination scan passed and project-local temp/runtime artifacts were cleaned.
