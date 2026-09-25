@@ -245,3 +245,12 @@ PLANNING → READY_FOR_CODEX
 actor: chatgpt-master
 task_hash: sha256:d6ccb9643ce822b86a70ccb7016d896fc3cb37253f638bbec1dc0d84e248d74c
 notes: Generalize skeleton/object action extraction into scene-independent hand_near_object and hand_to_face primitives while preserving conservative pickup/putdown and medication compatibility.
+
+
+2026-09-25T05:57:00Z
+TASK-0008
+MASTER_REVIEWING → CHANGES_REQUIRED
+actor: chatgpt-master
+pr: #9
+review_round: 1
+notes: Generic action direction accepted, but hand_near_object is incorrectly gated by wrist-near-face geometry. Also require a true continuity-gap regression rather than source-switch-only coverage. Scope remains TASK-0008.
