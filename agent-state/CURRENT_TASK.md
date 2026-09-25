@@ -615,3 +615,13 @@ Phase 0–3 已完成可验证骨架；当前环境缺少 Cargo、FFmpeg 和 .NE
 - [x] Added skeleton-only upper-pipeline/privacy/action regressions; targeted 61 passed.
 - [x] Full source suite returned `380 passed`; curated verifier returned `VERIFY_OK` / `380 passed`; project-local temp cleanup passed.
 - [ ] Master review and PR handoff remain pending; Codex must not choose TASK-0007.
+
+
+## TASK-0007 checkpoint — generic visual memory (2026-09-25)
+
+- [x] Verified the Task Packet hash and claimed `codex/task-0007-visual-memory`.
+- [x] Added non-person `object_in_zone` facts for configured zones with location/provenance.
+- [x] Added source/continuity/track-local `VisualMemory`; conservative gap/source/label/person/pixel boundaries are covered.
+- [x] Added FrameFactExtractor + zones integration and memory identity tests; targeted 144 passed.
+- [x] Full source suite returned `389 passed`; curated verifier returned `VERIFY_OK` / `389 passed`.
+- [ ] Master review and PR handoff remain pending; Codex must not choose TASK-0008.

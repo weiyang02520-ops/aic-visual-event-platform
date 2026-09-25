@@ -191,6 +191,7 @@ class FrameFactExtractor:
                     confidence=relation.confidence,
                     subject=relation.subject,
                     object=relation.object,
+                    location=relation.location,
                     metadata=relation_metadata if isinstance(relation_metadata, dict) else {},
                 )
                 facts.append(primitive)

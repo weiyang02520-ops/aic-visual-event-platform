@@ -249,6 +249,22 @@ class RelationEngine:
                 inside = zone.contains(point)
                 previous_inside = self._previous_zones.get(membership_key)
                 edge = "inside" if inside else "outside"
+                if inside and not is_person_label(entity.label):
+                    facts.append(
+                        RelationFact(
+                            "object_in_zone",
+                            timestamp,
+                            entity.confidence,
+                            {"id": entity.entity_id, "label": entity.label},
+                            {"zone_id": zone.zone_id, "label": zone.label},
+                            location=zone.label,
+                            metadata={
+                                "zone_id": zone.zone_id,
+                                "direct_observation": True,
+                                "bbox": list(entity.bbox),
+                            },
+                        )
+                    )
                 if previous_inside is not None and inside != previous_inside and self._allow(("zone", entity.entity_id, zone.zone_id, edge), timestamp):
                     facts.append(RelationFact("entered_zone" if inside else "left_zone", timestamp, entity.confidence, {"id": entity.entity_id, "label": entity.label}, location=zone.label, metadata={"zone_id": zone.zone_id}))
                 self._previous_zones[membership_key] = inside
