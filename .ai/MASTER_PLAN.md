@@ -31,3 +31,15 @@ Default for autonomous Codex work:
 - keep one task/one PR/one Master review boundary;
 - split only when there is a high-risk architecture boundary, external dependency, human decision, or a change that would make review too broad;
 - Codex should continue through all subpackages in the packet before handoff unless a declared stop condition is met.
+
+
+## User-led Control Mode
+
+Current operating mode: **manual/user-led**.
+
+- The roadmap may be maintained continuously in the repository.
+- Master must not automatically start the next major phase after a PASS.
+- The user explicitly chooses when to continue, review, change direction, or move phases.
+- When the user asks to continue, prefer one large coherent Task Packet over several small packets.
+- Default implementation packet: 60–180 minutes, 3–6 tightly related subgoals, one PR and one verification boundary.
+- Keep suggested future work in `.ai/DEVELOPMENT_DIRECTION.md`.
