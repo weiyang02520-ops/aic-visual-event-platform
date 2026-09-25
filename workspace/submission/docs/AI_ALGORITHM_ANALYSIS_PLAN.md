@@ -18,7 +18,7 @@
 
 1. 帧输入：Mock、JSONL、可选 OpenCV；时间戳、抽帧、取消、异常 FPS/PTS 和恢复间隙；
 2. CPU 检测与跟踪：帧差区域、FixtureDetector、距离门控的全局匹配、重复框和漏检状态处理；
-3. 关键点动作：消费显式 fixture keypoints，按人物/药品几何条件生成 `hand_to_face`；
+3. 骨骼与关键点动作：`skeleton.py` 提供 canonical COCO17 名称/索引、validated named points 和 source/timestamp/track/continuity provenance；`KeypointActionExtractor` 消费显式 skeleton/keypoints，按人物/药品几何条件生成 `hand_to_face`；
 4. 关系和时序：人物—物体接近、区域进出、药品序列、工作室移出/归还/缺失、连续段边界；
 5. 工程边界：任务取消与原子完成、embedding 输入校验、REST 预览像素递归脱敏、插件集成和证据保留。
 
@@ -36,6 +36,7 @@
 
 - 明确相机/边缘节点是否先骨骼化，确定原始帧的生命周期和传输路径；
 - 固定 keypoint、bbox、track、zone、timestamp、confidence 和 continuity metadata schema；
+- 固定 canonical COCO17 skeleton schema，并区分当前 RGB→pose→skeleton 的本地模式与目标 edge skeleton-only payload 模式；
 - 继续验证 REST、日志、SQLite、evidence resolver 和导出包不保存原始像素；
 - 将外部作品中的“隐私保护”“卡通化”“骨骼回放”分别标注为源头处理、传输脱敏和展示脱敏。
 
@@ -46,6 +47,7 @@
 目标：替换 CPU/fixture 入口时，保持下游关系和时序规则不变。
 
 - 接入经过授权的目标检测和姿态模型，记录模型版本、类别映射和输入尺寸；
+- 默认姿态 provider 输出所有可用的 COCO17 named keypoints；上层必须能仅凭 skeleton metadata 工作，不能依赖 raw pixels；
 - 对关键点置信度、遮挡、漏检、抖动和多人交叉做切片评估；
 - 比较无平滑、EMA/滤波和模型原生时序输出，观察 `hand_to_face`、区域进出和 track ID 的变化；
 - 评估 ByteTrack/Kalman 等外部方案时，必须与当前 CentroidTracker 统一数据集、门控、ID 指标和失败定义。

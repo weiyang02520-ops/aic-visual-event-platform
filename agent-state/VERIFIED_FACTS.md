@@ -562,3 +562,11 @@ Makerverse 与 livestream-rs 的静态仓库事实已在 Phase 0 以本目录内
 - File/URL: `workspace/frontend/src/types.ts`, `repository.ts`, `App.tsx`, `styles.css`, `workspace/docs/FRONTEND_SYSTEM_DESIGN.md`.
 - Limitation: Browser click-through was not run because no browser executable is available; media playback and Makerverse remain separate integration boundaries.
 - Confidence: high for the implemented state transitions and API contract path; browser rendering and live media behavior remain pending environment/deployment verification.
+
+
+### FACT-081
+- Claim: The AI pipeline has one canonical validated COCO17 skeleton contract and the real pose adapter exports all available named joints without exposing pixels.
+- Evidence: `skeleton.py` defines the standard 17-name/index order, `SkeletonKeypoint`/`SkeletonObservation` validation and provenance. `UltralyticsProvider` normalizes all available default COCO17 joints; observations/facts preserve semantic skeleton metadata. Skeleton-only fixture tests produce `hand_to_face` and person facts with source/time/track/continuity while raw pixel fields are absent. Targeted tests returned 61 passed; source and curated suites returned 380 passed / VERIFY_OK.
+- File/URL: `workspace/ai-engine/src/visual_event_ai/skeleton.py`, provider/action/fact modules, `tests/test_skeleton.py`, `workspace/docs/AI_ALGORITHM_DESIGN.md`.
+- Limitation: Mode B camera/edge skeleton-only output is not physically verified; one public model adapter and fixture contracts do not establish pose accuracy, gait, GNN or scene metrics.
+- Confidence: high for the canonical contract and local normalization/privacy behavior; low for hardware and generalization.

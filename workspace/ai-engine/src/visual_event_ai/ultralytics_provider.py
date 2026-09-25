@@ -18,13 +18,16 @@ from typing import Any
 from .entity_labels import is_person_label
 from .frame_pipeline import Frame
 from .providers import Detection
+from .skeleton import (
+    COCO17_KEYPOINT_INDICES,
+    COCO17_SCHEMA,
+    COCO17_SCHEMA_VERSION,
+    SkeletonKeypoint,
+)
 
 
-COCO_KEYPOINT_INDICES = {
-    "nose": 0,
-    "left_wrist": 9,
-    "right_wrist": 10,
-}
+# Backward-compatible alias for callers that imported the old provider map.
+COCO_KEYPOINT_INDICES = COCO17_KEYPOINT_INDICES
 
 
 def _attribute(value: Any, name: str, default: Any = None) -> Any:
@@ -124,7 +127,7 @@ class UltralyticsProvider:
         if any(isinstance(item, bool) or not isinstance(item, int) for item in person_class_ids):
             raise ValueError("person_class_ids must contain integers")
         self.person_class_ids = frozenset(person_class_ids)
-        indices = dict(keypoint_indices or COCO_KEYPOINT_INDICES)
+        indices = dict(keypoint_indices or COCO17_KEYPOINT_INDICES)
         if any(
             not isinstance(name, str)
             or not name.strip()
@@ -135,6 +138,14 @@ class UltralyticsProvider:
         ):
             raise ValueError("keypoint_indices must map non-empty names to non-negative integers")
         self.keypoint_indices = {name.strip(): index for name, index in indices.items()}
+        self.keypoint_schema = (
+            COCO17_SCHEMA
+            if all(
+                name in COCO17_KEYPOINT_INDICES and COCO17_KEYPOINT_INDICES[name] == index
+                for name, index in self.keypoint_indices.items()
+            )
+            else "custom"
+        )
 
     def new_session(self) -> UltralyticsProvider:
         """Return a stateless provider view; model weights are not reloaded per job."""
@@ -224,19 +235,25 @@ class UltralyticsProvider:
             if index >= len(points):
                 continue
             point = _to_python(points[index])
+            if point is None:
+                continue
             if not isinstance(point, (list, tuple)) or len(point) < 2:
                 raise ValueError(f"Ultralytics keypoint {name} has malformed coordinates")
             confidence = 1.0
             if confidence_row and index < len(confidence_row):
                 confidence_value = confidence_row[index]
+                if confidence_value is None:
+                    continue
                 if isinstance(confidence_value, (list, tuple)) and len(confidence_value) == 1:
                     confidence_value = confidence_value[0]
                 confidence = _confidence(confidence_value, f"keypoint {name} confidence")
-            normalized[name] = [
+            normalized_point = SkeletonKeypoint(
+                name,
                 _finite_number(point[0], f"keypoint {name} x"),
                 _finite_number(point[1], f"keypoint {name} y"),
                 confidence,
-            ]
+            )
+            normalized[name] = normalized_point.as_list()
         return normalized
 
     def _normalize_results(self, results: Any) -> list[Detection]:
@@ -270,7 +287,8 @@ class UltralyticsProvider:
                     "provider": self.provider_id,
                     "provider_version": self.version,
                     "class_id": class_id,
-                    "keypoint_schema": "coco17",
+                    "keypoint_schema": self.keypoint_schema,
+                    "keypoint_schema_version": COCO17_SCHEMA_VERSION,
                 }
                 keypoints = self._keypoints(result, row_index)
                 if keypoints:

@@ -6,12 +6,12 @@
   "task_version": 1,
   "task_hash": "sha256:aa527e1f620ea9dbb9ab163860102ce46fd839e7034772bab7a96826d0f31cff",
   "iteration": 6,
-  "status": "CODEX_RUNNING",
+  "status": "CODEX_VALIDATING",
   "last_actor": "codex",
   "next_actor": "codex",
   "active_branch": "codex/task-0006-skeleton-contract",
   "active_pr": null,
-  "last_commit": "0b979d5a669a627ec6db0fbb1224da2eb8ef12f4",
+  "last_commit": "92e931a",
   "retry_count": 0,
   "review_round": 0,
   "consecutive_failures": 0,
@@ -20,5 +20,5 @@
   "lock_owner": "codex-luna",
   "lock_token": "df3b37da-f0aa-4e0b-898e-20b290c1d96c",
   "lock_expires_at": "2026-09-25T04:23:13Z",
-  "updated_at": "2026-09-25T03:53:13Z"
+  "updated_at": "2026-09-25T03:59:50Z"
 }

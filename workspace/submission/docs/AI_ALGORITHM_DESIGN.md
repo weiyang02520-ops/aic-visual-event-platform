@@ -12,7 +12,7 @@
 
 依据项目内 `AIC_ALGORITHM_COMPETITION_ALIGNMENT.md`，当前作品优先按 `AI+场景创新` 组织：视觉事实层服务养老辅助和工作室物品管理，机器人作为待验证的感知载体。`AI+硬件创新` 需要另行补齐硬件参数、算法运行效率、稳定性/安全性和现场演示证据；`算法模型创新` 需要真实模型、基线和指标，不能由当前 CPU/fixture 规则测试替代。四份用户提供的算法/作品 DOCX 已按可借鉴方法、证据质量和迁移边界完成审计，见 `REFERENCE_ALGORITHM_AUDIT.md`；其内主张和指标不自动视为本项目结果。
 
-隐私优先的目标是让相机或边缘节点尽早完成骨骼化，只向上层输出关键点、轨迹和事件所需的最小字段。当前引擎只消费显式 fixture keypoints，尚未实现相机侧骨骼化、真实姿态模型或隐私模式开关；帧预览 API 现在会递归将常见 `image`、`gray`、`pixels`、`depth_map`、`rgb/bgr` 等矩阵替换为编码与尺寸摘要，但这只是传输边界的脱敏，不等同于相机源头处理。非图像语义字段（例如 fixture 中的关键点和标签）仍会保留。卡通化展示属于演示脱敏，也不等同于源头隐私保护。步态、身高比例和骨骼形态只列为后续身份研究方向，不作为当前身份认证能力。药品分区、固定位置和时间证据可以降低身份依赖，但缺少可信人物关联时仍只能输出不完整/待复核线索。
+隐私优先的目标是让相机或边缘节点尽早完成骨骼化，只向上层输出关键点、轨迹和事件所需的最小字段。当前实现区分两种部署模式：Mode A（当前/本地）是 `RGB frame -> pose provider -> skeleton -> upper AI`；Mode B（目标边缘隐私边界）是 `camera/edge pose -> skeleton-only payload -> upper AI`。Mode A 已通过真实 Ultralytics runtime smoke，Mode B 的骨骼-only 上层行为已通过软件契约测试，但物理相机/边缘节点的 skeleton-only 输出尚未硬件验收。帧预览 API 现在会递归将常见 `image`、`gray`、`pixels`、`depth_map`、`rgb/bgr` 等矩阵替换为编码与尺寸摘要，但这只是传输边界的脱敏，不等同于相机源头处理。非图像语义字段（例如 fixture 中的关键点和标签）仍会保留。卡通化展示属于 frontend/presentation 演示脱敏，不属于本任务的隐私源头实现。步态、身高比例和骨骼形态只列为后续身份研究方向，不作为当前身份认证能力。药品分区、固定位置和时间证据可以降低身份依赖，但缺少可信人物关联时仍只能输出不完整/待复核线索。
 
 同一脱敏边界现在贯穿事实和证据链：`FrameFactExtractor` 在把 detector metadata 变成 `PrimitiveFact` 前递归替换像素、深度、热成像和 raw-frame 数组；`/api/v1/vision/preview` 对观察 metadata 使用同一规则；任务创建 metadata、SQLite job metadata 和事件 payload 写入前也会脱敏。关键点、标签、bbox、来源和形状摘要保留，原始像素值不进入事件证据。这是软件传输/存储边界的验证，不代表相机源头已经删除原始帧。
 
@@ -48,12 +48,12 @@ VideoSourceAdapter
 - `motion_cpu`：基于帧差/四邻域连通区域的可解释 CPU baseline，只检测变化区域，不输出人/药盒/工具语义类别；输入灰度值必须为有限非布尔数值且在 `[0,255]`，浮点强度会保留，不会截断或裁剪；非法样本会清空历史并跳过比较；大图抽样后的检测框会映射回原始帧像素坐标，原帧尺寸/抽样步长变化时重置比较历史；每次 `FrameFactExtractor` 分析提取都会创建独立 provider session，避免并发 job 共享帧差历史；首帧不产生检测，状态在来源变化或每个新分析任务的 `frame_index=0` 时清空；区域面积分数是启发式字段，不是校准概率；
 - `fixture`：用于确定性测试的检测输出；
 - `onnx`：只有在输入/输出 adapter 经过验证时才允许选择，否则保持 unavailable；
-- `ultralytics`：可选的 Ultralytics-compatible person/pose adapter。它只负责把本地 frame payload 的模型结果归一化为 person `Detection`、bbox、confidence 和 COCO17 的 `nose`/`left_wrist`/`right_wrist` keypoints；缺少依赖、模型文件或输入/输出不合法时保持 unavailable 或 fail closed。当前只完成 fake-result 和 frame/fact integration contract tests，没有模型权重和真实 runtime 证据；
+- `ultralytics`：可选的 Ultralytics-compatible person/pose adapter。它使用 `skeleton.py` 的单一 COCO17 名称/索引定义，把本地 frame payload 的模型结果归一化为 person `Detection`、bbox、confidence 和所有可用的 COCO17 named keypoints；缺少点可省略，坐标/置信度不合法时 fail closed。检测 metadata 保留 `keypoint_schema`/version，观察和事实 metadata 还带 pixel-free `skeleton`（source、UTC timestamp、track、continuity provenance）。
 - 可扩展 provider：真实模型可在不改变下游 schema 的情况下接入。
 
 Tracker 输出 `track_id`、类别、置信度和中心/区域信息。当前 CentroidTracker 先按类别与最大质心距离门控（人物标签走共享人物分类，其他类别按大小写规范化后的完整标签匹配），再求最大匹配数下的最小总距离分配；这避免逐边贪心导致的无谓 ID 断裂，但没有运动模型、外观特征或遮挡推理，交叉目标和快速移动仍可能造成 ID switch。重复框的观察归一化会逐个分配 track。遮挡、多人、多物体和跨摄像头 ID 的真实性能需要专项数据集验证，当前测试只证明本地确定性行为。
 
-可选的 `KeypointActionExtractor` 消费 Detector metadata 中的明确关键点坐标；它不从像素估计人体姿态。人物检测框高度用于归一化 face-to-wrist 距离，且同一手腕必须同时接近药品框，才输出 `hand_to_face`；对同一人物/药品组合只在动作进入阈值时输出一次事实，容忍 1 个采样帧的关键点丢失，超过间隔后才重新武装。提取器按 `source_id` 隔离动作 episode；一次调用混入多个来源会拒绝，避免同一人物/对象 ID 在换源后沿用旧去抖状态。
+可选的 `KeypointActionExtractor` 通过 canonical `SkeletonObservation` 消费 Detector/fixture 的明确关键点坐标；它不从像素估计人体姿态。人物检测框高度用于归一化 face-to-wrist 距离，且同一手腕必须同时接近药品框，才输出 `hand_to_face`；对同一人物/药品组合只在动作进入阈值时输出一次事实，容忍 1 个采样帧的关键点丢失，超过间隔后才重新武装。提取器按 `source_id` 隔离动作 episode；一次调用混入多个来源会拒绝，避免同一人物/对象 ID 在换源后沿用旧去抖状态。骨骼-only fixture 回归证明上层 action/fact 逻辑不需要读取 raw image/gray/RGB/BGR。
 
 `FrameFactExtractor` 将 `source_id` 写入对象、关系、动作和观察间隙事实的 metadata；如果调用方把带来源标记的关系事实与另一来源的 keypoint observations 混合，动作提取器会拒绝该批次。没有来源 metadata 的旧构造事实保留兼容路径，但不应被当作跨来源身份证据。
 

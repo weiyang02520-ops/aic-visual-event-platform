@@ -181,3 +181,10 @@ PLANNING → READY_FOR_CODEX
 actor: chatgpt-master
 task_hash: sha256:aa527e1f620ea9dbb9ab163860102ce46fd839e7034772bab7a96826d0f31cff
 notes: Canonical skeleton-first contract, full COCO17 normalization, skeleton-only upper-pipeline proof and privacy documentation.
+
+
+2026-09-25T03:59:50Z
+TASK-0006
+CODEX_RUNNING -> CODEX_VALIDATING
+actor: codex-luna
+notes: Added canonical COCO17 skeleton contract, full Ultralytics keypoint normalization, skeleton provenance/privacy flow and skeleton-only upper-pipeline tests; source suite 380 passed and curated VERIFY_OK.

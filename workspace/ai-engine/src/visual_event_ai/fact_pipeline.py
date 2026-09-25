@@ -12,6 +12,7 @@ from .privacy import sanitize_sensitive_payload
 from .providers import CentroidTracker, normalize_observations
 from .quality import evaluate_channel_quality
 from .relations import Entity, RelationEngine, Zone
+from .skeleton import SkeletonObservation
 
 
 class FrameFactExtractor:
@@ -118,6 +119,20 @@ class FrameFactExtractor:
                 metadata = dict(sanitized_metadata) if isinstance(sanitized_metadata, dict) else {}
                 metadata["continuity_segment"] = continuity_segment
                 metadata["source_id"] = frame.source_id
+                skeleton = SkeletonObservation.from_metadata(
+                    metadata,
+                    source_id=frame.source_id,
+                    timestamp=observation.timestamp,
+                    track_id=(
+                        observation.subject.get("track_id")
+                        if isinstance(observation.subject, dict)
+                        else None
+                    ),
+                    continuity_segment=continuity_segment,
+                    strict=False,
+                )
+                if skeleton is not None:
+                    metadata["skeleton"] = skeleton.as_dict()
                 if quality_summary is not None:
                     metadata["quality_gate"] = quality_summary
                 if discontinuity_before:
