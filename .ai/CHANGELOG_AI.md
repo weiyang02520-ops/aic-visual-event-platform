@@ -322,3 +322,23 @@ AI-DOCUMENT-ALIGNMENT
 PLAN_UPDATED
 actor: chatgpt-master
 notes: After TASK-0009, complete temporal visual memory, then schedule-aware medication review logic. 2S-AGCN/fall-violence and audio fusion remain documented extension boundaries unless model/data evidence is later supplied.
+
+
+2026-09-25T06:45:00Z
+TASK-0009 v2
+READY_FOR_CODEX → SUPERSEDED_BEFORE_CLAIM
+actor: chatgpt-master
+notes: No branch/PR/lock existed. User requested larger autonomous work packets to reduce Codex idle cycles.
+
+2026-09-25T06:45:00Z
+TASK-0009 v3
+PLANNING → READY_FOR_CODEX
+actor: chatgpt-master
+task_hash: sha256:f7f72535c048bced69e307dd0b3a0a0dfff760336afc854a7436f3ede2e0da74
+notes: Bundled 45–120 minute packet: semantic object perception + temporal visual memory + schedule-aware medication review + aligned docs/tests.
+
+2026-09-25T06:45:00Z
+AUTOMATION-POLICY
+TASK_SIZING_UPDATED
+actor: chatgpt-master
+notes: Default future Codex packets should bundle 2–4 tightly related subgoals and target 45–120 minutes unless review risk/external dependency requires splitting.
