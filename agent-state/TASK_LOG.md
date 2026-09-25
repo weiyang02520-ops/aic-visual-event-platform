@@ -556,3 +556,11 @@
 - Integrated generic hand_near_object facts into FrameFactExtractor while preserving medication reasoner behavior and conservative pickup/putdown candidates.
 - Added deterministic arbitrary-object, missing/low-confidence, person-only, identity/provenance/privacy and pipeline tests.
 - Source suite: `396 passed`; curated verifier: `VERIFY_OK`, `396 passed`; project-local temp directories cleaned.
+
+
+## 2026-09-25 — TASK-0008 R1 fixes
+
+- Applied Master R1 narrow fixes on the existing action-primitives branch/PR.
+- Decoupled hand_near_object from face proximity; added explicit far-from-face/near-tool regression.
+- Added actual FrameFactExtractor discontinuity/observation_gap regression proving a fresh post-gap medication episode.
+- Targeted tests 161 passed; full source suite 398 passed; curated VERIFY_OK.

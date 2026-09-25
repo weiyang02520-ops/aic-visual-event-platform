@@ -6,19 +6,19 @@
   "task_version": 1,
   "task_hash": "sha256:d6ccb9643ce822b86a70ccb7016d896fc3cb37253f638bbec1dc0d84e248d74c",
   "iteration": 8,
-  "status": "CODEX_RUNNING",
+  "status": "CODEX_VALIDATING",
   "last_actor": "codex",
   "next_actor": "codex",
   "active_branch": "codex/task-0008-generic-action-primitives",
   "active_pr": 9,
-  "last_commit": "3c0a9238564a16eba2e5a7520dc6aec6cf32d42c",
+  "last_commit": "f1b1b64",
   "retry_count": 0,
-  "review_round": 0,
+  "review_round": 1,
   "consecutive_failures": 0,
   "human_required": false,
   "blocked_reason": null,
   "lock_owner": "codex-luna",
   "lock_token": "8b334eeb-2ba3-4b4c-a0e5-b4b7c0a2dd48",
   "lock_expires_at": "2026-09-25T06:32:00Z",
-  "updated_at": "2026-09-25T06:02:00Z"
+  "updated_at": "2026-09-25T06:04:43Z"
 }

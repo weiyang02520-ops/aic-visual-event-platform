@@ -635,3 +635,12 @@ Phase 0–3 已完成可验证骨架；当前环境缺少 Cargo、FFmpeg 和 .NE
 - [x] Added deterministic action/provenance/source/time/continuity/privacy tests; targeted 159 passed.
 - [x] Full source suite returned `396 passed`; curated verifier returned `VERIFY_OK` / `396 passed`.
 - [ ] Master review and PR handoff remain pending; Codex must not choose TASK-0009.
+
+
+## TASK-0008 R1 checkpoint — generic action primitives (2026-09-25)
+
+- [x] Master R1 blocker fixed: hand_near_object no longer requires wrist-to-face proximity.
+- [x] Added far-from-face/near-arbitrary-object regression; hand_near_object emits and hand_to_face does not.
+- [x] Added real FrameFactExtractor observation_gap/continuity regression proving a fresh post-gap action episode.
+- [x] Targeted tests returned 161 passed; full source suite 398 passed; curated VERIFY_OK.
+- [ ] R2 review on existing PR #9 remains pending; no new task selected.

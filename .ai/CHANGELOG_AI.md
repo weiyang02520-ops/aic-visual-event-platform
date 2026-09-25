@@ -261,3 +261,10 @@ actor: codex-luna
 commit: 3c0a9238564a16eba2e5a7520dc6aec6cf32d42c
 pr: https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/9
 notes: Scene-independent action primitives and medication compatibility adapter complete; source suite 396 passed; curated VERIFY_OK; PR is OPEN/CLEAN; lock released and next_actor set to chatgpt.
+
+
+2026-09-25T06:04:43Z
+TASK-0008 R1
+CODEX_RUNNING -> CODEX_VALIDATING
+actor: codex-luna
+notes: Fixed independent hand_near_object wrist geometry and added actual FrameFactExtractor observation_gap/continuity action regression; targeted 161 passed, full 398 passed, curated VERIFY_OK. Returning same PR #9 for R2.

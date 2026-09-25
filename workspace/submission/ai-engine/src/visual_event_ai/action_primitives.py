@@ -194,15 +194,15 @@ class GenericActionPrimitiveExtractor:
             if nose is None:
                 continue
             face_radius = person_bbox[3] * self.max_face_distance_fraction
-            wrists = []
+            valid_wrists = []
             for hand_name in ("left_wrist", "right_wrist"):
                 wrist = self._point(skeleton.keypoints, hand_name)
                 if wrist is None:
                     continue
                 face_distance = hypot(wrist[0] - nose[0], wrist[1] - nose[1])
-                if face_distance <= face_radius:
-                    wrists.append((hand_name, wrist, face_distance))
-            for hand_name, wrist, face_distance in wrists:
+                valid_wrists.append((hand_name, wrist, face_distance))
+            close_wrists = [item for item in valid_wrists if item[2] <= face_radius]
+            for hand_name, wrist, face_distance in close_wrists:
                 if self.emit_hand_to_face:
                     pair = (person_id, hand_name)
                     last_seen = self._last_seen_frames.get(pair)
@@ -226,6 +226,9 @@ class GenericActionPrimitiveExtractor:
                             )
                         )
                     self._last_seen_frames[pair] = frame_index
+            # Object proximity is independent of face proximity: a hand may
+            # be interacting with a tool while nowhere near the face.
+            for hand_name, wrist, face_distance in valid_wrists:
                 for object_id, object_observation in objects:
                     object_bbox = _bbox(object_observation)
                     if object_bbox is None:

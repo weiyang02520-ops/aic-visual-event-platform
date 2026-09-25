@@ -2,7 +2,7 @@
 
 ## Result
 
-`PASS_GENERIC_ACTION_PRIMITIVES`
+`PASS_GENERIC_ACTION_PRIMITIVES_R1`
 
 The low-level skeleton/object action stage now produces scene-independent action observations. Generic geometry emits `hand_near_object` for arbitrary non-person objects and generic `hand_to_face` from person skeleton geometry alone. The existing `KeypointActionExtractor` name remains as a compatibility adapter that adds medication context only for the medication temporal reasoner.
 
@@ -41,11 +41,18 @@ No frontend, hardware, Makerverse/livestream-rs, gait, GNN, model, training or d
 
 ## Tests and verification
 
-- Targeted generic action/legacy action/fact/core/reasoner tests: `159 passed`.
-- Full source suite with an absolute project-local basetemp: `396 passed`, 1 non-blocking Starlette deprecation warning.
+- Targeted generic action/legacy action/fact/core/reasoner tests: `161 passed` (including the R1 regressions).
+- Full source suite with an absolute project-local basetemp: `398 passed`, 1 non-blocking Starlette deprecation warning.
 - Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `396 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette deprecation warnings.
 - Source and curated AI mirrors were synchronized. Project-local pytest temp directories were removed.
 - No model weights, media, runtime DB, venv, cache, raw pixels or secrets are tracked.
+
+## R1 fixes
+
+- `hand_near_object` now evaluates every valid/confident wrist against every non-person object independently of wrist-to-face geometry.
+- Added a regression where the wrist is far from the face but close to an arbitrary tool; it emits `hand_near_object` and does not emit `hand_to_face`.
+- Added a real `FrameFactExtractor` discontinuity regression: a valid post-`observation_gap` medication gesture emits a fresh action in the new continuity segment instead of reusing the pre-gap episode.
+- Same PR #9 remains in use for Master R2 review.
 
 ## Master decision needed
 

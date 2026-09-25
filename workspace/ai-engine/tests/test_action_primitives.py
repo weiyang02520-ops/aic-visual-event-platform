@@ -57,6 +57,17 @@ def test_generic_extractor_rejects_far_or_low_confidence_wrist():
     assert extractor.extract([person(wrist=(20, 25, 0.2)), object_observation()], [], frame_index=1) == []
 
 
+def test_hand_near_object_does_not_require_wrist_near_face():
+    facts = GenericActionPrimitiveExtractor(emit_hand_to_face=True).extract(
+        [person(wrist=(70, 80, 0.9)), object_observation(bbox=(68, 78, 8, 10))],
+        [],
+        frame_index=0,
+    )
+
+    assert any(fact.fact_type == "hand_near_object" for fact in facts)
+    assert not any(fact.fact_type == "hand_to_face" for fact in facts)
+
+
 def test_generic_extractor_emits_hand_to_face_without_an_object():
     facts = GenericActionPrimitiveExtractor().extract([person()], [], frame_index=0)
 
@@ -117,3 +128,43 @@ def test_frame_fact_extractor_emits_generic_action_primitive(tmp_path):
     assert action.metadata["source_id"] == str(fixture)
     assert action.metadata["continuity_segment"] == 0
     assert all(key not in action.metadata for key in ("image", "gray", "rgb", "bgr", "pixels"))
+
+
+def test_frame_fact_extractor_resets_action_episode_after_observation_gap():
+    from visual_event_ai.frame_pipeline import Frame, FramePipeline
+    from visual_event_ai.model_providers import DetectorProviderRegistry
+
+    class DiscontinuousProvider:
+        def iter_frames(self, source, *, interval, max_frames, token, recover):
+            payload = {
+                "objects": [
+                    {
+                        "label": "person",
+                        "confidence": 0.95,
+                        "bbox": [0, 0, 40, 100],
+                        "keypoints": {
+                            "nose": [20, 20, 0.95],
+                            "left_wrist": [20, 25, 0.9],
+                            "right_wrist": [35, 75, 0.9],
+                        },
+                    },
+                    {"label": "medicine bottle", "confidence": 0.85, "bbox": [18, 20, 8, 10]},
+                ]
+            }
+            yield Frame(source, 0, BASE, payload, {"provider": "fixture"})
+            yield Frame(
+                source,
+                1,
+                BASE + timedelta(seconds=1),
+                payload,
+                {"provider": "fixture", "discontinuity_before": True, "discontinuity_reason": "test_gap"},
+            )
+
+    facts = FrameFactExtractor(
+        pipeline=FramePipeline(providers={"file": DiscontinuousProvider()}),
+        detectors=DetectorProviderRegistry(requested="fixture"),
+    ).extract("gap.jsonl")
+
+    assert sum(fact.fact_type == "observation_gap" for fact in facts) == 1
+    assert sum(fact.fact_type == "hand_to_face" for fact in facts) == 2
+    assert {fact.metadata["continuity_segment"] for fact in facts if fact.fact_type == "hand_to_face"} == {0, 1}

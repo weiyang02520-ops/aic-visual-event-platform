@@ -668,3 +668,12 @@
 - Full source suite: `396 passed`, 1 non-blocking warning.
 - Curated verifier: `VERIFY_OK`, `396 passed`, 616 non-blocking warnings.
 - Source/curated mirrors match; no model weights/media/runtime/cache files tracked.
+
+
+## 2026-09-25 — TASK-0008 R1 fixes
+
+- `hand_near_object` now evaluates a valid wrist independently of wrist-to-face proximity; far-from-face/near-tool regression emits only the generic object action.
+- A real `FrameFactExtractor` discontinuity regression uses `discontinuity_before`/observation_gap and proves the post-gap medication action emits again with a new continuity segment.
+- Targeted action/fact/core/reasoner tests: `161 passed`.
+- Full source suite: `398 passed`; curated `VERIFY_OK`, `398 passed`, 616 non-blocking warnings.
+- Same PR #9 is updated for R2; no new PR.
