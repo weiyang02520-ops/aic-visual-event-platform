@@ -229,3 +229,19 @@ actor: codex-luna
 commit: 9e7021448869adf2fbc461b7a442342b030376f9
 pr: https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/8
 notes: Generic object_in_zone facts and source/continuity-local VisualMemory complete; source suite 389 passed; curated VERIFY_OK; PR is OPEN/CLEAN; lock released and next_actor set to chatgpt.
+
+
+2026-09-25T04:55:00Z
+TASK-0007
+MASTER_REVIEWING → PASS
+actor: chatgpt-master
+pr: #8
+merge_commit: 3c6b8e9190356efddd5eaf8e38f580df53526451
+notes: Generic object_in_zone facts and conservative source/continuity-local VisualMemory accepted. A2 complete.
+
+2026-09-25T04:55:00Z
+TASK-0008
+PLANNING → READY_FOR_CODEX
+actor: chatgpt-master
+task_hash: sha256:d6ccb9643ce822b86a70ccb7016d896fc3cb37253f638bbec1dc0d84e248d74c
+notes: Generalize skeleton/object action extraction into scene-independent hand_near_object and hand_to_face primitives while preserving conservative pickup/putdown and medication compatibility.
