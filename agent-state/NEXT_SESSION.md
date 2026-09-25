@@ -212,3 +212,10 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - Commit: `3c0a9238564a16eba2e5a7520dc6aec6cf32d42c`; PR [#9](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/9) targets `main` and is `OPEN` / `CLEAN`.
 - State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`.
 - Review generic action/medication compatibility evidence before any next task; Codex must not choose TASK-0009.
+
+
+## TASK-0008 R1 PR handoff (2026-09-25)
+
+- Fix commit: `8fffbcdcf197f80241da8489beed863fe6f4dec4`; same PR [#9](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/9) returned for R2 review.
+- State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`; review round 1 addressed.
+- Codex must not select TASK-0009.

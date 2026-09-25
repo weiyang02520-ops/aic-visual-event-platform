@@ -644,3 +644,11 @@ Phase 0–3 已完成可验证骨架；当前环境缺少 Cargo、FFmpeg 和 .NE
 - [x] Added real FrameFactExtractor observation_gap/continuity regression proving a fresh post-gap action episode.
 - [x] Targeted tests returned 161 passed; full source suite 398 passed; curated VERIFY_OK.
 - [ ] R2 review on existing PR #9 remains pending; no new task selected.
+
+
+## TASK-0008 R1 checkpoint (2026-09-25)
+
+- [x] Fixed independent hand_near_object wrist/object geometry.
+- [x] Added real observation_gap/continuity action regression.
+- [x] Targeted tests 161 passed; full source 398 passed; curated VERIFY_OK.
+- [x] Same PR #9 returned for R2 review; no new task selected.

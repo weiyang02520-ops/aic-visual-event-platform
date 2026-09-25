@@ -677,3 +677,11 @@
 - Targeted action/fact/core/reasoner tests: `161 passed`.
 - Full source suite: `398 passed`; curated `VERIFY_OK`, `398 passed`, 616 non-blocking warnings.
 - Same PR #9 is updated for R2; no new PR.
+
+
+## 2026-09-25 — TASK-0008 R1 verification
+
+- Far-from-face/near-tool regression: `hand_near_object` emits and `hand_to_face` does not.
+- Real FrameFactExtractor discontinuity regression: pre-gap and post-gap medication actions both emit with continuity segments 0 and 1; old episode is not reused.
+- Targeted tests: `161 passed`. Full source suite: `398 passed`, 1 warning. Curated verifier: `VERIFY_OK`, `398 passed`, 616 warnings.
+- Same PR #9 returned for R2; no scope expansion or new task selected.

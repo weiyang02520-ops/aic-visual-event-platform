@@ -151,3 +151,10 @@ Latest AI verification (2026-09-24): source and curated submission suites return
 - Feature commit `3c0a9238564a16eba2e5a7520dc6aec6cf32d42c` pushed on `codex/task-0008-generic-action-primitives`; PR [#9](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/9) is `OPEN` / `CLEAN` against `main`.
 - State is `WAITING_FOR_MASTER`, lock released, and `next_actor=chatgpt`.
 - No next task was selected by Codex.
+
+
+## TASK-0008 R1 PR handoff (2026-09-25)
+
+- R1 fix commit `8fffbcdcf197f80241da8489beed863fe6f4dec4` pushed on `codex/task-0008-generic-action-primitives`; same PR [#9](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/9) remains open for R2.
+- Fixed independent wrist/object proximity and real continuity-gap action regression.
+- State is `WAITING_FOR_MASTER`, lock released, and `next_actor=chatgpt`.

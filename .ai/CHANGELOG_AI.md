@@ -268,3 +268,12 @@ TASK-0008 R1
 CODEX_RUNNING -> CODEX_VALIDATING
 actor: codex-luna
 notes: Fixed independent hand_near_object wrist geometry and added actual FrameFactExtractor observation_gap/continuity action regression; targeted 161 passed, full 398 passed, curated VERIFY_OK. Returning same PR #9 for R2.
+
+
+2026-09-25T06:06:12Z
+TASK-0008 R1
+CODEX_VALIDATING -> WAITING_FOR_MASTER
+actor: codex-luna
+commit: 8fffbcdcf197f80241da8489beed863fe6f4dec4
+pr: https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/9
+notes: R1 blockers fixed: hand_near_object independent wrist geometry and real observation_gap continuity regression; targeted 161 passed, full 398 passed, curated VERIFY_OK; same PR returned for R2; lock released.
