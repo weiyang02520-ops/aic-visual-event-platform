@@ -59,13 +59,14 @@ Status: COMPLETE after TASK-0006 (canonical COCO17 + skeleton-only upper-pipelin
 - preserve existing nose/wrist medication-action semantics.
 
 ### A2 — Detection, tracking and object memory
-Status: ACTIVE via TASK-0007.
+Status: COMPLETE after TASK-0007 (generic object_in_zone + conservative VisualMemory identity boundary).
 - audit current Centroid/Hungarian tracker and object continuity;
 - define object state / last-known-location memory independent of scene plugin;
 - only add a new tracker adapter if it materially improves architecture without forcing dataset claims;
 - document ByteTrack/Kalman as an alternative if not implemented.
 
 ### A3 — Generic action primitives
+Status: ACTIVE via TASK-0008.
 - normalize reusable skeleton/object actions such as hand_near_object, object_picked/carried/put_down and hand_to_face;
 - keep confidence, source, UTC timestamp and continuity segment provenance;
 - avoid scene-specific conclusions at this layer.
