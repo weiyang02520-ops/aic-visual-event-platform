@@ -1,67 +1,55 @@
-# Codex Completion Report — TASK-0006
+# Codex Completion Report — TASK-0007
 
 ## Result
 
-`PASS_CANONICAL_SKELETON_CONTRACT`
+`PASS_GENERIC_VISUAL_MEMORY`
 
-The AI pose path now has one canonical, validated COCO17 skeleton contract. The real Ultralytics adapter exports every available valid COCO17 named joint, while the existing hand-to-face action rule consumes the same normalized contract and preserves its source, timestamp, dropout and debounce behavior.
+The AI layer now produces a generic `object_in_zone` observation for configured non-person objects and maintains a conservative source/continuity-local last-seen memory. The memory records direct observations without merging labels, cross-source tracks or post-gap tracks into a claimed physical identity.
 
-This is a software contract and normalization result. It is not a gait model, GNN classifier, accuracy benchmark, physical edge-privacy or hardware validation result.
+This is a deterministic software memory and provenance result. It is not cross-camera ReID, gait recognition, accuracy validation, scene-event inference or hardware evidence.
 
 ## Task identity
 
-- Task: `TASK-0006`
+- Task: `TASK-0007`
 - Task version: `1`
-- Task hash: `sha256:aa527e1f620ea9dbb9ab163860102ce46fd839e7034772bab7a96826d0f31cff`
-- Branch: `codex/task-0006-skeleton-contract`
-- Base commit: `0b979d5a669a627ec6db0fbb1224da2eb8ef12f4` (`origin/main` at task claim)
-- Claim commit: `92f5924`
-- Resume commit: `92e931a`
-- Run: `codex-task-0006-20260925T035313Z`
+- Task hash: `sha256:a8ec2f821222fbe86b5c438f33fcccb80ff300887ea9c2d24ffad603a8b78a5c`
+- Branch: `codex/task-0007-visual-memory`
+- Base lineage: `fa5a0ea` (`origin/main` at task dispatch)
+- Claim commit: `da8293f`
+- Run: `codex-task-0007-20260925T043735Z`
 
 ## Changed files
 
-- `workspace/ai-engine/src/visual_event_ai/skeleton.py`
-- `workspace/ai-engine/src/visual_event_ai/ultralytics_provider.py`
-- `workspace/ai-engine/src/visual_event_ai/providers.py`
+- `workspace/ai-engine/src/visual_event_ai/relations.py`
 - `workspace/ai-engine/src/visual_event_ai/fact_pipeline.py`
-- `workspace/ai-engine/src/visual_event_ai/keypoint_actions.py`
-- `workspace/ai-engine/tests/test_skeleton.py`
-- AI README, algorithm design/analysis/provider docs and synchronized copies under `workspace/submission/`
+- `workspace/ai-engine/src/visual_event_ai/visual_memory.py`
+- `workspace/ai-engine/tests/test_visual_memory.py`
+- AI README, algorithm/tracking/provider docs and synchronized copies under `workspace/submission/`
 - `.ai/` report, run, heartbeat and state records
 - `agent-state/` evidence and handoff records
 
-No frontend, Makerverse/livestream-rs, gait, GNN, robot or training work changed.
+No frontend, scene-plugin, Makerverse/livestream-rs, model, tracker algorithm or hardware changes were made. The existing Hungarian/centroid tracker remains unchanged; ByteTrack/Kalman are documented as future adapters requiring data evidence.
 
-## Contract behavior
+## Behavior
 
-- `skeleton.py` owns the standard COCO17 names/index ordering and schema version `1.0`.
-- `SkeletonKeypoint` validates finite non-Boolean x/y/confidence values; `SkeletonObservation` preserves optional schema/version, named points, source ID, UTC timestamp, track ID and continuity segment. Missing/occluded points remain omitted.
-- `UltralyticsProvider` defaults to all 17 canonical joints, preserves custom keypoint-index injection, omits missing points and fails closed on malformed/non-finite coordinates/confidences.
-- Observations/facts receive a semantic pixel-free `skeleton` metadata object. Privacy sanitization preserves it while redacting image/gray/RGB/BGR/pixel fields.
-- `KeypointActionExtractor` reads the canonical skeleton contract; nose plus either wrist remains sufficient for `hand_to_face`, and existing source/timestamp/dropout/debounce protections remain green.
-- A skeleton-only JSONL fixture reaches `object_detected` and `hand_to_face` facts with source, UTC timestamp, track and continuity provenance without any raw image payload.
+- Configured zones now emit repeated non-person `object_in_zone` facts with entity ID, label, zone_id/location, bbox, confidence, timestamp, source and continuity metadata.
+- `VisualMemory` is scene-independent and stores source_id, continuity_segment, normalized track/entity identity, label, last_seen_at, last bbox, current/last zone/location, confidence, state and direct/history provenance.
+- The default identity key is `(source_id, continuity_segment, track/entity ID)`. Same labels remain separate; same track IDs across sources or continuity gaps remain separate. Label queries return candidates rather than merging identities.
+- `object_detected`, `object_in_zone`, `entered_zone` and `left_zone` update memory conservatively. Leaving a zone clears current certainty while retaining last-observed history. Observation gaps do not create post-gap continuity.
+- Person detections are excluded and no raw pixels can enter memory records.
 
 ## Tests and verification
 
-- Targeted skeleton/provider/action/fact/privacy tests: `61 passed`.
-- Full source suite with an absolute project-local basetemp: `380 passed`, 1 non-blocking Starlette deprecation warning.
-- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `380 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette deprecation warnings.
-- Source and curated AI code/docs/test mirrors were synchronized. Verified project-local pytest temp directories were removed.
+- Targeted relation/fact/memory/tracker tests: `144 passed`.
+- Full source suite with an absolute project-local basetemp: `389 passed`, 1 non-blocking Starlette deprecation warning.
+- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `389 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette deprecation warnings.
+- Source and curated AI mirrors were synchronized. Project-local pytest temp directories were removed.
 - No model weights, media, runtime DB, venv, cache, raw pixels or secrets are tracked.
-
-## Privacy deployment modes
-
-- Mode A (current/local): `RGB frame -> pose provider -> skeleton -> upper AI`; covered by the real Ultralytics runtime smoke and this normalization path.
-- Mode B (target edge-privacy boundary): `camera/edge pose -> skeleton-only payload -> upper AI`; upper-pipeline behavior is software-tested, but physical camera/edge skeleton-only output is not hardware-verified.
-- Cartoon rendering is a frontend/presentation concern outside this task.
 
 ## Master decision needed
 
-Review the canonical skeleton contract and PR. If accepted, Master may decide the next task; Codex must not select one.
+Review the generic location fact, memory identity boundary and integration evidence. If accepted, Master may decide the next task; Codex must not select one.
 
 ## Commit / PR
 
-- Feature commit: `eadef5b` (`feat(ai): add canonical skeleton contract`)
-- PR: [#7](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/7) targeting `main`
-- PR state at handoff: `OPEN`, merge state `CLEAN`; state returned to `WAITING_FOR_MASTER` and lock released
+- Feature commit and PR: pending handoff after final state update

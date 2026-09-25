@@ -182,3 +182,11 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - Commit: `eadef5b97586ab0a82d4d93a6d6bd566b60ebbf9`; PR [#7](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/7) targets `main` and is `OPEN` / `CLEAN`.
 - State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`.
 - Review canonical skeleton/full-pose evidence and privacy deployment modes before any next task; Codex must not choose TASK-0007.
+
+
+## TASK-0007 checkpoint (2026-09-25)
+
+- Branch: `codex/task-0007-visual-memory`; task hash verified; generic memory evidence is in `visual_memory.py`, relation/fact integration and tests.
+- Targeted tests: `144 passed`; source suite: `389 passed`; curated `VERIFY_OK`.
+- Identity remains source/continuity/track local; no ReID, gait, ByteTrack/Kalman or metrics claims.
+- State will return to `WAITING_FOR_MASTER`, `next_actor=chatgpt`; Codex must not choose TASK-0008.

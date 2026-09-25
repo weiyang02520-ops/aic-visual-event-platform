@@ -536,3 +536,13 @@
 - Added canonical contract, full pose, partial/malformed point, privacy and skeleton-only upper-pipeline regressions.
 - Updated AI algorithm/provider/analysis docs and curated mirrors; no frontend/hardware/gait/GNN/training work.
 - Targeted tests: `61 passed`; full source suite: `380 passed`; curated verifier: `VERIFY_OK`, `380 passed`; project-local temp directories cleaned.
+
+
+## 2026-09-25 — TASK-0007 generic object location memory
+
+- Claimed TASK-0007 after verifying its hash and created the task branch.
+- Added repeated non-person `object_in_zone` facts for configured zones, including location/bbox/source/continuity metadata.
+- Added scene-independent `VisualMemory` with conservative source + continuity + track identity keys, direct last-seen updates, zone history and gap/source boundaries.
+- Added integration and deterministic tests for zone movement, same-label parallel objects, cross-source/gap isolation, person exclusion and pixel-free records.
+- Fixed relation location propagation into PrimitiveFact; did not modify the Hungarian/centroid tracker.
+- Source suite: `389 passed`; curated verifier: `VERIFY_OK`, `389 passed`; project-local temp directories cleaned.

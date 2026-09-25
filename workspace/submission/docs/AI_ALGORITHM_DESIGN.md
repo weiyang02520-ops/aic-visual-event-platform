@@ -53,6 +53,10 @@ VideoSourceAdapter
 
 Tracker 输出 `track_id`、类别、置信度和中心/区域信息。当前 CentroidTracker 先按类别与最大质心距离门控（人物标签走共享人物分类，其他类别按大小写规范化后的完整标签匹配），再求最大匹配数下的最小总距离分配；这避免逐边贪心导致的无谓 ID 断裂，但没有运动模型、外观特征或遮挡推理，交叉目标和快速移动仍可能造成 ID switch。重复框的观察归一化会逐个分配 track。遮挡、多人、多物体和跨摄像头 ID 的真实性能需要专项数据集验证，当前测试只证明本地确定性行为。
 
+当配置了 zones 时，关系层对非人物实体逐帧产生 `object_in_zone` 语义事实；它包含 track/entity ID、对象标签、zone_id、位置、时间、置信度、source_id 和 continuity_segment。该事实是空间观察，不是“归还”“缺失”或“携带”事件。
+
+`VisualMemory` 是独立于场景插件的通用 last-seen 核心。默认身份键是 `source_id + continuity_segment + track/entity ID`，记录最后观察时间、bbox、当前/最后 zone、置信度和 direct/history provenance。同标签对象保持独立；跨来源或跨连续段的同一数字 track_id 不会合并。离开区域只移除 current-zone certainty 并保留 last-known history；缺失间隙后的新连续段使用新身份键。按标签查询只返回候选列表，不宣称 ReID 或跨摄像头实体连续。
+
 可选的 `KeypointActionExtractor` 通过 canonical `SkeletonObservation` 消费 Detector/fixture 的明确关键点坐标；它不从像素估计人体姿态。人物检测框高度用于归一化 face-to-wrist 距离，且同一手腕必须同时接近药品框，才输出 `hand_to_face`；对同一人物/药品组合只在动作进入阈值时输出一次事实，容忍 1 个采样帧的关键点丢失，超过间隔后才重新武装。提取器按 `source_id` 隔离动作 episode；一次调用混入多个来源会拒绝，避免同一人物/对象 ID 在换源后沿用旧去抖状态。骨骼-only fixture 回归证明上层 action/fact 逻辑不需要读取 raw image/gray/RGB/BGR。
 
 `FrameFactExtractor` 将 `source_id` 写入对象、关系、动作和观察间隙事实的 metadata；如果调用方把带来源标记的关系事实与另一来源的 keypoint observations 混合，动作提取器会拒绝该批次。没有来源 metadata 的旧构造事实保留兼容路径，但不应被当作跨来源身份证据。

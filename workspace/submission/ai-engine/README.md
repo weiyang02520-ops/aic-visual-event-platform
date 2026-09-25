@@ -102,3 +102,5 @@ $env:AI_ZONES_JSON = '[{"zone_id":"shelf-a","label":"工具架 A","x":0,"y":0,"w
 OpenCV 本地视频帧的 payload 同时提供模型输入用的 BGR `image` 和 MotionDetector 使用的 list-based `gray` helper，并附带 `shape` / `channels`。像素只在瞬时帧/推理路径中存在；公共预览、事实 metadata、job metadata 和 SQLite 事件写入会走递归像素摘要脱敏。
 
 若检测 provider 在人物对象中提供 canonical skeleton 的鼻部和手腕关键点，`KeypointActionExtractor` 可按几何距离生成启发式 `hand_to_face` 事实，并绑定同一人物附近的药品框；它容忍一个采样帧的关键点缺失以避免重复动作边缘。骨骼-only fixture 回归证明上层逻辑不需要 raw pixels；项目不会从普通像素帧伪造关键点。
+
+配置 zones 后，非人物对象会产生通用 `object_in_zone` 空间事实；`visual_memory.py` 按 source、continuity segment 和 track/entity ID 维护最后观察时间、bbox 和当前/最后位置。它不按标签合并对象，也不宣称跨摄像头 ReID。

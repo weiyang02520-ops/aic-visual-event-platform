@@ -648,3 +648,13 @@
 - Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `380 passed`, 616 non-blocking warnings.
 - Source and curated AI mirrors match; temporary basetemp directories were removed; no weights/media/runtime/cache files were tracked.
 - Evidence is software contract/runtime normalization only; physical edge skeleton-only output, gait, GNN and metrics remain unverified.
+
+
+## 2026-09-25 — TASK-0007 generic visual memory
+
+- Targeted relation/fact/memory/tracker command with absolute project-local basetemp: `144 passed`.
+- FrameFactExtractor + configured zones produced repeated `object_in_zone` facts for a non-person object; VisualMemory updated zone A→B and preserved source/continuity/track provenance.
+- Tests cover same-label parallel tracks, same track ID across sources, same track ID after continuity gap, left-zone history, person exclusion and raw pixel absence.
+- Full source suite: `389 passed`, 1 non-blocking warning.
+- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `389 passed`, 616 non-blocking warnings.
+- Source/curated mirrors match; no model weights, media, runtime DB, venv, cache or secrets tracked.

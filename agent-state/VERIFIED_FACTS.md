@@ -570,3 +570,11 @@ Makerverse 与 livestream-rs 的静态仓库事实已在 Phase 0 以本目录内
 - File/URL: `workspace/ai-engine/src/visual_event_ai/skeleton.py`, provider/action/fact modules, `tests/test_skeleton.py`, `workspace/docs/AI_ALGORITHM_DESIGN.md`.
 - Limitation: Mode B camera/edge skeleton-only output is not physically verified; one public model adapter and fixture contracts do not establish pose accuracy, gait, GNN or scene metrics.
 - Confidence: high for the canonical contract and local normalization/privacy behavior; low for hardware and generalization.
+
+
+### FACT-082
+- Claim: Generic source-local visual memory now answers last-seen object location without merging identities across sources or continuity gaps.
+- Evidence: RelationEngine emits non-person `object_in_zone` facts with zone/location/bbox/source/continuity metadata; `VisualMemory` stores source, continuity, track/entity ID, last_seen_at, bbox, current/last zone and provenance. FrameFactExtractor + zones integration and deterministic identity/privacy tests pass; source suite 389 passed and curated verification returned VERIFY_OK / 389 passed.
+- File/URL: `workspace/ai-engine/src/visual_event_ai/visual_memory.py`, `relations.py`, `fact_pipeline.py`, `tests/test_visual_memory.py`, `workspace/docs/AI_ALGORITHM_DESIGN.md`.
+- Limitation: This is not cross-camera ReID, gait recognition, physical-item identity or a scene missing/return event; labels only yield separate candidates.
+- Confidence: high for local fact/memory semantics and identity boundaries; low for real detector tracking/generalization until authorized data exists.

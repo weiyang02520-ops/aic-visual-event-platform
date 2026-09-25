@@ -12,6 +12,7 @@
 - `FixtureDetector`：把机器人/相机/标注 fixture 的预计算 objects 归一化，便于端到端测试；缺少 objects 字段表示空帧，显式 objects 列表内每项都必须是带 bbox 的对象记录；保留 pose `keypoints` 与浮点 bbox，非法行、标签、几何或置信度会带记录索引报错，不会裁剪异常分数；
 - 参数契约：MotionDetector 的阈值/面积和 CentroidTracker 的 missed 计数要求非布尔整数；RelationEngine/Tracker 距离与冷却要求非布尔有限实数，错误类型统一返回 ValueError。
 - `CentroidTracker`：先按类别和最大距离门控，再做最大有效匹配数下的最小总距离分配，输出 track id；人物类别复用共享分类器，其他标签按大小写不敏感的完整类别匹配；交叉、遮挡和快速移动时仍可能发生 ID switch；
+- 配置 zones 后，关系层对非人物对象逐帧输出 `object_in_zone`；通用 `VisualMemory` 使用 `source_id + continuity_segment + track/entity ID` 维护最后观察位置，不把同标签、跨源或跨段 track 合并成同一实体。
 - `normalize_observations`：统一输出 source_id、timestamp、fact_type、confidence、subject/object 和 metadata；对相同类别与相同 bbox 的重复检测逐个分配 track，避免 dictionary 覆盖导致观察共用同一个 ID；
 - FastAPI：`/api/v1/vision/preview` 支持 `fixture` 或 `motion` provider 预览。
 - 可选 `UltralyticsProvider` 已完成一次 `REAL_RUNTIME_SMOKE`：项目内 `.venv` 安装 `pose`/`media` extras 后，使用官方 `yolo11n-pose.pt` 和官方公开 `bus.jpg`，通过现有 BGR 输入与归一化路径得到 4 个 `person` 检测。默认 provider 现在按 canonical COCO17 定义保留所有可用 named keypoints；`SkeletonObservation` 集中校验坐标/置信度并携带 schema/version/provenance。详细身份、哈希、来源和运行边界见 `REAL_RUNTIME_SMOKE_TASK-0003.md`；这不是准确率或性能评测。
