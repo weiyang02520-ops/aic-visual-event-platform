@@ -1,8 +1,8 @@
 {
-  "task_id": "TASK-0008",
-  "task_version": 1,
-  "task_hash": "sha256:d6ccb9643ce822b86a70ccb7016d896fc3cb37253f638bbec1dc0d84e248d74c",
-  "commit": "b39df674573196fa28669232cf3d3dc21eb46577",
-  "note": "A3 complete after R1/R2: scene-independent hand_near_object and hand_to_face primitives, medication compatibility isolated, observation-gap episode reset proven; 398 passed / VERIFY_OK.",
-  "recorded_at": "2026-09-25T06:20:00Z"
+  "task_id": "TASK-0009",
+  "task_version": 3,
+  "task_hash": "sha256:f7f72535c048bced69e307dd0b3a0a0dfff760336afc854a7436f3ede2e0da74",
+  "commit": "ee7b3f72f9184d470e32135656cd4bf8144898f8",
+  "note": "A4.1–A4.3 complete: semantic non-person perception, bounded TemporalVisualMemory and schedule-aware medication review; 414 passed / VERIFY_OK.",
+  "recorded_at": "2026-09-25T07:55:00Z"
 }
