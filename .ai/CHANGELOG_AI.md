@@ -285,3 +285,20 @@ actor: chatgpt-master
 pr: #9
 review_round: 1
 notes: Generic action direction accepted, but hand_near_object was incorrectly gated by wrist-near-face geometry. Also required a true continuity-gap regression rather than source-switch-only coverage. Scope remained TASK-0008; Codex R1 fixes are now applied in the branch above.
+
+
+2026-09-25T06:20:00Z
+TASK-0008
+MASTER_REVIEWING → PASS
+actor: chatgpt-master
+pr: #9
+review_round: 2
+merge_commit: b39df674573196fa28669232cf3d3dc21eb46577
+notes: R1 blockers resolved. Generic hand/object geometry is independent of face proximity; real observation_gap continuity regression passes. Final source and curated verification: 398 passed / VERIFY_OK. A3 complete.
+
+2026-09-25T06:20:00Z
+TASK-0009
+PLANNING → READY_FOR_CODEX
+actor: chatgpt-master
+task_hash: sha256:1f57b3316b6cb923c481289f60fbc0405b1e665cecdf358aacb0e23872454f46
+notes: Build bounded scene-independent temporal visual memory over generic action facts and existing VisualMemory, preserving source/continuity identity boundaries and plugin compatibility.
