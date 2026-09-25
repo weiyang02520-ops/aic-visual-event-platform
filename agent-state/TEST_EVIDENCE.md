@@ -635,3 +635,16 @@
 - Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `371 passed`, 616 non-blocking warnings; full verifier also passed and skipped frontend build because submission node_modules is absent.
 - Source/submission frontend and docs hashes match; no node_modules, dist, DB, secrets or local paths were tracked.
 - Browser click-through remains unverified because the worker has no browser executable.
+
+
+## 2026-09-25 — TASK-0006 canonical skeleton contract
+
+- Canonical contract tests cover COCO17 ordering, partial points, finite/non-Boolean coordinate/confidence validation and provenance serialization.
+- Real-adapter contract tests cover all 17 available fake COCO joints, schema/version metadata and existing provider/action behavior.
+- Skeleton-only JSONL fixture produced person facts and `hand_to_face` without image/gray/RGB/BGR/pixel fields; source_id, UTC timestamp, track_id and continuity_segment were preserved.
+- Privacy sanitizer preserved semantic `skeleton` data and replaced image/gray arrays with safe summaries.
+- Targeted command with absolute project-local basetemp: `61 passed`.
+- Full source command with absolute project-local basetemp: `380 passed`, 1 non-blocking warning.
+- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `380 passed`, 616 non-blocking warnings.
+- Source and curated AI mirrors match; temporary basetemp directories were removed; no weights/media/runtime/cache files were tracked.
+- Evidence is software contract/runtime normalization only; physical edge skeleton-only output, gait, GNN and metrics remain unverified.

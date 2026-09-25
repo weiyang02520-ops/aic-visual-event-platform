@@ -14,7 +14,8 @@
 - `CentroidTracker`：先按类别和最大距离门控，再做最大有效匹配数下的最小总距离分配，输出 track id；人物类别复用共享分类器，其他标签按大小写不敏感的完整类别匹配；交叉、遮挡和快速移动时仍可能发生 ID switch；
 - `normalize_observations`：统一输出 source_id、timestamp、fact_type、confidence、subject/object 和 metadata；对相同类别与相同 bbox 的重复检测逐个分配 track，避免 dictionary 覆盖导致观察共用同一个 ID；
 - FastAPI：`/api/v1/vision/preview` 支持 `fixture` 或 `motion` provider 预览。
-- 可选 `UltralyticsProvider` 已完成一次 `REAL_RUNTIME_SMOKE`：项目内 `.venv` 安装 `pose`/`media` extras 后，使用官方 `yolo11n-pose.pt` 和官方公开 `bus.jpg`，通过现有 BGR 输入与归一化路径得到 4 个 `person` 检测，检测均带 `nose`、`left_wrist`、`right_wrist`。详细身份、哈希、来源和运行边界见 `REAL_RUNTIME_SMOKE_TASK-0003.md`；这不是准确率或性能评测。
+- 可选 `UltralyticsProvider` 已完成一次 `REAL_RUNTIME_SMOKE`：项目内 `.venv` 安装 `pose`/`media` extras 后，使用官方 `yolo11n-pose.pt` 和官方公开 `bus.jpg`，通过现有 BGR 输入与归一化路径得到 4 个 `person` 检测。默认 provider 现在按 canonical COCO17 定义保留所有可用 named keypoints；`SkeletonObservation` 集中校验坐标/置信度并携带 schema/version/provenance。详细身份、哈希、来源和运行边界见 `REAL_RUNTIME_SMOKE_TASK-0003.md`；这不是准确率或性能评测。
+- 骨骼隐私部署有两个明确模式：Mode A 是当前本地 `RGB frame -> pose provider -> skeleton -> upper AI`；Mode B 是目标 `camera/edge pose -> skeleton-only payload -> upper AI`。Mode A 有真实 runtime smoke，Mode B 的上层 skeleton-only 合同有 fixture 回归；物理相机/边缘节点尚未硬件验证，卡通化展示属于 frontend/presentation。
 - TASK-0004 又把同一真实 provider 接到 `FramePipeline`/`OpenCVFrameProvider` 和 `FrameFactExtractor`：项目内两帧 AVI 经真实 OpenCV 解码后产生 8 个带 source_id、UTC 时间戳和 COCO17 鼻部/双腕关键点的 `object_detected` facts。详细来源、哈希和边界见 `REAL_LOCAL_VIDEO_SMOKE_TASK-0004.md`；这仍不是准确率或场景事件评测。
 
 ## 不应误读的部分

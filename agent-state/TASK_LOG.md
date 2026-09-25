@@ -525,3 +525,14 @@
 - `npm run build` passed; local AI service + `npm run smoke:real` passed; direct unreachable probe returned `fetch failed`.
 - Full AI suite: `371 passed`; curated verifier: `VERIFY_OK`, `371 passed`; project-local basetemp and runtime smoke DB cleaned.
 - Browser click-through was not run because no browser executable is available; no backend/AI source change was needed.
+
+
+## 2026-09-25 — TASK-0006 canonical skeleton contract
+
+- Resumed the claimed TASK-0006 branch after the previous heartbeat lock expired; refreshed the lock and verified the task hash.
+- Added canonical COCO17 ordering/schema/version and validated named skeleton keypoints with optional source/timestamp/track/continuity provenance.
+- Expanded the default Ultralytics path from three joints to every available COCO17 joint while preserving custom mappings and fail-closed validation.
+- Propagated semantic skeleton metadata through normalization/facts and refactored keypoint actions to consume the canonical contract.
+- Added canonical contract, full pose, partial/malformed point, privacy and skeleton-only upper-pipeline regressions.
+- Updated AI algorithm/provider/analysis docs and curated mirrors; no frontend/hardware/gait/GNN/training work.
+- Targeted tests: `61 passed`; full source suite: `380 passed`; curated verifier: `VERIFY_OK`, `380 passed`; project-local temp directories cleaned.

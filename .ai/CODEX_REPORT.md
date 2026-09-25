@@ -1,65 +1,67 @@
-# Codex Completion Report — TASK-0005
+# Codex Completion Report — TASK-0006
 
 ## Result
 
-`PASS_FRONTEND_REAL_CONNECTION_STATE`
+`PASS_CANONICAL_SKELETON_CONTRACT`
 
-The frontend Real API boundary is now truthful and failure-safe. The Repository abstraction exposes a health check, source switching clears the previous data before loading, stale responses from an old source are ignored, and Real API failures render an explicit offline state with empty data instead of retaining Mock content.
+The AI pose path now has one canonical, validated COCO17 skeleton contract. The real Ultralytics adapter exports every available valid COCO17 named joint, while the existing hand-to-face action rule consumes the same normalized contract and preserves its source, timestamp, dropout and debounce behavior.
+
+This is a software contract and normalization result. It is not a gait model, GNN classifier, accuracy benchmark, physical edge-privacy or hardware validation result.
 
 ## Task identity
 
-- Task: `TASK-0005`
+- Task: `TASK-0006`
 - Task version: `1`
-- Task hash: `sha256:09cc8a1afcbf1a30ee0a3b2647433693ddd5786c9ff12ce78b7c9f25a1304f43`
-- Branch: `codex/task-0005-frontend-real-connection-state`
-- Base commit: `ba5b242de6f87b4d84c6af944c10cf3a718a21db` (`origin/main` at task claim)
-- Run: `codex-task-0005-20260924T133940Z`
+- Task hash: `sha256:aa527e1f620ea9dbb9ab163860102ce46fd839e7034772bab7a96826d0f31cff`
+- Branch: `codex/task-0006-skeleton-contract`
+- Base commit: `0b979d5a669a627ec6db0fbb1224da2eb8ef12f4` (`origin/main` at task claim)
+- Claim commit: `92f5924`
+- Resume commit: `92e931a`
+- Run: `codex-task-0006-20260925T035313Z`
 
 ## Changed files
 
-- `workspace/frontend/src/types.ts`
-- `workspace/frontend/src/repository.ts`
-- `workspace/frontend/src/App.tsx`
-- `workspace/frontend/src/styles.css`
-- `workspace/frontend/README.md`
-- `workspace/docs/AI_FRONTEND_PHASE1.md`
-- `workspace/docs/FRONTEND_SYSTEM_DESIGN.md`
-- Matching frontend source, README and documentation copies under `workspace/submission/`
+- `workspace/ai-engine/src/visual_event_ai/skeleton.py`
+- `workspace/ai-engine/src/visual_event_ai/ultralytics_provider.py`
+- `workspace/ai-engine/src/visual_event_ai/providers.py`
+- `workspace/ai-engine/src/visual_event_ai/fact_pipeline.py`
+- `workspace/ai-engine/src/visual_event_ai/keypoint_actions.py`
+- `workspace/ai-engine/tests/test_skeleton.py`
+- AI README, algorithm design/analysis/provider docs and synchronized copies under `workspace/submission/`
 - `.ai/` report, run, heartbeat and state records
 - `agent-state/` evidence and handoff records
 
-No backend, AI algorithm, media adapter or robot code changed. No new frontend test framework was introduced.
+No frontend, Makerverse/livestream-rs, gait, GNN, robot or training work changed.
 
-## Behavior
+## Contract behavior
 
-- Repository implementations now expose `health()`. Real requests normalize trailing base URL slashes, report network/HTTP/API detail errors, and never fall back to Mock.
-- App connection state is explicit: loading, online, offline or Mock. Switching sources clears events, plugins, objects and persons before requests; a cancelled previous request cannot repopulate the new source.
-- Real initial load requires `/health` plus the four initial resource lists to succeed before showing `Real API 在线`. Failure leaves empty lists and shows the concise error reason.
-- Sidebar, page banner, dashboard, monitor and settings derive AI status from the connection state. Real API online does not imply a live media stream; without a resolved Makerverse endpoint the UI says `未接入`/`NO STREAM`.
-- Review, plugin toggle, analysis and registry actions are guarded while Real is loading/offline and report errors without invoking Mock.
-- Mock health/data and demo analysis behavior remain unchanged.
+- `skeleton.py` owns the standard COCO17 names/index ordering and schema version `1.0`.
+- `SkeletonKeypoint` validates finite non-Boolean x/y/confidence values; `SkeletonObservation` preserves optional schema/version, named points, source ID, UTC timestamp, track ID and continuity segment. Missing/occluded points remain omitted.
+- `UltralyticsProvider` defaults to all 17 canonical joints, preserves custom keypoint-index injection, omits missing points and fails closed on malformed/non-finite coordinates/confidences.
+- Observations/facts receive a semantic pixel-free `skeleton` metadata object. Privacy sanitization preserves it while redacting image/gray/RGB/BGR/pixel fields.
+- `KeypointActionExtractor` reads the canonical skeleton contract; nose plus either wrist remains sufficient for `hand_to_face`, and existing source/timestamp/dropout/debounce protections remain green.
+- A skeleton-only JSONL fixture reaches `object_detected` and `hand_to_face` facts with source, UTC timestamp, track and continuity provenance without any raw image payload.
 
 ## Tests and verification
 
-- Frontend `npm run build`: passed (`tsc -b` + Vite).
-- Local AI service started with a project-local runtime database; `npm run smoke:real`: passed (`health=ok`, plugins 2, events 0, objects 0, persons 0, evidence fixture, selected detector motion_cpu, registry matches 0).
-- Direct unreachable API probe to `http://127.0.0.1:8199/health`: `fetch failed`; the UI path handles this as offline and clears source arrays before load.
-- Full AI source suite with absolute project-local basetemp: `371 passed`, 1 non-blocking Starlette deprecation warning.
-- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `371 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette deprecation warnings.
-- Full verifier also passed; it skipped the frontend build because `workspace/submission/frontend/node_modules` is intentionally absent. The source frontend build above is the frontend build evidence.
-- Build output, runtime database and temporary pytest directories were removed; no generated artifacts are tracked.
+- Targeted skeleton/provider/action/fact/privacy tests: `61 passed`.
+- Full source suite with an absolute project-local basetemp: `380 passed`, 1 non-blocking Starlette deprecation warning.
+- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `380 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette deprecation warnings.
+- Source and curated AI code/docs/test mirrors were synchronized. Verified project-local pytest temp directories were removed.
+- No model weights, media, runtime DB, venv, cache, raw pixels or secrets are tracked.
 
-## Verification limits
+## Privacy deployment modes
 
-No browser executable is installed in this environment, so a click-through visual check of Mock → unreachable Real was not run. The source-level state path is deterministic and build-checked; the direct unreachable probe confirms the expected network failure. Browser-level interaction should be rechecked when a browser session is available.
+- Mode A (current/local): `RGB frame -> pose provider -> skeleton -> upper AI`; covered by the real Ultralytics runtime smoke and this normalization path.
+- Mode B (target edge-privacy boundary): `camera/edge pose -> skeleton-only payload -> upper AI`; upper-pipeline behavior is software-tested, but physical camera/edge skeleton-only output is not hardware-verified.
+- Cartoon rendering is a frontend/presentation concern outside this task.
 
 ## Master decision needed
 
-Review the connection-state behavior and PR. If accepted, Master may decide the next task; Codex must not select one.
+Review the canonical skeleton contract and PR. If accepted, Master may decide the next task; Codex must not select one.
 
 ## Commit / PR
 
-- Claim commit: `6eccacc`
-- Feature commit: `08f0b7b` (`feat(frontend): make real connection state truthful`)
-- PR: [#6](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/6) targeting `main`
+- Feature commit: `eadef5b` (`feat(ai): add canonical skeleton contract`)
+- PR: [#7](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/7) targeting `main`
 - PR state at handoff: `OPEN`, merge state `CLEAN`; state returned to `WAITING_FOR_MASTER` and lock released

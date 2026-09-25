@@ -105,3 +105,19 @@ Latest AI verification (2026-09-24): source and curated submission suites return
 - Feature commit `08f0b7bf191d09ad8d22f51033e7d0e33a473363` pushed on `codex/task-0005-frontend-real-connection-state`; PR [#6](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/6) is `OPEN` / `CLEAN` against `main`.
 - State is `WAITING_FOR_MASTER`, lock released, and `next_actor=chatgpt`.
 - No next task was selected by Codex.
+
+
+## TASK-0006 canonical skeleton checkpoint (2026-09-25)
+
+- AI owns one validated COCO17 names/index/schema contract; default Ultralytics normalization exports all available named joints.
+- Skeleton metadata is pixel-free and preserves source, UTC timestamp, track and continuity provenance through observations/facts.
+- Hand-to-face action behavior remains compatible; skeleton-only fixture flow and privacy preservation are covered.
+- Source suite returned `380 passed`; curated verifier returned `VERIFY_OK` / `380 passed`.
+- Mode A RGB→pose→skeleton is current/local runtime evidence; Mode B edge skeleton-only output remains software-tested but hardware-unverified.
+
+
+## TASK-0006 PR handoff (2026-09-25)
+
+- Feature commit `eadef5b97586ab0a82d4d93a6d6bd566b60ebbf9` pushed on `codex/task-0006-skeleton-contract`; PR [#7](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/7) is `OPEN` / `CLEAN` against `main`.
+- State is `WAITING_FOR_MASTER`, lock released, and `next_actor=chatgpt`.
+- No next task was selected by Codex.

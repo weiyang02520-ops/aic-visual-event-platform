@@ -73,7 +73,7 @@ $env:AI_DETECTOR_PROVIDER = "ultralytics"
 $env:AI_ULTRALYTICS_MODEL_PATH = "C:\path\to\verified-pose-model.pt"
 ```
 
-`ultralytics` provider 只归一化 person bbox/confidence 和 COCO17 `nose`、`left_wrist`、`right_wrist` keypoints；缺少依赖、模型文件或合法输入时明确 unavailable/fail closed。当前仓库不包含模型权重；fake-result、本地 frame/fact contract tests 和一次真实运行冒烟已覆盖适配边界，准确率仍未验证。
+`ultralytics` provider 使用 canonical COCO17 skeleton contract，归一化 person bbox/confidence 和所有可用 named keypoints；缺少依赖、模型文件或合法输入时明确 unavailable/fail closed。`SkeletonObservation` 还保留 schema/version、source、UTC timestamp、track 和 continuity provenance。当前仓库不包含模型权重；fake-result、本地 frame/fact contract tests 和真实运行冒烟已覆盖适配边界，准确率仍未验证。
 
 TASK-0003 已在项目内忽略的 runtime 路径完成一次官方 `yolo11n-pose.pt` + `bus.jpg` CPU 冒烟，结果标记为 `REAL_RUNTIME_SMOKE`，不是准确率、性能、真实摄像头或机器人验收。身份、来源和边界记录在 `../docs/REAL_RUNTIME_SMOKE_TASK-0003.md`。
 
@@ -101,4 +101,4 @@ $env:AI_ZONES_JSON = '[{"zone_id":"shelf-a","label":"工具架 A","x":0,"y":0,"w
 
 OpenCV 本地视频帧的 payload 同时提供模型输入用的 BGR `image` 和 MotionDetector 使用的 list-based `gray` helper，并附带 `shape` / `channels`。像素只在瞬时帧/推理路径中存在；公共预览、事实 metadata、job metadata 和 SQLite 事件写入会走递归像素摘要脱敏。
 
-若检测 provider 在人物对象中提供 `nose`、`left_wrist`、`right_wrist` 关键点，`KeypointActionExtractor` 可按几何距离生成启发式 `hand_to_face` 事实，并绑定同一人物附近的药品框；它容忍一个采样帧的关键点缺失以避免重复动作边缘。当前只有 fixture 输入验证此路；项目没有内置姿态模型，也不会从普通像素帧伪造关键点。
+若检测 provider 在人物对象中提供 canonical skeleton 的鼻部和手腕关键点，`KeypointActionExtractor` 可按几何距离生成启发式 `hand_to_face` 事实，并绑定同一人物附近的药品框；它容忍一个采样帧的关键点缺失以避免重复动作边缘。骨骼-only fixture 回归证明上层逻辑不需要 raw pixels；项目不会从普通像素帧伪造关键点。

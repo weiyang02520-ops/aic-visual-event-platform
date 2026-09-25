@@ -9,6 +9,7 @@ from typing import Any, Protocol
 
 from .frame_pipeline import Frame
 from .entity_labels import is_person_label
+from .skeleton import SkeletonObservation
 
 
 BBox = tuple[float, float, float, float]
@@ -439,6 +440,16 @@ def normalize_observations(frame: Frame, detections: list[Detection], tracks: li
     for detection in detections:
         matching_tracks = tracks_by_detection[(detection.label, detection.bbox)]
         track = matching_tracks.pop(0) if matching_tracks else None
+        metadata = {**detection.metadata, "frame_index": frame.frame_index}
+        skeleton = SkeletonObservation.from_metadata(
+            metadata,
+            source_id=frame.source_id,
+            timestamp=frame.timestamp,
+            track_id=track.track_id if track is not None else None,
+            strict=False,
+        )
+        if skeleton is not None:
+            metadata["skeleton"] = skeleton.as_dict()
         observations.append(
             Observation(
                 source_id=frame.source_id,
@@ -447,7 +458,7 @@ def normalize_observations(frame: Frame, detections: list[Detection], tracks: li
                 confidence=detection.confidence,
                 subject={"track_id": track.track_id, "label": detection.label} if track else {"label": detection.label},
                 object={"bbox": detection.bbox},
-                metadata={**detection.metadata, "frame_index": frame.frame_index},
+                metadata=metadata,
             )
         )
     return observations

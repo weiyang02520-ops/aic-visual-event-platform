@@ -181,3 +181,19 @@ PLANNING → READY_FOR_CODEX
 actor: chatgpt-master
 task_hash: sha256:aa527e1f620ea9dbb9ab163860102ce46fd839e7034772bab7a96826d0f31cff
 notes: Canonical skeleton-first contract, full COCO17 normalization, skeleton-only upper-pipeline proof and privacy documentation.
+
+
+2026-09-25T03:59:50Z
+TASK-0006
+CODEX_RUNNING -> CODEX_VALIDATING
+actor: codex-luna
+notes: Added canonical COCO17 skeleton contract, full Ultralytics keypoint normalization, skeleton provenance/privacy flow and skeleton-only upper-pipeline tests; source suite 380 passed and curated VERIFY_OK.
+
+
+2026-09-25T04:02:01Z
+TASK-0006
+CODEX_VALIDATING -> WAITING_FOR_MASTER
+actor: codex-luna
+commit: eadef5b97586ab0a82d4d93a6d6bd566b60ebbf9
+pr: https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/7
+notes: Canonical COCO17 skeleton contract and full pose normalization complete; source suite 380 passed; curated VERIFY_OK; PR is OPEN/CLEAN; lock released and next_actor set to chatgpt.

@@ -604,3 +604,14 @@ Phase 0–3 已完成可验证骨架；当前环境缺少 Cargo、FFmpeg 和 .NE
 - [x] Frontend build passed; local AI service `npm run smoke:real` passed; AI suite and curated verifier passed.
 - [ ] Browser click-through remains pending because the worker environment has no browser executable.
 - [ ] Master review and PR handoff remain pending; Codex must not choose TASK-0006.
+
+
+## TASK-0006 checkpoint — canonical skeleton contract (2026-09-25)
+
+- [x] Verified the Task Packet hash and resumed the claimed branch `codex/task-0006-skeleton-contract` with a refreshed lock.
+- [x] Added canonical COCO17 names/index/schema and validated partial named skeleton observations.
+- [x] Expanded default Ultralytics normalization to all available COCO17 joints with fail-closed malformed values and custom-map compatibility.
+- [x] Refactored action/fact normalization to preserve pixel-free skeleton/source/timestamp/track/continuity metadata.
+- [x] Added skeleton-only upper-pipeline/privacy/action regressions; targeted 61 passed.
+- [x] Full source suite returned `380 passed`; curated verifier returned `VERIFY_OK` / `380 passed`; project-local temp cleanup passed.
+- [ ] Master review and PR handoff remain pending; Codex must not choose TASK-0007.

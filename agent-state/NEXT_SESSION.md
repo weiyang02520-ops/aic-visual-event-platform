@@ -167,3 +167,18 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - Commit: `08f0b7bf191d09ad8d22f51033e7d0e33a473363`; PR [#6](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/6) targets `main` and is `OPEN` / `CLEAN`.
 - State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`.
 - Review Real connection/offline behavior and the browser-validation limitation before any next task; Codex must not choose TASK-0006.
+
+
+## TASK-0006 checkpoint (2026-09-25)
+
+- Branch: `codex/task-0006-skeleton-contract`; task hash verified; implementation and evidence are in `skeleton.py`, provider/action/fact paths and updated AI docs.
+- Targeted tests: `61 passed`; source suite: `380 passed`; curated `VERIFY_OK`.
+- Canonical skeleton metadata remains semantic and pixel-free; no frontend/hardware work was done.
+- State will return to `WAITING_FOR_MASTER`, `next_actor=chatgpt`; Codex must not choose TASK-0007.
+
+
+## TASK-0006 PR handoff (2026-09-25)
+
+- Commit: `eadef5b97586ab0a82d4d93a6d6bd566b60ebbf9`; PR [#7](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/7) targets `main` and is `OPEN` / `CLEAN`.
+- State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`.
+- Review canonical skeleton/full-pose evidence and privacy deployment modes before any next task; Codex must not choose TASK-0007.

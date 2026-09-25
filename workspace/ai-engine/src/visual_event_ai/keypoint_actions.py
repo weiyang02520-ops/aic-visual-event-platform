@@ -16,6 +16,7 @@ from typing import Any
 from .entity_labels import is_medication_entity, is_person_label
 from .models import PrimitiveFact
 from .providers import Observation
+from .skeleton import SkeletonKeypoint, SkeletonObservation
 
 
 def _finite_real(value: Any) -> float | None:
@@ -77,16 +78,12 @@ class KeypointActionExtractor:
         return key or None
 
     def _point(self, keypoints: Mapping[str, Any], name: str) -> tuple[float, float, float] | None:
-        value = keypoints.get(name)
-        if not isinstance(value, (list, tuple)) or len(value) < 3:
+        point = SkeletonKeypoint.from_value(name, keypoints.get(name), strict=False)
+        if point is None:
             return None
-        converted = [_finite_real(item) for item in value[:3]]
-        if any(item is None for item in converted):
+        if point.confidence < self.min_keypoint_confidence:
             return None
-        x, y, confidence = converted
-        if not 0.0 <= confidence <= 1.0 or confidence < self.min_keypoint_confidence:
-            return None
-        return x, y, confidence
+        return point.x, point.y, point.confidence
 
     @staticmethod
     def _bbox(observation: Observation) -> tuple[float, float, float, float] | None:
@@ -201,7 +198,13 @@ class KeypointActionExtractor:
         emitted: list[PrimitiveFact] = []
         for person_id, observation in people:
             metadata = observation.metadata
-            keypoints = metadata.get("keypoints") if isinstance(metadata, Mapping) else None
+            skeleton = SkeletonObservation.from_metadata(
+                metadata,
+                source_id=observation.source_id,
+                timestamp=observation.timestamp,
+                strict=False,
+            )
+            keypoints = skeleton.keypoints if skeleton is not None else None
             person_bbox = self._bbox(observation)
             if not isinstance(keypoints, Mapping) or person_bbox is None:
                 continue
