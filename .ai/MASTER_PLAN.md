@@ -20,3 +20,14 @@ Prepare algorithm/architecture/plugin/event/experiment/frontend material and lat
 
 ## M5 — Submission / Release
 Clean package, verifier green, claim/evidence audit, final report and document.
+
+
+## Task Packet Sizing Policy
+
+Default for autonomous Codex work:
+- target approximately 45–120 minutes of meaningful implementation/verification per Task Packet;
+- bundle 2–4 tightly related subgoals when they share the same architecture and test boundary;
+- prefer one larger coherent PR over several tiny PRs that cause worker idle time;
+- keep one task/one PR/one Master review boundary;
+- split only when there is a high-risk architecture boundary, external dependency, human decision, or a change that would make review too broad;
+- Codex should continue through all subpackages in the packet before handoff unless a declared stop condition is met.
