@@ -277,3 +277,11 @@ actor: codex-luna
 commit: 8fffbcdcf197f80241da8489beed863fe6f4dec4
 pr: https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/9
 notes: R1 blockers fixed: hand_near_object independent wrist geometry and real observation_gap continuity regression; targeted 161 passed, full 398 passed, curated VERIFY_OK; same PR returned for R2; lock released.
+
+2026-09-25T05:57:00Z
+TASK-0008
+MASTER_REVIEWING -> CHANGES_REQUIRED
+actor: chatgpt-master
+pr: #9
+review_round: 1
+notes: Generic action direction accepted, but hand_near_object was incorrectly gated by wrist-near-face geometry. Also required a true continuity-gap regression rather than source-switch-only coverage. Scope remained TASK-0008; Codex R1 fixes are now applied in the branch above.
