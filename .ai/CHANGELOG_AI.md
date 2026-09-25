@@ -252,3 +252,12 @@ TASK-0008
 CODEX_RUNNING -> CODEX_VALIDATING
 actor: codex-luna
 notes: Added scene-independent hand_near_object/hand_to_face primitives with medication compatibility adapter; source suite 396 passed and curated VERIFY_OK.
+
+
+2026-09-25T05:44:34Z
+TASK-0008
+CODEX_VALIDATING -> WAITING_FOR_MASTER
+actor: codex-luna
+commit: 3c0a9238564a16eba2e5a7520dc6aec6cf32d42c
+pr: https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/9
+notes: Scene-independent action primitives and medication compatibility adapter complete; source suite 396 passed; curated VERIFY_OK; PR is OPEN/CLEAN; lock released and next_actor set to chatgpt.

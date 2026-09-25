@@ -53,4 +53,6 @@ Review the generic action primitives and medication compatibility adapter. If ac
 
 ## Commit / PR
 
-- Feature commit and PR: pending handoff after final state update
+- Feature commit: `3c0a923` (`feat(ai): add generic action primitives`)
+- PR: [#9](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/9) targeting `main`
+- PR state at handoff: `OPEN`, merge state `CLEAN`; state returned to `WAITING_FOR_MASTER` and lock released

@@ -205,3 +205,10 @@ Before coding, read `CODEX_BOOTSTRAP.md` and `.ai/CURRENT_STATE.json`. If state 
 - Targeted tests: `159 passed`; source suite: `396 passed`; curated `VERIFY_OK`.
 - Medication behavior remains behind the compatibility adapter; no definitive grasp/carry or metrics claims.
 - State will return to `WAITING_FOR_MASTER`, `next_actor=chatgpt`; Codex must not choose TASK-0009.
+
+
+## TASK-0008 PR handoff (2026-09-25)
+
+- Commit: `3c0a9238564a16eba2e5a7520dc6aec6cf32d42c`; PR [#9](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/9) targets `main` and is `OPEN` / `CLEAN`.
+- State: `WAITING_FOR_MASTER`; lock released; `next_actor=chatgpt`.
+- Review generic action/medication compatibility evidence before any next task; Codex must not choose TASK-0009.
