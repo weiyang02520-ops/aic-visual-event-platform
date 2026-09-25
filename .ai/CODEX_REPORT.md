@@ -43,7 +43,7 @@ No frontend, hardware, Makerverse/livestream-rs, gait, GNN, model, training or d
 
 - Targeted generic action/legacy action/fact/core/reasoner tests: `161 passed` (including the R1 regressions).
 - Full source suite with an absolute project-local basetemp: `398 passed`, 1 non-blocking Starlette deprecation warning.
-- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `396 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette deprecation warnings.
+- Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `398 passed`, 616 non-blocking Python 3.14 FastAPI/Starlette deprecation warnings.
 - Source and curated AI mirrors were synchronized. Project-local pytest temp directories were removed.
 - No model weights, media, runtime DB, venv, cache, raw pixels or secrets are tracked.
 
@@ -54,9 +54,9 @@ No frontend, hardware, Makerverse/livestream-rs, gait, GNN, model, training or d
 - Added a real `FrameFactExtractor` discontinuity regression: a valid post-`observation_gap` medication gesture emits a fresh action in the new continuity segment instead of reusing the pre-gap episode.
 - Same PR #9 remains in use for Master R2 review.
 
-## Master decision needed
+## Master decision
 
-Review the generic action primitives and medication compatibility adapter. If accepted, Master may decide the next task; Codex must not select one.
+R2 PASS. PR #9 was accepted after the R1 fixes; final source and curated evidence are 398 passed / VERIFY_OK.
 
 ## Commit / PR
 
