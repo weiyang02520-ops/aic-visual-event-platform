@@ -658,3 +658,30 @@
 - Full source suite: `389 passed`, 1 non-blocking warning.
 - Curated `workspace/submission/VERIFY.ps1 -SkipFrontendBuild`: `VERIFY_OK`, `389 passed`, 616 non-blocking warnings.
 - Source/curated mirrors match; no model weights, media, runtime DB, venv, cache or secrets tracked.
+
+
+## 2026-09-25 — TASK-0008 generic action primitives
+
+- Targeted action/fact/core/reasoner command with absolute project-local basetemp: `159 passed`.
+- Generic extractor tests cover arbitrary tool/object hand proximity, far/low-confidence rejection, person-only hand-to-face, same-label identity, source/timestamp/continuity boundaries and no raw pixels.
+- FrameFactExtractor integration emits generic `hand_near_object`; existing medication sequence tests remain green through the compatibility adapter.
+- Full source suite: `396 passed`, 1 non-blocking warning.
+- Curated verifier: `VERIFY_OK`, `396 passed`, 616 non-blocking warnings.
+- Source/curated mirrors match; no model weights/media/runtime/cache files tracked.
+
+
+## 2026-09-25 — TASK-0008 R1 fixes
+
+- `hand_near_object` now evaluates a valid wrist independently of wrist-to-face proximity; far-from-face/near-tool regression emits only the generic object action.
+- A real `FrameFactExtractor` discontinuity regression uses `discontinuity_before`/observation_gap and proves the post-gap medication action emits again with a new continuity segment.
+- Targeted action/fact/core/reasoner tests: `161 passed`.
+- Full source suite: `398 passed`; curated `VERIFY_OK`, `398 passed`, 616 non-blocking warnings.
+- Same PR #9 is updated for R2; no new PR.
+
+
+## 2026-09-25 — TASK-0008 R1 verification
+
+- Far-from-face/near-tool regression: `hand_near_object` emits and `hand_to_face` does not.
+- Real FrameFactExtractor discontinuity regression: pre-gap and post-gap medication actions both emit with continuity segments 0 and 1; old episode is not reused.
+- Targeted tests: `161 passed`. Full source suite: `398 passed`, 1 warning. Curated verifier: `VERIFY_OK`, `398 passed`, 616 warnings.
+- Same PR #9 returned for R2; no scope expansion or new task selected.

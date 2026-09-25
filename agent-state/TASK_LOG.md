@@ -546,3 +546,29 @@
 - Added integration and deterministic tests for zone movement, same-label parallel objects, cross-source/gap isolation, person exclusion and pixel-free records.
 - Fixed relation location propagation into PrimitiveFact; did not modify the Hungarian/centroid tracker.
 - Source suite: `389 passed`; curated verifier: `VERIFY_OK`, `389 passed`; project-local temp directories cleaned.
+
+
+## 2026-09-25 — TASK-0008 generic action primitives
+
+- Resumed the claimed TASK-0008 branch after the heartbeat lock expired and refreshed the lock.
+- Added scene-independent `GenericActionPrimitiveExtractor` for arbitrary non-person hand proximity and generic hand-to-face geometry.
+- Kept `KeypointActionExtractor` as a medication compatibility adapter; generic primitives do not call medication label helpers.
+- Integrated generic hand_near_object facts into FrameFactExtractor while preserving medication reasoner behavior and conservative pickup/putdown candidates.
+- Added deterministic arbitrary-object, missing/low-confidence, person-only, identity/provenance/privacy and pipeline tests.
+- Source suite: `396 passed`; curated verifier: `VERIFY_OK`, `396 passed`; project-local temp directories cleaned.
+
+
+## 2026-09-25 — TASK-0008 R1 fixes
+
+- Applied Master R1 narrow fixes on the existing action-primitives branch/PR.
+- Decoupled hand_near_object from face proximity; added explicit far-from-face/near-tool regression.
+- Added actual FrameFactExtractor discontinuity/observation_gap regression proving a fresh post-gap medication episode.
+- Targeted tests 161 passed; full source suite 398 passed; curated VERIFY_OK.
+
+
+## 2026-09-25 — TASK-0008 Master R1 fixes
+
+- Master identified two blockers: hand_near_object was gated by face proximity; continuity test covered source switch but not observation_gap.
+- Decoupled object wrist geometry from face geometry and added far-from-face/near-tool coverage.
+- Added real FrameFactExtractor discontinuity regression proving a fresh post-gap action episode.
+- Targeted 161 passed; full source 398 passed; curated VERIFY_OK. Same PR #9 returned for R2.

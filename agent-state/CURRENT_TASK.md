@@ -625,3 +625,30 @@ Phase 0–3 已完成可验证骨架；当前环境缺少 Cargo、FFmpeg 和 .NE
 - [x] Added FrameFactExtractor + zones integration and memory identity tests; targeted 144 passed.
 - [x] Full source suite returned `389 passed`; curated verifier returned `VERIFY_OK` / `389 passed`.
 - [ ] Master review and PR handoff remain pending; Codex must not choose TASK-0008.
+
+
+## TASK-0008 checkpoint — generic action primitives (2026-09-25)
+
+- [x] Verified the Task Packet hash and resumed `codex/task-0008-generic-action-primitives` with a refreshed lock.
+- [x] Added generic `hand_near_object` and geometry-only `hand_to_face`; medication labels stay in the compatibility adapter.
+- [x] Integrated generic primitives into FrameFactExtractor and preserved existing medication sequence behavior.
+- [x] Added deterministic action/provenance/source/time/continuity/privacy tests; targeted 159 passed.
+- [x] Full source suite returned `396 passed`; curated verifier returned `VERIFY_OK` / `396 passed`.
+- [ ] Master review and PR handoff remain pending; Codex must not choose TASK-0009.
+
+
+## TASK-0008 R1 checkpoint — generic action primitives (2026-09-25)
+
+- [x] Master R1 blocker fixed: hand_near_object no longer requires wrist-to-face proximity.
+- [x] Added far-from-face/near-arbitrary-object regression; hand_near_object emits and hand_to_face does not.
+- [x] Added real FrameFactExtractor observation_gap/continuity regression proving a fresh post-gap action episode.
+- [x] Targeted tests returned 161 passed; full source suite 398 passed; curated VERIFY_OK.
+- [ ] R2 review on existing PR #9 remains pending; no new task selected.
+
+
+## TASK-0008 R1 checkpoint (2026-09-25)
+
+- [x] Fixed independent hand_near_object wrist/object geometry.
+- [x] Added real observation_gap/continuity action regression.
+- [x] Targeted tests 161 passed; full source 398 passed; curated VERIFY_OK.
+- [x] Same PR #9 returned for R2 review; no new task selected.

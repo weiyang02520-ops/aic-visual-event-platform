@@ -19,7 +19,7 @@
 1. 帧输入：Mock、JSONL、可选 OpenCV；时间戳、抽帧、取消、异常 FPS/PTS 和恢复间隙；
 2. CPU 检测与跟踪：帧差区域、FixtureDetector、距离门控的全局匹配、重复框和漏检状态处理；
 3. 骨骼与关键点动作：`skeleton.py` 提供 canonical COCO17 名称/索引、validated named points 和 source/timestamp/track/continuity provenance；`KeypointActionExtractor` 消费显式 skeleton/keypoints，按人物/药品几何条件生成 `hand_to_face`；
-4. 关系和时序：人物—物体接近、区域进出、药品序列、工作室移出/归还/缺失、连续段边界；
+4. 关系和动作 primitives：人物—物体接近、`hand_near_object`、generic `hand_to_face`、区域进出、药品序列、工作室移出/归还/缺失、连续段边界；
 5. 工程边界：任务取消与原子完成、embedding 输入校验、REST 预览像素递归脱敏、插件集成和证据保留。
 
 当前全量源码与 curated submission 均为 `363 passed`、`VERIFY_OK`。结果属于 fixture/CPU/local API 证据。

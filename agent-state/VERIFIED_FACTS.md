@@ -578,3 +578,11 @@ Makerverse 与 livestream-rs 的静态仓库事实已在 Phase 0 以本目录内
 - File/URL: `workspace/ai-engine/src/visual_event_ai/visual_memory.py`, `relations.py`, `fact_pipeline.py`, `tests/test_visual_memory.py`, `workspace/docs/AI_ALGORITHM_DESIGN.md`.
 - Limitation: This is not cross-camera ReID, gait recognition, physical-item identity or a scene missing/return event; labels only yield separate candidates.
 - Confidence: high for local fact/memory semantics and identity boundaries; low for real detector tracking/generalization until authorized data exists.
+
+
+### FACT-083
+- Claim: The AI pipeline has scene-independent skeleton/object action primitives while preserving medication-specific interpretation in a compatibility adapter.
+- Evidence: `GenericActionPrimitiveExtractor` emits arbitrary non-person `hand_near_object` and geometry-only `hand_to_face` with source/time/continuity/identity/confidence/geometry metadata; FrameFactExtractor integration and existing medication/core/reasoner tests pass. Source suite returned 396 passed and curated verification returned VERIFY_OK / 396 passed.
+- File/URL: `workspace/ai-engine/src/visual_event_ai/action_primitives.py`, `fact_pipeline.py`, `keypoint_actions.py`, `tests/test_action_primitives.py`, `workspace/docs/AI_ALGORITHM_DESIGN.md`.
+- Limitation: These are observation/candidate facts; no grasp/carry certainty, medical conclusion, gait/ReID, dataset metrics or hardware behavior is established.
+- Confidence: high for local geometry/provenance and compatibility behavior; low for real detector generalization.

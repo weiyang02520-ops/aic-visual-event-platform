@@ -137,3 +137,24 @@ Latest AI verification (2026-09-24): source and curated submission suites return
 - Feature commit `9e7021448869adf2fbc461b7a442342b030376f9` pushed on `codex/task-0007-visual-memory`; PR [#8](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/8) is `OPEN` / `CLEAN` against `main`.
 - State is `WAITING_FOR_MASTER`, lock released, and `next_actor=chatgpt`.
 - No next task was selected by Codex.
+
+
+## TASK-0008 generic action primitive checkpoint (2026-09-25)
+
+- Generic skeleton/object action extraction now emits `hand_near_object` and geometry-only `hand_to_face` without medication labels.
+- Legacy KeypointActionExtractor is a medication compatibility adapter; generic pipeline actions preserve provenance and conservative candidate semantics.
+- Source suite returned `396 passed`; curated verifier returned `VERIFY_OK` / `396 passed`.
+
+
+## TASK-0008 PR handoff (2026-09-25)
+
+- Feature commit `3c0a9238564a16eba2e5a7520dc6aec6cf32d42c` pushed on `codex/task-0008-generic-action-primitives`; PR [#9](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/9) is `OPEN` / `CLEAN` against `main`.
+- State is `WAITING_FOR_MASTER`, lock released, and `next_actor=chatgpt`.
+- No next task was selected by Codex.
+
+
+## TASK-0008 R1 PR handoff (2026-09-25)
+
+- R1 fix commit `8fffbcdcf197f80241da8489beed863fe6f4dec4` pushed on `codex/task-0008-generic-action-primitives`; same PR [#9](https://github.com/weiyang02520-ops/aic-visual-event-platform/pull/9) remains open for R2.
+- Fixed independent wrist/object proximity and real continuity-gap action regression.
+- State is `WAITING_FOR_MASTER`, lock released, and `next_actor=chatgpt`.
