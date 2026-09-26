@@ -28,9 +28,11 @@ import {
   X,
 } from "lucide-react";
 import { createMockRepository, createRealRepository } from "./repository";
+import { toPluginContract } from "./api";
 import { choosePlayback, classifyPlaybackUrl, createMakerverseLiveAdapter } from "./media";
 import { EventCenter } from "./features/events";
 import { ObjectMemoryPanel } from "./features/objects";
+import { buildRuntimeTimeline, getPluginPresentation, pluginEventsFor, pluginLifecycleLabel, PluginRuntimeCard, sceneSignals, type RuntimeTimelineEntry } from "./plugins";
 import type { LiveSession, Mode, Plugin, RegisteredObject, RegisteredPerson, Repository, RepositoryConnection, RepositoryConnectionStatus, ReviewStatus, Scenario, UnifiedEvent, View } from "./types";
 
 const navItems: { id: View; label: string; icon: typeof LayoutDashboard }[] = [
@@ -211,11 +213,13 @@ function App() {
           </button>
           {pluginsOpen && <div className="sidebar-plugin-list">
             {plugins.length === 0 ? <div className="sidebar-plugin-empty">暂无可用插件</div> : plugins.map((plugin) => {
-              const displayName = plugin.plugin_id === "elderly_care" ? "用药辅助" : plugin.plugin_id === "workshop" ? "物品看护" : plugin.name;
+              const contract = toPluginContract(plugin);
+              const presentation = getPluginPresentation(contract);
+              const Icon = presentation.icon === "object" ? Box : presentation.icon === "medicine" ? ClipboardCheck : Network;
               return <div className={`sidebar-plugin-row ${plugin.enabled ? "enabled" : ""}`} key={plugin.plugin_id}>
-                <div className="sidebar-plugin-icon">{plugin.plugin_id === "workshop" ? <Box size={18} /> : <ClipboardCheck size={18} />}</div>
-                <div className="sidebar-plugin-copy"><strong>{displayName}</strong><span><i className={`mini-status ${plugin.enabled ? "on" : ""}`} />{plugin.enabled ? "已启用" : "未启用"}</span></div>
-                <button className={`sidebar-mini-switch ${plugin.enabled ? "on" : ""}`} onClick={() => toggle(plugin)} aria-label={`${plugin.enabled ? "停用" : "启用"}${displayName}`}><i /></button>
+                <div className="sidebar-plugin-icon"><Icon size={18} /></div>
+                <div className="sidebar-plugin-copy"><strong>{presentation.label}</strong><span><i className={`mini-status ${plugin.enabled ? "on" : ""}`} />{plugin.enabled ? "已启用" : "未启用"}</span></div>
+                <button className={`sidebar-mini-switch ${plugin.enabled ? "on" : ""}`} onClick={() => toggle(plugin)} aria-label={`${plugin.enabled ? "停用" : "启用"}${presentation.label}`}><i /></button>
               </div>;
             })}
             <button className="sidebar-plugin-manage" onClick={() => setView("plugins")}>管理全部插件 <ArrowUpRight size={14} /></button>
@@ -283,7 +287,10 @@ function EventsView({ events, onReview }: { events: UnifiedEvent[]; onReview: (e
   return <section className="panel full-panel"><div className="panel-heading"><div><span className="panel-kicker">EVENT CENTER / HISTORY</span><h2>事件中心</h2></div><div className="filter-row"><label className="search-box"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索事件、位置或对象" /></label><label className="filter-select"><SlidersHorizontal size={15} /><select value={status} onChange={(event) => setStatus(event.target.value as ReviewStatus | "all")}><option value="all">全部状态</option><option value="pending">待复核</option><option value="confirmed">已确认</option><option value="rejected">已驳回</option></select></label></div></div><div className="event-table"><div className="event-table-head"><span>事件</span><span>来源</span><span>置信度</span><span>状态</span><span>时间</span><span /></div>{filtered.length === 0 ? <EmptyState text="没有匹配事件" /> : filtered.map((event) => { const evidenceStatus = event.evidence[0]?.status ?? "unavailable"; const evidenceText = evidenceStatus === "fixture" ? "测试 fixture" : evidenceStatus === "provided_unverified" ? "已提供·未验证" : evidenceStatus === "available" ? "可回放" : "待解析"; return <div className="event-table-row" key={event.event_id}><div className="table-event"><div className={`event-type ${event.severity}`}><Activity size={15} /></div><div><strong>{event.title}</strong><small>{event.plugin_id} · {event.object?.label as string ?? "基础事实"}</small></div></div><span className="source-cell"><strong>{event.source_id}</strong><small className="evidence-inline">证据：{evidenceText}</small></span><span className="confidence"><i style={{ width: `${event.confidence * 100}%` }} />{Math.round(event.confidence * 100)}%</span><span className={`review-badge ${event.review_status}`}>{event.review_status === "pending" ? "待复核" : event.review_status === "confirmed" ? "已确认" : "已驳回"}</span><span className="table-time">{relativeTime(event.started_at)}</span><button className="table-open"><ArrowUpRight size={15} /></button>{event.review_status === "pending" && <div className="table-row-actions"><button onClick={() => onReview(event, "confirmed")}><Check size={14} /></button><button onClick={() => onReview(event, "rejected")}><X size={14} /></button></div>}</div>; })}</div></section>;
 }
 
-function PluginsView({ plugins, connection, onToggle }: { plugins: Plugin[]; connection: RepositoryConnection; onToggle: (plugin: Plugin) => Promise<void> }) { return <section className="plugin-layout"><div className="panel plugin-main"><div className="panel-heading"><div><span className="panel-kicker">EXTENSION RUNTIME</span><h2>插件能力</h2></div><span className="status-summary"><span className={`status-dot ${connectionDotClass(connection.status)}`} /> {connection.status === "offline" ? "数据源离线" : `${plugins.filter((item) => item.enabled).length} 个运行中`}</span></div><p className="panel-lead">插件在启动时从 <code>plugins/</code> 自动发现。场景模式只改变界面重点，不会替你关闭其他插件。</p>{plugins.map((plugin) => <div className="plugin-row" key={plugin.plugin_id}><div className={`plugin-symbol ${plugin.enabled ? "on" : "off"}`}><Sparkles size={18} /></div><div className="plugin-copy"><div><strong>{plugin.name}</strong><span className="version">v{plugin.version}</span></div><p>{plugin.description}</p><small>{plugin.plugin_id} · {plugin.state}</small></div><button className={`switch ${plugin.enabled ? "on" : ""}`} onClick={() => onToggle(plugin)} aria-label={`切换${plugin.name}`}><i /></button></div>)}</div><div className="panel plugin-note"><span className="panel-kicker">PLUGIN CONTRACT</span><h2>统一事件出口</h2><p>前端只消费统一事件，不直接理解插件内部算法。插件异常会进入 degraded/error 状态，主服务和其他插件继续运行。</p><div className="contract-list"><span><Check size={14} /> 自动发现</span><span><Check size={14} /> 全局启停</span><span><Check size={14} /> 并行运行</span><span><Check size={14} /> 独立测试</span></div></div></section>; }
+function PluginsView({ plugins, connection, onToggle }: { plugins: Plugin[]; connection: RepositoryConnection; onToggle: (plugin: Plugin) => Promise<void> }) {
+  const contracts = plugins.map(toPluginContract);
+  return <section className="plugin-layout"><div className="panel plugin-main"><div className="panel-heading"><div><span className="panel-kicker">EXTENSION RUNTIME</span><h2>插件能力</h2></div><span className="status-summary"><span className={`status-dot ${connectionDotClass(connection.status)}`} /> {connection.status === "offline" ? "数据源离线" : `${contracts.filter((item) => item.enabled).length} 个运行中`}</span></div><p className="panel-lead">插件状态来自 Plugin Contract，前端通过 Registry 解析展示定义。新增插件只需注册定义，无需修改核心页面。</p>{contracts.map((contract) => { const presentation = getPluginPresentation(contract); const source = plugins.find((item) => item.plugin_id === contract.plugin_id); if (!source) return null; return <div className="plugin-row" key={contract.plugin_id}><div className={`plugin-symbol ${contract.enabled ? "on" : "off"}`}><Sparkles size={18} /></div><div className="plugin-copy"><div><strong>{presentation.label}</strong><span className="version">v{contract.version}</span></div><p>{contract.description}</p><small>{contract.plugin_id} · {pluginLifecycleLabel(contract.state)}</small></div><button className={`switch ${contract.enabled ? "on" : ""}`} onClick={() => onToggle(source)} aria-label={`切换${presentation.label}`}><i /></button></div>; })}</div><div className="panel plugin-note"><span className="panel-kicker">PLUGIN CONTRACT</span><h2>统一事件出口</h2><p>前端只消费统一事件，不直接理解插件内部算法。插件异常会进入 degraded/error 状态，主服务和其他插件继续运行。</p><div className="contract-list"><span><Check size={14} /> 自动发现</span><span><Check size={14} /> 全局启停</span><span><Check size={14} /> 并行运行</span><span><Check size={14} /> 独立测试</span></div></div></section>;
+}
 
 function RegistryView({ repo, mode, connection, objects, persons, events, plugins, onObjects, onPersons, onToast }: { repo: Repository; mode: Mode; connection: RepositoryConnection; objects: RegisteredObject[]; persons: RegisteredPerson[]; events: UnifiedEvent[]; plugins: Plugin[]; onObjects: (items: RegisteredObject[]) => void; onPersons: (items: RegisteredPerson[]) => void; onToast: (message: string) => void }) {
   const [kind, setKind] = useState<"object" | "person">("object");
@@ -355,61 +362,6 @@ function relativeTime(value: string) { const diff = Math.max(0, Date.now() - new
 
 type PrivacyMode = "cartoon" | "skeleton";
 
-type TimelineEntry = {
-  id: string;
-  time: string;
-  title: string;
-  detail: string;
-  kind: "person" | "medicine" | "object" | "status";
-};
-
-function factLabel(factType: string): string {
-  const labels: Record<string, string> = {
-    hand_near_object: "手靠近物品",
-    hand_to_face: "手靠近面部",
-    pickup_candidate: "拿起物品",
-    putdown_candidate: "放回物品",
-    entered_zone: "进入区域",
-    left_zone: "离开区域",
-    motion: "发生移动",
-    object_in_zone: "物品位于区域",
-    object_detected: "检测到物品",
-  };
-  return labels[factType] ?? factType.replaceAll("_", " ");
-}
-
-function buildMonitorTimeline(mode: Mode, events: UnifiedEvent[], plugins: Plugin[]): TimelineEntry[] {
-  if (mode === "mock") {
-    const enabled = new Set(plugins.filter((plugin) => plugin.enabled).map((plugin) => plugin.plugin_id));
-    const entries: TimelineEntry[] = [
-      { id: "enter", time: "07:42", title: "进入客厅", detail: "连续轨迹建立", kind: "person" },
-      { id: "settle", time: "08:12", title: "在沙发就座", detail: "持续静止", kind: "status" },
-    ];
-    if (enabled.has("elderly_care")) {
-      entries.splice(1, 0,
-        { id: "medicine-pick", time: "07:58", title: "拿起药盒", detail: "手接触药盒", kind: "medicine" },
-        { id: "face", time: "08:01", title: "手靠近面部", detail: "疑似服药行为", kind: "medicine" },
-        { id: "medicine-return", time: "08:05", title: "放回药盒", detail: "回到桌面区域", kind: "medicine" },
-      );
-    }
-    if (enabled.has("workshop")) {
-      entries.splice(Math.min(entries.length - 1, 3), 0, { id: "water", time: "08:04", title: "拿起水杯", detail: "物品位置变化", kind: "object" });
-    }
-    return entries;
-  }
-
-  const flattened = events.flatMap((event) =>
-    event.facts.map((fact, index) => ({
-      id: `${event.event_id}-${index}`,
-      time: new Date(event.started_at).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" }),
-      title: factLabel(fact.fact_type),
-      detail: event.location ?? event.title,
-      kind: event.plugin_id === "elderly_care" ? "medicine" as const : event.object ? "object" as const : "status" as const,
-    })),
-  );
-  return flattened.slice(0, 8);
-}
-
 function MonitorLive({ scenario, mode, connection, plugins, events, objects, onToggle, onRun, onModeChange }: {
   scenario: Scenario;
   mode: Mode;
@@ -467,15 +419,15 @@ function MonitorLive({ scenario, mode, connection, plugins, events, objects, onT
   const realReason = connection.status === "offline"
     ? `Real API 离线：${connection.reason ?? "未连接"}`
     : mediaError ?? playback.reason;
-  const enabledPlugins = plugins.filter((plugin) => plugin.enabled);
-  const timeline = useMemo(() => buildMonitorTimeline(mode, events, plugins), [mode, events, plugins]);
-  const medicationEvents = events.filter((event) => event.plugin_id === "elderly_care").slice(0, 2);
-  const displayObjects = mode === "mock" && scenario === "elderly"
-    ? [
-        objects.find((item) => item.name.includes("药")) ?? { object_id: "mock-med", name: "降压药盒", description: "Mock 演示对象", reference_uris: [], status: "active" },
-        { object_id: "mock-water", name: "水杯", description: "Mock 演示对象", reference_uris: [], status: "active" },
-      ]
-    : objects.slice(0, 2);
+  const pluginContracts = useMemo(() => plugins.map(toPluginContract), [plugins]);
+  const enabledPlugins = pluginContracts.filter((plugin) => plugin.enabled);
+  const signals = useMemo(() => sceneSignals(pluginContracts), [pluginContracts]);
+  const timeline = useMemo(() => buildRuntimeTimeline(mode, events, pluginContracts), [mode, events, pluginContracts]);
+  const displayObjects = objects.slice(0, 3);
+  async function togglePlugin(pluginId: string) {
+    const plugin = plugins.find((item) => item.plugin_id === pluginId);
+    if (plugin) await onToggle(plugin);
+  }
 
   return <section className="privacy-monitor-page">
     <header className="privacy-page-header">
@@ -499,7 +451,7 @@ function MonitorLive({ scenario, mode, connection, plugins, events, objects, onT
     <div className="privacy-monitor-grid">
       <article className="privacy-video-card">
         <div className="privacy-stage">
-          {mode === "mock" ? <PrivacyMockScene privacyMode={privacyMode} medicationEnabled={enabledPlugins.some((plugin) => plugin.plugin_id === "elderly_care")} objectEnabled={enabledPlugins.some((plugin) => plugin.plugin_id === "workshop")} /> :
+          {mode === "mock" ? <PrivacyMockScene privacyMode={privacyMode} medicationEnabled={signals.medicineEnabled} objectEnabled={signals.objectEnabled} /> :
             <div className="privacy-stream-placeholder"><ShieldCheck size={30} /><strong>隐私渲染流未接入</strong><span>隐私监护页不会直接回退到原始视频。{session ? `已发现媒体会话，等待骨骼/卡漫输出接口。` : realReason}</span></div>}
           <div className="camera-chip"><span className="camera-online-dot" /> 客厅 · Camera 01 <i /> {mode === "mock" ? "08:01:23" : session ? "LIVE" : "NO STREAM"}</div>
           <div className="privacy-player-controls"><button aria-label="暂停"><Pause size={19} fill="currentColor" /></button><span>08:01 / 10:00</span><div className="privacy-progress"><i /></div><button aria-label="运行分析" onClick={onRun}><Sparkles size={18} /></button></div>
@@ -510,12 +462,12 @@ function MonitorLive({ scenario, mode, connection, plugins, events, objects, onT
         <section className="privacy-info-card privacy-status-card">
           <div className="privacy-card-heading"><div><Activity size={20} /><strong>当前状态</strong></div><span className="healthy-pill"><i />正常</span></div>
           <div className="privacy-status-row"><Users size={17} /><span>人物</span><strong>{mode === "mock" ? "Person 01" : session ? "已发现" : "待接入"}</strong></div>
-          <div className="privacy-status-row"><Sparkles size={17} /><span>当前动作</span><strong>{enabledPlugins.some((plugin) => plugin.plugin_id === "elderly_care") ? "手靠近药盒" : "基础轨迹"}</strong></div>
+          <div className="privacy-status-row"><Sparkles size={17} /><span>当前动作</span><strong>{signals.primaryAction}</strong></div>
           <div className="privacy-status-row"><ShieldCheck size={17} /><span>停留区域</span><strong>客厅 · 茶几</strong></div>
           <div className="privacy-status-row"><ShieldCheck size={17} /><span>状态</span><strong className="status-ok">{connection.status === "offline" ? "数据源离线" : "正常"}</strong></div>
         </section>
 
-        {enabledPlugins.map((plugin, index) => <PluginMonitorCard key={plugin.plugin_id} plugin={plugin} events={plugin.plugin_id === "elderly_care" ? medicationEvents : events.filter((event) => event.plugin_id === plugin.plugin_id).slice(0, 2)} objects={displayObjects} mode={mode} onToggle={onToggle} stretch={index === enabledPlugins.length - 1} />)}
+        {enabledPlugins.map((plugin, index) => <PluginRuntimeCard key={plugin.plugin_id} plugin={plugin} events={pluginEventsFor(plugin, events)} objects={displayObjects} onToggle={togglePlugin} stretch={index === enabledPlugins.length - 1} />)}
         {enabledPlugins.length === 0 && <section className="privacy-info-card plugin-live-card plugin-live-empty"><Network size={24} /><strong>未启用场景插件</strong><span>展开左侧“插件功能”后启用需要的监护能力。</span></section>}
       </aside>
     </div>
@@ -576,35 +528,7 @@ function PrivacyMockScene({ privacyMode, medicationEnabled, objectEnabled }: { p
   </div>;
 }
 
-function PluginMonitorCard({ plugin, events, objects, mode, onToggle, stretch }: {
-  plugin: Plugin;
-  events: UnifiedEvent[];
-  objects: RegisteredObject[];
-  mode: Mode;
-  onToggle: (plugin: Plugin) => Promise<void>;
-  stretch: boolean;
-}) {
-  const isMedication = plugin.plugin_id === "elderly_care";
-  const isObjectWatch = plugin.plugin_id === "workshop";
-  const title = isMedication ? "用药辅助" : isObjectWatch ? "物品看护" : plugin.name;
-  return <section className={`privacy-info-card plugin-live-card ${stretch ? "stretch" : ""}`}>
-    <div className="privacy-card-heading">
-      <div>{isObjectWatch ? <Box size={20} /> : <ClipboardCheck size={20} />}<strong>{title}</strong><span className="enabled-pill"><i />已启用</span></div>
-      <button className="plugin-inline-toggle" onClick={() => onToggle(plugin)}>停用</button>
-    </div>
-    {isMedication ? <div className="plugin-live-list">
-      {(events.length ? events : mode === "mock" ? [
-        { event_id: "mock-med-1", title: "疑似服药行为", started_at: new Date(), review_status: "pending" },
-        { event_id: "mock-med-2", title: "时间与计划匹配", started_at: new Date(), review_status: "pending" },
-      ] : []).slice(0, 2).map((event: any, index: number) => <div className="plugin-live-row" key={event.event_id ?? index}><div className="plugin-live-thumb medicine-thumb" /><div><span>{index === 0 ? "07:58" : "08:05"}</span><strong>{event.title}</strong></div><em>{event.review_status === "pending" ? "待确认" : "已记录"}</em></div>)}
-      {!events.length && mode !== "mock" && <div className="plugin-card-empty">等待用药相关事件</div>}
-    </div> : isObjectWatch ? <div className="plugin-live-list">
-      {(objects.length ? objects : mode === "mock" ? [{ object_id: "med", name: "降压药盒" }, { object_id: "water", name: "水杯" }] : []).slice(0, 2).map((item: any, index: number) => <div className="plugin-live-row object-row" key={item.object_id ?? index}><div className={`plugin-live-thumb ${index === 0 ? "medicine-thumb" : "water-thumb"}`} /><div><strong>{item.name}</strong><span>{mode === "mock" ? (index === 0 ? "最后位置：客厅 · 茶几" : "当前位置：茶几") : "等待位置事实"}</span></div><ArrowUpRight size={15} /></div>)}
-    </div> : <div className="plugin-generic-state"><Sparkles size={18} /><span>{plugin.description}</span></div>}
-  </section>;
-}
-
-function ActionTimeline({ entries }: { entries: TimelineEntry[] }) {
+function ActionTimeline({ entries }: { entries: RuntimeTimelineEntry[] }) {
   if (!entries.length) return <section className="action-timeline-card"><div className="action-timeline-heading"><div><Activity size={20} /><strong>最近动作</strong></div></div><div className="timeline-empty">暂无最近动作</div></section>;
   const offsets = [2, -7, 4, -5, 5, -2, 7, -4];
   return <section className="action-timeline-card">
