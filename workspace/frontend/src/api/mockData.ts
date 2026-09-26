@@ -1,8 +1,8 @@
 import type { Plugin, RegisteredObject, RegisteredPerson, UnifiedEvent } from "../types";
 
 export const mockPlugins: Plugin[] = [
-  { plugin_id: "elderly_care", name: "智慧养老辅助判断", version: "0.1.0", description: "把药盒、人物和动作事实组合成可复核的疑似服药事件。", enabled: true, state: "running" },
-  { plugin_id: "workshop", name: "工作室物品管理", version: "0.1.0", description: "追踪工具离开登记区域、归还和最后出现位置。", enabled: true, state: "running" },
+  { plugin_id: "elderly_care", name: "智慧养老辅助判断", version: "0.1.0", description: "把药盒、人物和动作事实组合成可复核的疑似服药事件。", enabled: true, state: "enabled" },
+  { plugin_id: "workshop", name: "工作室物品管理", version: "0.1.0", description: "追踪工具离开登记区域、归还和最后出现位置。", enabled: true, state: "enabled" },
 ];
 
 export function createMockEvents(): UnifiedEvent[] {

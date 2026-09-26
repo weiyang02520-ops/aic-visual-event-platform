@@ -16,7 +16,7 @@ export function createMockAdapter(): Repository {
     async listPlugins() { await wait(); return structuredClone(plugins); },
     async togglePlugin(pluginId, enabled) {
       await wait();
-      plugins = plugins.map((plugin) => plugin.plugin_id === pluginId ? { ...plugin, enabled, state: enabled ? "running" : "disabled" } : plugin);
+      plugins = plugins.map((plugin) => plugin.plugin_id === pluginId ? { ...plugin, enabled, state: enabled ? "enabled" : "disabled" } : plugin);
       const result = plugins.find((plugin) => plugin.plugin_id === pluginId);
       if (!result) throw new Error("plugin not found");
       return structuredClone(result);
