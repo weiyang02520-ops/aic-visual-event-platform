@@ -943,14 +943,7 @@ body {
   box-shadow: 0 10px 22px rgba(53, 118, 207, .1), inset 3px 0 0 #287ff3;
 }
 .nav-item.active::after {
-  content: "";
-  width: 6px;
-  height: 6px;
-  position: absolute;
-  right: 14px;
-  border-radius: 50%;
-  background: #287ff3;
-  box-shadow: 0 0 0 4px rgba(40, 127, 243, .1);
+  display: none;
 }
 .nav-item.active svg { color: #287ff3; }
 .nav-item em { background: #f37d70; box-shadow: 0 4px 10px rgba(236, 111, 107, .2); }
