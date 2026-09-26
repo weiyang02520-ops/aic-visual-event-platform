@@ -436,7 +436,12 @@ function MonitorLive({ scenario, mode, connection, plugins, events, objects, onT
   const enabledPlugins = plugins.filter((plugin) => plugin.enabled);
   const timeline = useMemo(() => buildMonitorTimeline(mode, events, plugins), [mode, events, plugins]);
   const medicationEvents = events.filter((event) => event.plugin_id === "elderly_care").slice(0, 2);
-  const displayObjects = objects.slice(0, 2);
+  const displayObjects = mode === "mock" && scenario === "elderly"
+    ? [
+        objects.find((item) => item.name.includes("药")) ?? { object_id: "mock-med", name: "降压药盒", description: "Mock 演示对象", reference_uris: [], status: "active" },
+        { object_id: "mock-water", name: "水杯", description: "Mock 演示对象", reference_uris: [], status: "active" },
+      ]
+    : objects.slice(0, 2);
 
   return <section className="privacy-monitor-page">
     <header className="privacy-page-header">
@@ -461,8 +466,7 @@ function MonitorLive({ scenario, mode, connection, plugins, events, objects, onT
       <article className="privacy-video-card">
         <div className="privacy-stage">
           {mode === "mock" ? <PrivacyMockScene privacyMode={privacyMode} medicationEnabled={enabledPlugins.some((plugin) => plugin.plugin_id === "elderly_care")} objectEnabled={enabledPlugins.some((plugin) => plugin.plugin_id === "workshop")} /> :
-            playback.browserPlayable && playback.url ? <video className="privacy-real-video" src={playback.url} controls autoPlay muted playsInline /> :
-            <div className="privacy-stream-placeholder"><Video size={30} /><strong>真实媒体流未就绪</strong><span>{realReason}</span></div>}
+            <div className="privacy-stream-placeholder"><ShieldCheck size={30} /><strong>隐私渲染流未接入</strong><span>隐私监护页不会直接回退到原始视频。{session ? `已发现媒体会话，等待骨骼/卡漫输出接口。` : realReason}</span></div>}
           <div className="camera-chip"><span className="camera-online-dot" /> 客厅 · Camera 01 <i /> {mode === "mock" ? "08:01:23" : session ? "LIVE" : "NO STREAM"}</div>
           <div className="privacy-player-controls"><button aria-label="暂停"><Pause size={19} fill="currentColor" /></button><span>08:01 / 10:00</span><div className="privacy-progress"><i /></div><button aria-label="运行分析" onClick={onRun}><Sparkles size={18} /></button></div>
         </div>
