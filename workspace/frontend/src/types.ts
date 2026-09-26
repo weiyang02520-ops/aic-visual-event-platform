@@ -125,7 +125,7 @@ export interface Repository {
   createAnalysis(source: string): Promise<AnalysisJob>;
   getAnalysis(jobId: string): Promise<AnalysisJob>;
   listObjects(): Promise<RegisteredObject[]>;
-  createObject(name: string): Promise<RegisteredObject>;
+  createObject(name: string, description?: string, referenceUris?: string[]): Promise<RegisteredObject>;
   listPersons(): Promise<RegisteredPerson[]>;
-  createPerson(name: string, role: string): Promise<RegisteredPerson>;
+  createPerson(name: string, role: string, referenceUris?: string[]): Promise<RegisteredPerson>;
 }

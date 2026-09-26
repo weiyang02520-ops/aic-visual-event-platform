@@ -150,9 +150,9 @@ export function createMockRepository(): Repository {
       await wait();
       return structuredClone(objects);
     },
-    async createObject(name) {
+    async createObject(name, description = "新注册对象", referenceUris = []) {
       await wait();
-      const item: RegisteredObject = { object_id: `obj-${Date.now()}`, name, description: "新注册对象", reference_uris: [], status: "active" };
+      const item: RegisteredObject = { object_id: `obj-${Date.now()}`, name, description, reference_uris: referenceUris, status: "active" };
       objects = [item, ...objects];
       return structuredClone(item);
     },
@@ -160,9 +160,9 @@ export function createMockRepository(): Repository {
       await wait();
       return structuredClone(persons);
     },
-    async createPerson(name, role) {
+    async createPerson(name, role, referenceUris = []) {
       await wait();
-      const item: RegisteredPerson = { person_id: `person-${Date.now()}`, display_name: name, role, reference_uris: [], status: "active" };
+      const item: RegisteredPerson = { person_id: `person-${Date.now()}`, display_name: name, role, reference_uris: referenceUris, status: "active" };
       persons = [item, ...persons];
       return structuredClone(item);
     },
@@ -200,8 +200,8 @@ export function createRealRepository(baseUrl: string): Repository {
     createAnalysis: (source) => request<AnalysisJob>("/api/v1/analysis/jobs", { method: "POST", body: JSON.stringify({ source }) }),
     getAnalysis: (jobId) => request<AnalysisJob>(`/api/v1/analysis/jobs/${encodeURIComponent(jobId)}`),
     listObjects: () => request<RegisteredObject[]>("/api/v1/objects"),
-    createObject: (name) => request<RegisteredObject>("/api/v1/objects", { method: "POST", body: JSON.stringify({ name }) }),
+    createObject: (name, description = "新注册对象", referenceUris = []) => request<RegisteredObject>("/api/v1/objects", { method: "POST", body: JSON.stringify({ name, description, reference_uris: referenceUris }) }),
     listPersons: () => request<RegisteredPerson[]>("/api/v1/persons"),
-    createPerson: (name, role) => request<RegisteredPerson>("/api/v1/persons", { method: "POST", body: JSON.stringify({ display_name: name, role }) }),
+    createPerson: (name, role, referenceUris = []) => request<RegisteredPerson>("/api/v1/persons", { method: "POST", body: JSON.stringify({ display_name: name, role, reference_uris: referenceUris }) }),
   };
 }

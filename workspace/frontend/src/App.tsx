@@ -10,7 +10,9 @@ import {
   ClipboardCheck,
   Eye,
   Gauge,
+  ImagePlus,
   LayoutDashboard,
+  Link2,
   Network,
   Pause,
   Play,
@@ -282,38 +284,68 @@ function EventsView({ events, onReview }: { events: UnifiedEvent[]; onReview: (e
 function PluginsView({ plugins, connection, onToggle }: { plugins: Plugin[]; connection: RepositoryConnection; onToggle: (plugin: Plugin) => Promise<void> }) { return <section className="plugin-layout"><div className="panel plugin-main"><div className="panel-heading"><div><span className="panel-kicker">EXTENSION RUNTIME</span><h2>插件能力</h2></div><span className="status-summary"><span className={`status-dot ${connectionDotClass(connection.status)}`} /> {connection.status === "offline" ? "数据源离线" : `${plugins.filter((item) => item.enabled).length} 个运行中`}</span></div><p className="panel-lead">插件在启动时从 <code>plugins/</code> 自动发现。场景模式只改变界面重点，不会替你关闭其他插件。</p>{plugins.map((plugin) => <div className="plugin-row" key={plugin.plugin_id}><div className={`plugin-symbol ${plugin.enabled ? "on" : "off"}`}><Sparkles size={18} /></div><div className="plugin-copy"><div><strong>{plugin.name}</strong><span className="version">v{plugin.version}</span></div><p>{plugin.description}</p><small>{plugin.plugin_id} · {plugin.state}</small></div><button className={`switch ${plugin.enabled ? "on" : ""}`} onClick={() => onToggle(plugin)} aria-label={`切换${plugin.name}`}><i /></button></div>)}</div><div className="panel plugin-note"><span className="panel-kicker">PLUGIN CONTRACT</span><h2>统一事件出口</h2><p>前端只消费统一事件，不直接理解插件内部算法。插件异常会进入 degraded/error 状态，主服务和其他插件继续运行。</p><div className="contract-list"><span><Check size={14} /> 自动发现</span><span><Check size={14} /> 全局启停</span><span><Check size={14} /> 并行运行</span><span><Check size={14} /> 独立测试</span></div></div></section>; }
 
 function RegistryView({ repo, mode, connection, objects, persons, onObjects, onPersons, onToast }: { repo: Repository; mode: Mode; connection: RepositoryConnection; objects: RegisteredObject[]; persons: RegisteredPerson[]; onObjects: (items: RegisteredObject[]) => void; onPersons: (items: RegisteredPerson[]) => void; onToast: (message: string) => void }) {
-  const [objectName, setObjectName] = useState("");
-  const [personName, setPersonName] = useState("");
+  const [kind, setKind] = useState<"object" | "person">("object");
+  const [name, setName] = useState("");
+  const [detail, setDetail] = useState("");
+  const [referenceUri, setReferenceUri] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const canMutate = mode === "mock" || connection.status === "online";
   const blockedMessage = () => onToast(`${connectionLabel(connection)}，登记操作未执行${connection.reason ? `：${connection.reason}` : ""}`);
 
-  async function addObject() {
-    if (!objectName.trim()) return;
+  function resetForm() {
+    setName("");
+    setDetail("");
+    setReferenceUri("");
+  }
+
+  async function submitRegistration() {
+    const cleanName = name.trim();
+    const cleanDetail = detail.trim();
+    const references = referenceUri.trim() ? [referenceUri.trim()] : [];
+    if (!cleanName) {
+      onToast(kind === "object" ? "请先填写对象名称" : "请先填写人员名称");
+      return;
+    }
     if (!canMutate) return blockedMessage();
+    setSubmitting(true);
     try {
-      await repo.createObject(objectName.trim());
-      onObjects(await repo.listObjects());
-      setObjectName("");
-      onToast("关注对象已登记");
+      if (kind === "object") {
+        await repo.createObject(cleanName, cleanDetail || "新注册对象", references);
+        onObjects(await repo.listObjects());
+        onToast("关注对象已登记");
+      } else {
+        await repo.createPerson(cleanName, cleanDetail || "unknown", references);
+        onPersons(await repo.listPersons());
+        onToast("人员身份已登记");
+      }
+      resetForm();
     } catch (error) {
-      onToast(`对象登记失败：${errorMessage(error)}`);
+      onToast(`${kind === "object" ? "对象" : "人员"}登记失败：${errorMessage(error)}`);
+    } finally {
+      setSubmitting(false);
     }
   }
 
-  async function addPerson() {
-    if (!personName.trim()) return;
-    if (!canMutate) return blockedMessage();
-    try {
-      await repo.createPerson(personName.trim(), "unknown");
-      onPersons(await repo.listPersons());
-      setPersonName("");
-      onToast("人员已登记");
-    } catch (error) {
-      onToast(`人员登记失败：${errorMessage(error)}`);
-    }
-  }
-
-  return <section className="registry-grid"><div className="panel registry-panel"><div className="panel-heading"><div><span className="panel-kicker">REGISTERED OBJECTS</span><h2>关注对象</h2></div><span className="count-pill">{objects.length}</span></div><p className="panel-lead">上传少量参考图即可注册长尾物品；当前演示先保存名称与引用位。</p><div className="inline-form"><input value={objectName} onChange={(event) => setObjectName(event.target.value)} placeholder="例如：这个药盒 / 这把电钻" /><button onClick={addObject}><Plus size={15} /> 登记</button></div>{objects.map((item) => <div className="registry-row" key={item.object_id}><div className="registry-icon"><Box size={16} /></div><div><strong>{item.name}</strong><span>{item.description}</span></div><span className="active-label">{item.status}</span></div>)}</div><div className="panel registry-panel"><div className="panel-heading"><div><span className="panel-kicker">REGISTERED PEOPLE</span><h2>人员身份</h2></div><span className="count-pill">{persons.length}</span></div><p className="panel-lead">支持注册式人员区分；识别不确定时保留 unknown/ambiguous 状态。</p><div className="inline-form"><input value={personName} onChange={(event) => setPersonName(event.target.value)} placeholder="例如：爷爷 / 家属 / 工作人员" /><button onClick={addPerson}><Plus size={15} /> 登记</button></div>{persons.map((item) => <div className="registry-row" key={item.person_id}><div className="registry-icon person"><Users size={16} /></div><div><strong>{item.display_name}</strong><span>{item.role}</span></div><span className="active-label">{item.status}</span></div>)}</div></section>;
+  return <section className="registry-workspace">
+    <div className="panel registry-panel registry-form-panel">
+      <div className="panel-heading"><div><span className="panel-kicker">REGISTRY / CONTROLLED INPUT</span><h2>建立关注对象</h2></div><span className="count-pill">{objects.length + persons.length} 条记录</span></div>
+      <p className="panel-lead">先选择登记类型，再填写名称和上下文。参考图使用可访问的链接保存到引用位，当前接口不会把本地文件伪装成已上传。</p>
+      <div className="registry-kind-tabs" role="tablist" aria-label="登记类型">
+        <button className={kind === "object" ? "active" : ""} onClick={() => { setKind("object"); resetForm(); }}><Box size={17} /><span><strong>关注对象</strong><small>药盒、工具、物品</small></span></button>
+        <button className={kind === "person" ? "active" : ""} onClick={() => { setKind("person"); resetForm(); }}><Users size={17} /><span><strong>人员身份</strong><small>家属、工作人员、老人</small></span></button>
+      </div>
+      <div className="registry-form-grid">
+        <label className="registry-field"><span>{kind === "object" ? "对象名称" : "人员名称"}</span><input value={name} onChange={(event) => setName(event.target.value)} placeholder={kind === "object" ? "例如：降压药盒 / 电钻" : "例如：爷爷 / 家属"} /></label>
+        <label className="registry-field"><span>{kind === "object" ? "用途或位置" : "角色"}</span><input value={detail} onChange={(event) => setDetail(event.target.value)} placeholder={kind === "object" ? "例如：客厅茶几 / 工具架 A" : "例如：resident / staff"} /></label>
+        <label className="registry-field registry-field-wide"><span><Link2 size={14} /> 参考图链接 <em>可选</em></span><input value={referenceUri} onChange={(event) => setReferenceUri(event.target.value)} placeholder="https://…/reference.jpg" /></label>
+      </div>
+      <div className="registry-form-footer"><div className="registry-contract-note"><ImagePlus size={17} /><span>保存名称、描述/角色和引用地址；模型匹配仍由 AI 服务的实际证据决定。</span></div><button className="primary-button registry-submit" disabled={submitting} onClick={submitRegistration}>{submitting ? "保存中…" : kind === "object" ? "保存关注对象" : "保存人员身份"}<Plus size={15} /></button></div>
+    </div>
+    <div className="registry-lists">
+      <div className="panel registry-panel registry-list-panel"><div className="panel-heading"><div><span className="panel-kicker">REGISTERED OBJECTS</span><h2>关注对象</h2></div><span className="count-pill">{objects.length}</span></div>{objects.length === 0 ? <div className="registry-empty">还没有关注对象</div> : objects.map((item) => <div className="registry-row" key={item.object_id}><div className="registry-icon"><Box size={16} /></div><div><strong>{item.name}</strong><span>{item.description || "未填写描述"}{item.reference_uris.length ? " · 已有引用图" : ""}</span></div><span className="active-label">{item.status}</span></div>)}</div>
+      <div className="panel registry-panel registry-list-panel"><div className="panel-heading"><div><span className="panel-kicker">REGISTERED PEOPLE</span><h2>人员身份</h2></div><span className="count-pill">{persons.length}</span></div>{persons.length === 0 ? <div className="registry-empty">还没有人员身份</div> : persons.map((item) => <div className="registry-row" key={item.person_id}><div className="registry-icon person"><Users size={16} /></div><div><strong>{item.display_name}</strong><span>{item.role || "unknown"}{item.reference_uris.length ? " · 已有引用图" : ""}</span></div><span className="active-label">{item.status}</span></div>)}</div>
+    </div>
+  </section>;
 }
 function SettingsView({ mode, scenario, connection }: { mode: Mode; scenario: Scenario; connection: RepositoryConnection }) { return <section className="settings-grid"><div className="panel settings-main"><span className="panel-kicker">WORKSPACE SETTINGS</span><h2>系统设置</h2><div className="setting-item"><div><strong>数据源模式</strong><span>当前前端数据 provider</span></div><b className="setting-value">{mode === "mock" ? "Mock 演示" : connection.status === "online" ? "Real AI API 在线" : connection.status === "loading" ? "Real API 连接中" : "Real API 离线"}</b></div><div className="setting-item"><div><strong>当前场景</strong><span>只改变界面重点，不改变插件状态</span></div><b className="setting-value">{scenarioCopy[scenario].label}</b></div><div className="setting-item"><div><strong>API 地址</strong><span>Real 模式下的 AI 服务地址</span></div><code>{import.meta.env.VITE_AI_API_URL ?? "http://127.0.0.1:8010"}</code></div><div className="setting-item"><div><strong>隐私模式</strong><span>事件保存，不重复保存视频</span></div><span className="switch on"><i /></span></div></div><div className="panel settings-note"><ShieldCheck size={22} /><h3>证据边界</h3><p>事件用于辅助判断和人工复核。没有可用录像解析器时，界面会保留时间窗并标注“待解析”，不会伪造播放证据。</p><div className="note-tag"><Check size={13} /> 文档与实现保持同步</div></div></section>; }
 
