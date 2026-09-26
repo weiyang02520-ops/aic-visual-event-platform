@@ -1227,6 +1227,11 @@ body {
 .object-memory-detail-empty span { max-width:190px; font-size:10px; line-height:1.6; }
 .object-detail-placeholder { width:48px; height:48px; display:grid; place-items:center; color:#78a5de; border-radius:14px; background:#eaf3ff; }
 .registry-lists-single { grid-template-columns:minmax(0,1fr); }
+.enabled-pill.plugin-state-registered { color:#637995; background:#edf3fa; }
+.enabled-pill.plugin-state-enabled { color:#2c7bc9; background:#e9f3ff; }
+.enabled-pill.plugin-state-degraded { color:#bd7a2d; background:#fff3df; }
+.enabled-pill.plugin-state-error { color:#c95752; background:#fff0ef; }
+.plugin-card-empty { min-height:54px; display:flex; align-items:center; justify-content:center; gap:7px; color:#8795a8; font-size:11px; }
 @media (max-width: 1050px) {
   .object-memory-workspace { grid-template-columns:1fr; }
   .object-memory-detail { min-height:0; }
