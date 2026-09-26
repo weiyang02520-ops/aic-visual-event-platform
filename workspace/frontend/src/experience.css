@@ -1138,3 +1138,20 @@ body {
   .registry-form-footer { align-items:stretch; flex-direction:column; }
   .registry-submit { width:100%; }
 }
+
+/* Event Center v1: contract-driven reasoning and evidence details. */
+.event-center-panel .panel-heading { align-items:flex-start; }
+.event-center-lead { margin:8px 0 0; color:#8091a7; font-size:11px; line-height:1.55; }
+.event-detail-status { display:inline-flex; margin-top:10px; padding:4px 8px; border-radius:999px; color:#e77f3e; background:#fff1e8; font:9px "DM Mono", monospace; }
+.event-detail-status.confirmed { color:#119b58; background:#eaf9f0; }
+.event-detail-status.rejected { color:#de5d59; background:#fff0ef; }
+.event-reasoning-timeline { display:grid; gap:0; padding:6px 0; }
+.event-reasoning-step { min-height:52px; position:relative; display:flex; align-items:flex-start; gap:10px; }
+.event-reasoning-step:not(:last-child)::after { content:""; position:absolute; left:6px; top:18px; bottom:0; width:1px; background:#dbe6f1; }
+.event-reasoning-marker { width:14px; height:14px; z-index:1; flex:0 0 14px; color:#287ff3; border-radius:50%; background:#e7f1ff; }
+.event-reasoning-copy { display:grid; gap:4px; padding-top:0; }
+.event-reasoning-copy strong { color:#263b59; font-size:11px; font-weight:700; }
+.event-reasoning-copy span { color:#8090a5; font-size:10px; }
+.event-reasoning-arrow { display:none; }
+.event-contract-empty { min-height:150px; display:grid; place-items:center; color:#8796aa; font-size:11px; }
+.event-drawer .evidence-list { margin-bottom:4px; }
