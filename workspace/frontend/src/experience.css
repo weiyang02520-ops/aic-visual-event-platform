@@ -1102,3 +1102,39 @@ body {
 .metric-card.amber .metric-icon { color: #e8953e; background: #fff1df; }
 .metric-card.violet .metric-icon { color: #7667ee; background: #efedff; }
 .metric-card.green .metric-icon { color: #17a967; background: #e5f8ee; }
+
+/* Registry flow: type first, then context and references, then submit. */
+.registry-workspace { display:grid; gap:16px; }
+.registry-form-panel { padding:26px; }
+.registry-kind-tabs { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; margin:22px 0 20px; }
+.registry-kind-tabs button { min-height:72px; padding:12px 14px; display:flex; align-items:center; gap:11px; border:1px solid #dce6f1; border-radius:14px; color:#6b7e99; background:#f8fbff; text-align:left; transition:all .18s ease; }
+.registry-kind-tabs button:hover { transform:translateY(-1px); border-color:#bcd4f4; background:#f3f8ff; }
+.registry-kind-tabs button.active { color:#1d6dd8; border-color:rgba(40,127,243,.38); background:linear-gradient(110deg,#e8f2ff,#f8fbff); box-shadow:0 8px 18px rgba(48,116,210,.1); }
+.registry-kind-tabs button svg { flex:0 0 17px; }
+.registry-kind-tabs button span { display:grid; gap:4px; }
+.registry-kind-tabs strong { color:#263c60; font-size:13px; }
+.registry-kind-tabs button.active strong { color:#1766ca; }
+.registry-kind-tabs small { color:#8b9bb0; font-size:10px; }
+.registry-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
+.registry-field { display:grid; gap:7px; color:#70839e; font-size:11px; font-weight:650; }
+.registry-field span { display:flex; align-items:center; gap:5px; }
+.registry-field span svg { color:#4b88e6; }
+.registry-field em { color:#9aa8b9; font-style:normal; font-size:10px; font-weight:400; }
+.registry-field input { width:100%; height:42px; padding:0 12px; border:1px solid #dbe5f0; outline:0; border-radius:10px; color:#263a59; background:#f9fbfe; font-size:12px; transition:border-color .18s ease,box-shadow .18s ease; }
+.registry-field input:focus { border-color:rgba(40,127,243,.5); box-shadow:0 0 0 4px rgba(40,127,243,.08); }
+.registry-field-wide { grid-column:1 / -1; }
+.registry-form-footer { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:18px; padding-top:16px; border-top:1px solid #e6edf5; }
+.registry-contract-note { display:flex; align-items:center; gap:8px; color:#8191a7; font-size:10px; line-height:1.5; }
+.registry-contract-note svg { flex:0 0 17px; color:#5c8fe5; }
+.registry-submit { min-width:142px; justify-content:center; }
+.registry-submit:disabled { cursor:wait; opacity:.62; transform:none; }
+.registry-lists { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.registry-list-panel { min-height:230px; padding:22px; }
+.registry-empty { min-height:150px; display:grid; place-items:center; color:#8998ac; font-size:11px; }
+.registry-list-panel .registry-row { padding:14px 0; }
+.registry-list-panel .registry-row:hover { background:#f5f9ff; border-radius:10px; padding-left:8px; padding-right:8px; }
+@media (max-width: 720px) {
+  .registry-form-grid, .registry-lists { grid-template-columns:1fr; }
+  .registry-form-footer { align-items:stretch; flex-direction:column; }
+  .registry-submit { width:100%; }
+}
