@@ -30,6 +30,7 @@ import {
 import { createMockRepository, createRealRepository } from "./repository";
 import { choosePlayback, classifyPlaybackUrl, createMakerverseLiveAdapter } from "./media";
 import { EventCenter } from "./features/events";
+import { ObjectMemoryPanel } from "./features/objects";
 import type { LiveSession, Mode, Plugin, RegisteredObject, RegisteredPerson, Repository, RepositoryConnection, RepositoryConnectionStatus, ReviewStatus, Scenario, UnifiedEvent, View } from "./types";
 
 const navItems: { id: View; label: string; icon: typeof LayoutDashboard }[] = [
@@ -236,7 +237,7 @@ function App() {
           {view === "monitor" && <MonitorLive scenario={scenario} mode={mode} connection={connection} plugins={plugins} events={events} objects={objects} onToggle={toggle} onRun={runDemo} onModeChange={setMode} />}
           {view === "events" && <EventCenter events={events} onReview={review} />}
           {view === "plugins" && <PluginsView plugins={plugins} connection={connection} onToggle={toggle} />}
-          {view === "registry" && <RegistryView repo={repo} mode={mode} connection={connection} objects={objects} persons={persons} onObjects={setObjects} onPersons={setPersons} onToast={setToast} />}
+          {view === "registry" && <RegistryView repo={repo} mode={mode} connection={connection} objects={objects} persons={persons} events={events} plugins={plugins} onObjects={setObjects} onPersons={setPersons} onToast={setToast} />}
           {view === "settings" && <SettingsView mode={mode} scenario={scenario} connection={connection} />}
         </div>
       </main>
@@ -284,7 +285,7 @@ function EventsView({ events, onReview }: { events: UnifiedEvent[]; onReview: (e
 
 function PluginsView({ plugins, connection, onToggle }: { plugins: Plugin[]; connection: RepositoryConnection; onToggle: (plugin: Plugin) => Promise<void> }) { return <section className="plugin-layout"><div className="panel plugin-main"><div className="panel-heading"><div><span className="panel-kicker">EXTENSION RUNTIME</span><h2>插件能力</h2></div><span className="status-summary"><span className={`status-dot ${connectionDotClass(connection.status)}`} /> {connection.status === "offline" ? "数据源离线" : `${plugins.filter((item) => item.enabled).length} 个运行中`}</span></div><p className="panel-lead">插件在启动时从 <code>plugins/</code> 自动发现。场景模式只改变界面重点，不会替你关闭其他插件。</p>{plugins.map((plugin) => <div className="plugin-row" key={plugin.plugin_id}><div className={`plugin-symbol ${plugin.enabled ? "on" : "off"}`}><Sparkles size={18} /></div><div className="plugin-copy"><div><strong>{plugin.name}</strong><span className="version">v{plugin.version}</span></div><p>{plugin.description}</p><small>{plugin.plugin_id} · {plugin.state}</small></div><button className={`switch ${plugin.enabled ? "on" : ""}`} onClick={() => onToggle(plugin)} aria-label={`切换${plugin.name}`}><i /></button></div>)}</div><div className="panel plugin-note"><span className="panel-kicker">PLUGIN CONTRACT</span><h2>统一事件出口</h2><p>前端只消费统一事件，不直接理解插件内部算法。插件异常会进入 degraded/error 状态，主服务和其他插件继续运行。</p><div className="contract-list"><span><Check size={14} /> 自动发现</span><span><Check size={14} /> 全局启停</span><span><Check size={14} /> 并行运行</span><span><Check size={14} /> 独立测试</span></div></div></section>; }
 
-function RegistryView({ repo, mode, connection, objects, persons, onObjects, onPersons, onToast }: { repo: Repository; mode: Mode; connection: RepositoryConnection; objects: RegisteredObject[]; persons: RegisteredPerson[]; onObjects: (items: RegisteredObject[]) => void; onPersons: (items: RegisteredPerson[]) => void; onToast: (message: string) => void }) {
+function RegistryView({ repo, mode, connection, objects, persons, events, plugins, onObjects, onPersons, onToast }: { repo: Repository; mode: Mode; connection: RepositoryConnection; objects: RegisteredObject[]; persons: RegisteredPerson[]; events: UnifiedEvent[]; plugins: Plugin[]; onObjects: (items: RegisteredObject[]) => void; onPersons: (items: RegisteredPerson[]) => void; onToast: (message: string) => void }) {
   const [kind, setKind] = useState<"object" | "person">("object");
   const [name, setName] = useState("");
   const [detail, setDetail] = useState("");
@@ -342,8 +343,8 @@ function RegistryView({ repo, mode, connection, objects, persons, onObjects, onP
       </div>
       <div className="registry-form-footer"><div className="registry-contract-note"><ImagePlus size={17} /><span>保存名称、描述/角色和引用地址；模型匹配仍由 AI 服务的实际证据决定。</span></div><button className="primary-button registry-submit" disabled={submitting} onClick={submitRegistration}>{submitting ? "保存中…" : kind === "object" ? "保存关注对象" : "保存人员身份"}<Plus size={15} /></button></div>
     </div>
-    <div className="registry-lists">
-      <div className="panel registry-panel registry-list-panel"><div className="panel-heading"><div><span className="panel-kicker">REGISTERED OBJECTS</span><h2>关注对象</h2></div><span className="count-pill">{objects.length}</span></div>{objects.length === 0 ? <div className="registry-empty">还没有关注对象</div> : objects.map((item) => <div className="registry-row" key={item.object_id}><div className="registry-icon"><Box size={16} /></div><div><strong>{item.name}</strong><span>{item.description || "未填写描述"}{item.reference_uris.length ? " · 已有引用图" : ""}</span></div><span className="active-label">{item.status}</span></div>)}</div>
+    <ObjectMemoryPanel objects={objects} events={events} plugins={plugins} />
+    <div className="registry-lists registry-lists-single">
       <div className="panel registry-panel registry-list-panel"><div className="panel-heading"><div><span className="panel-kicker">REGISTERED PEOPLE</span><h2>人员身份</h2></div><span className="count-pill">{persons.length}</span></div>{persons.length === 0 ? <div className="registry-empty">还没有人员身份</div> : persons.map((item) => <div className="registry-row" key={item.person_id}><div className="registry-icon person"><Users size={16} /></div><div><strong>{item.display_name}</strong><span>{item.role || "unknown"}{item.reference_uris.length ? " · 已有引用图" : ""}</span></div><span className="active-label">{item.status}</span></div>)}</div>
     </div>
   </section>;
