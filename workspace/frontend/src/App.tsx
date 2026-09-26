@@ -79,6 +79,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [connection, setConnection] = useState<RepositoryConnection>({ mode: "mock", status: "loading" });
   const [toast, setToast] = useState<string | null>(null);
+  const [pluginsOpen, setPluginsOpen] = useState(false);
 
   useEffect(() => {
     function onHashChange() {
@@ -190,25 +191,46 @@ function App() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <div className="brand"><div className="brand-mark"><Sparkles size={18} /></div><div><strong>sentinel</strong><span>VISION OPERATIONS</span></div></div>
-        <div className="workspace-switch"><span className="status-dot" /> 演示工作区 <ChevronDown size={14} /></div>
-        <nav className="main-nav">
-          <span className="nav-caption">工作台</span>
-          {navItems.map((item) => {
+        <nav className="main-nav primary-nav">
+          {navItems.filter((item) => ["dashboard", "monitor", "events"].includes(item.id)).map((item) => {
             const Icon = item.icon;
-            return <button key={item.id} className={`nav-item ${view === item.id ? "active" : ""}`} onClick={() => setView(item.id)}><Icon size={17} /><span>{item.label}</span>{item.id === "events" && pendingCount > 0 && <em>{pendingCount}</em>}</button>;
+            const label = item.id === "dashboard" ? "首页" : item.id === "monitor" ? "隐私监护" : "事件中心";
+            return <button key={item.id} className={`nav-item ${view === item.id ? "active" : ""}`} onClick={() => setView(item.id)}><Icon size={20} /><span>{label}</span>{item.id === "events" && pendingCount > 0 && <em>{pendingCount}</em>}</button>;
           })}
         </nav>
-        <div className="sidebar-bottom"><div className="health-card"><div className="health-heading"><span className={`status-dot ${connectionDotClass(connection.status)}`} /> 系统状态 <span>{connection.status === "online" || connection.status === "mock" ? "正常" : connection.status === "loading" ? "连接中" : "离线"}</span></div><div className="health-line"><span>AI Engine</span><b>{connection.status === "online" ? "在线" : connection.status === "mock" ? "Mock" : connection.status === "loading" ? "连接中" : "离线"}</b></div><div className="health-line"><span>媒体流</span><b className="muted">{mode === "mock" ? "Mock" : "未接入"}</b></div><div className="health-line"><span>机器人适配</span><b className="muted">预留</b></div></div><div className="user-chip"><div className="avatar">未</div><div><strong>未央</strong><span>项目成员</span></div><CircleHelp size={16} /></div></div>
+
+        <section className={`sidebar-plugin-section ${pluginsOpen ? "open" : ""}`}>
+          <button className="sidebar-plugin-toggle" onClick={() => setPluginsOpen((open) => !open)} aria-expanded={pluginsOpen}>
+            <Network size={19} />
+            <span>插件功能</span>
+            <ChevronDown size={16} className="sidebar-plugin-chevron" />
+          </button>
+          {pluginsOpen && <div className="sidebar-plugin-list">
+            {plugins.length === 0 ? <div className="sidebar-plugin-empty">暂无可用插件</div> : plugins.map((plugin) => {
+              const displayName = plugin.plugin_id === "elderly_care" ? "用药辅助" : plugin.plugin_id === "workshop" ? "物品看护" : plugin.name;
+              return <div className={`sidebar-plugin-row ${plugin.enabled ? "enabled" : ""}`} key={plugin.plugin_id}>
+                <div className="sidebar-plugin-icon">{plugin.plugin_id === "workshop" ? <Box size={18} /> : <ClipboardCheck size={18} />}</div>
+                <div className="sidebar-plugin-copy"><strong>{displayName}</strong><span><i className={`mini-status ${plugin.enabled ? "on" : ""}`} />{plugin.enabled ? "已启用" : "未启用"}</span></div>
+                <button className={`sidebar-mini-switch ${plugin.enabled ? "on" : ""}`} onClick={() => toggle(plugin)} aria-label={`${plugin.enabled ? "停用" : "启用"}${displayName}`}><i /></button>
+              </div>;
+            })}
+            <button className="sidebar-plugin-manage" onClick={() => setView("plugins")}>管理全部插件 <ArrowUpRight size={14} /></button>
+          </div>}
+        </section>
+
+        <div className="sidebar-admin">
+          <button onClick={() => setView("registry")} className={view === "registry" ? "active" : ""}><Users size={18} /><span>对象与人员</span></button>
+          <button onClick={() => setView("settings")} className={view === "settings" ? "active" : ""}><Settings size={18} /><span>系统设置</span></button>
+        </div>
       </aside>
 
       <main className="main-content">
-        <header className="topbar"><div className="breadcrumbs"><span>控制台</span><span>/</span><strong>{currentScenario.label}</strong></div><div className="top-actions"><div className="mode-toggle"><button className={mode === "mock" ? "selected" : ""} onClick={() => setMode("mock")}>Mock</button><button className={mode === "real" ? "selected" : ""} onClick={() => setMode("real")}>Real API</button></div><button className="icon-button"><Bell size={18} /><i /></button><div className="top-avatar">未</div></div></header>
-        <div className="content-wrap">
-          <section className="page-intro"><div><div className="eyebrow"><span className="live-pulse" /> LIVE OPERATIONS / 01</div><h1>{currentScenario.label} <span>控制台</span></h1><p>{currentScenario.subtitle} · {mode === "mock" ? "离线演示数据" : "AI REST 数据源"}</p></div><div className="intro-actions"><div className={`connection-state ${connection.status}`}><span className={`status-dot ${connectionDotClass(connection.status)}`} /><strong>{connectionLabel(connection)}</strong>{connection.reason && <small title={connection.reason}>{connection.reason}</small>}</div><label className="select-wrap"><SlidersHorizontal size={15} /><select value={scenario} onChange={(event) => setScenario(event.target.value as Scenario)}>{Object.entries(scenarioCopy).map(([key, item]) => <option key={key} value={key}>{item.label}</option>)}</select></label><button className="primary-button" onClick={runDemo}><Play size={15} fill="currentColor" /> 开始一次分析</button></div></section>
+        {view !== "monitor" && <header className="topbar"><div className="breadcrumbs"><span>控制台</span><span>/</span><strong>{currentScenario.label}</strong></div><div className="top-actions"><div className="mode-toggle"><button className={mode === "mock" ? "selected" : ""} onClick={() => setMode("mock")}>Mock</button><button className={mode === "real" ? "selected" : ""} onClick={() => setMode("real")}>Real API</button></div><button className="icon-button"><Bell size={18} /><i /></button><div className="top-avatar">未</div></div></header>}
+        <div className={`content-wrap ${view === "monitor" ? "monitor-content-wrap" : ""}`}>
+          {view !== "monitor" && <section className="page-intro"><div><div className="eyebrow"><span className="live-pulse" /> LIVE OPERATIONS / 01</div><h1>{currentScenario.label} <span>控制台</span></h1><p>{currentScenario.subtitle} · {mode === "mock" ? "离线演示数据" : "AI REST 数据源"}</p></div><div className="intro-actions"><div className={`connection-state ${connection.status}`}><span className={`status-dot ${connectionDotClass(connection.status)}`} /><strong>{connectionLabel(connection)}</strong>{connection.reason && <small title={connection.reason}>{connection.reason}</small>}</div><label className="select-wrap"><SlidersHorizontal size={15} /><select value={scenario} onChange={(event) => setScenario(event.target.value as Scenario)}>{Object.entries(scenarioCopy).map(([key, item]) => <option key={key} value={key}>{item.label}</option>)}</select></label><button className="primary-button" onClick={runDemo}><Play size={15} fill="currentColor" /> 开始一次分析</button></div></section>}
 
           {view === "dashboard" && <Dashboard events={events} plugins={plugins} pendingCount={pendingCount} enabledCount={enabledCount} evidenceCount={evidenceCount} loading={loading} mode={mode} connection={connection} onNavigate={setView} onReview={review} />}
-          {view === "monitor" && <MonitorLive scenario={scenario} mode={mode} connection={connection} onRun={runDemo} />}
+          {view === "monitor" && <MonitorLive scenario={scenario} mode={mode} connection={connection} plugins={plugins} events={events} objects={objects} onToggle={toggle} onRun={runDemo} onModeChange={setMode} />}
           {view === "events" && <EventsViewInteractive events={events} onReview={review} />}
           {view === "plugins" && <PluginsView plugins={plugins} connection={connection} onToggle={toggle} />}
           {view === "registry" && <RegistryView repo={repo} mode={mode} connection={connection} objects={objects} persons={persons} onObjects={setObjects} onPersons={setPersons} onToast={setToast} />}
@@ -297,9 +319,77 @@ function SettingsView({ mode, scenario, connection }: { mode: Mode; scenario: Sc
 
 function relativeTime(value: string) { const diff = Math.max(0, Date.now() - new Date(value).getTime()); const minutes = Math.round(diff / 60000); return minutes < 1 ? "刚刚" : minutes < 60 ? `${minutes} 分钟前` : `${Math.round(minutes / 60)} 小时前`; }
 
-function MonitorLive({ scenario, mode, connection, onRun }: { scenario: Scenario; mode: Mode; connection: RepositoryConnection; onRun: () => Promise<void> }) {
+type PrivacyMode = "cartoon" | "skeleton";
+
+type TimelineEntry = {
+  id: string;
+  time: string;
+  title: string;
+  detail: string;
+  kind: "person" | "medicine" | "object" | "status";
+};
+
+function factLabel(factType: string): string {
+  const labels: Record<string, string> = {
+    hand_near_object: "手靠近物品",
+    hand_to_face: "手靠近面部",
+    pickup_candidate: "拿起物品",
+    putdown_candidate: "放回物品",
+    entered_zone: "进入区域",
+    left_zone: "离开区域",
+    motion: "发生移动",
+    object_in_zone: "物品位于区域",
+    object_detected: "检测到物品",
+  };
+  return labels[factType] ?? factType.replaceAll("_", " ");
+}
+
+function buildMonitorTimeline(mode: Mode, events: UnifiedEvent[], plugins: Plugin[]): TimelineEntry[] {
+  if (mode === "mock") {
+    const enabled = new Set(plugins.filter((plugin) => plugin.enabled).map((plugin) => plugin.plugin_id));
+    const entries: TimelineEntry[] = [
+      { id: "enter", time: "07:42", title: "进入客厅", detail: "连续轨迹建立", kind: "person" },
+      { id: "settle", time: "08:12", title: "在沙发就座", detail: "持续静止", kind: "status" },
+    ];
+    if (enabled.has("elderly_care")) {
+      entries.splice(1, 0,
+        { id: "medicine-pick", time: "07:58", title: "拿起药盒", detail: "手接触药盒", kind: "medicine" },
+        { id: "face", time: "08:01", title: "手靠近面部", detail: "疑似服药行为", kind: "medicine" },
+        { id: "medicine-return", time: "08:05", title: "放回药盒", detail: "回到桌面区域", kind: "medicine" },
+      );
+    }
+    if (enabled.has("workshop")) {
+      entries.splice(Math.min(entries.length - 1, 3), 0, { id: "water", time: "08:04", title: "拿起水杯", detail: "物品位置变化", kind: "object" });
+    }
+    return entries;
+  }
+
+  const flattened = events.flatMap((event) =>
+    event.facts.map((fact, index) => ({
+      id: `${event.event_id}-${index}`,
+      time: new Date(event.started_at).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" }),
+      title: factLabel(fact.fact_type),
+      detail: event.location ?? event.title,
+      kind: event.plugin_id === "elderly_care" ? "medicine" as const : event.object ? "object" as const : "status" as const,
+    })),
+  );
+  return flattened.slice(0, 8);
+}
+
+function MonitorLive({ scenario, mode, connection, plugins, events, objects, onToggle, onRun, onModeChange }: {
+  scenario: Scenario;
+  mode: Mode;
+  connection: RepositoryConnection;
+  plugins: Plugin[];
+  events: UnifiedEvent[];
+  objects: RegisteredObject[];
+  onToggle: (plugin: Plugin) => Promise<void>;
+  onRun: () => Promise<void>;
+  onModeChange: (mode: Mode) => void;
+}) {
   const [session, setSession] = useState<LiveSession | null>(null);
   const [mediaError, setMediaError] = useState<string | null>(null);
+  const [privacyMode, setPrivacyMode] = useState<PrivacyMode>("cartoon");
 
   useEffect(() => {
     if (mode === "mock") {
@@ -343,10 +433,162 @@ function MonitorLive({ scenario, mode, connection, onRun }: { scenario: Scenario
   const realReason = connection.status === "offline"
     ? `Real API 离线：${connection.reason ?? "未连接"}`
     : mediaError ?? playback.reason;
-  const mediaLabel = mode === "mock" ? playback.label : session ? playback.label : "未接入";
-  const streamTitle = mode === "mock" ? "MOCK" : session ? "LIVE" : "未接入";
-  return <section className="monitor-layout"><div className="panel large-video"><div className="panel-heading"><div><span className="panel-kicker">LIVE MONITOR / CAMERA 01</span><h2>客厅摄像头 <span className="live-tag">{streamTitle}</span></h2></div><div className="monitor-actions"><span className="quality-pill">{mode === "mock" ? "1080P · MOCK" : session ? "REAL · STREAM" : "REAL API · NO STREAM"}</span><button className="icon-button"><Pause size={16} /></button></div></div><div className="video-preview expanded"><div className="video-grid" /><div className="video-center"><div className="play-ring"><Play size={24} fill="currentColor" /></div><p>{mode === "mock" ? scenarioCopy[scenario].subtitle : realReason}</p><small className="media-status">{mediaLabel}</small></div><div className="video-scan" /><div className="overlay-box box-one"><span>PERSON 01</span><b>{mode === "mock" ? "0.94" : "—"}</b></div><div className="overlay-box box-two"><span>MEDICINE BOX</span><b>{mode === "mock" ? "0.87" : "—"}</b></div></div><div className="timeline"><span>00:00</span><div><i /><b /><b /><b /></div><span>{session ? "LIVE" : "—"}</span></div><button className="primary-button monitor-run" onClick={onRun}><Sparkles size={15} /> 运行一次事件分析</button></div><div className="monitor-side"><div className="panel"><div className="panel-heading"><div><span className="panel-kicker">SIGNALS</span><h2>实时信号</h2></div></div><Signal label="人物轨迹" value={mode === "mock" ? "稳定" : session ? "已发现" : "待接入"} color="green" /><Signal label="关注对象" value={mode === "mock" ? "2 个" : "—"} color="cyan" /><Signal label="事件管线" value={mode === "mock" ? "Mock" : connection.status === "online" ? "已连接" : "未就绪"} color="violet" /><Signal label="视频证据" value={mediaLabel} color="amber" /></div><div className="panel robot-card"><span className="panel-kicker">ROBOT ADAPTER</span><h2>机器人执行端</h2><p>等待老师提供机器人型号与通信文档后接入。</p><div className="robot-placeholder"><Box size={20} /><span>ADAPTER RESERVED</span></div></div></div></section>;
+  const enabledPlugins = plugins.filter((plugin) => plugin.enabled);
+  const timeline = useMemo(() => buildMonitorTimeline(mode, events, plugins), [mode, events, plugins]);
+  const medicationEvents = events.filter((event) => event.plugin_id === "elderly_care").slice(0, 2);
+  const displayObjects = mode === "mock" && scenario === "elderly"
+    ? [
+        objects.find((item) => item.name.includes("药")) ?? { object_id: "mock-med", name: "降压药盒", description: "Mock 演示对象", reference_uris: [], status: "active" },
+        { object_id: "mock-water", name: "水杯", description: "Mock 演示对象", reference_uris: [], status: "active" },
+      ]
+    : objects.slice(0, 2);
+
+  return <section className="privacy-monitor-page">
+    <header className="privacy-page-header">
+      <div className="privacy-title-block">
+        <h1>隐私监护</h1>
+        <p>在保护隐私的前提下查看关键行为与物品状态</p>
+      </div>
+      <div className="privacy-header-tools">
+        <div className="privacy-policy-note"><ShieldCheck size={18} /><span>界面不提供原始画面入口，仅展示骨骼/卡漫结果</span></div>
+        <div className="privacy-mode-switch" role="group" aria-label="隐私显示模式">
+          <button className={privacyMode === "cartoon" ? "active" : ""} onClick={() => setPrivacyMode("cartoon")}><Eye size={17} /> 卡漫模式</button>
+          <button className={privacyMode === "skeleton" ? "active" : ""} onClick={() => setPrivacyMode("skeleton")}><Users size={17} /> 骨骼模式</button>
+        </div>
+        <div className="monitor-source-toggle" title="切换前端数据源">
+          <button className={mode === "mock" ? "active" : ""} onClick={() => onModeChange("mock")}>Mock</button>
+          <button className={mode === "real" ? "active" : ""} onClick={() => onModeChange("real")}>Real</button>
+        </div>
+      </div>
+    </header>
+
+    <div className="privacy-monitor-grid">
+      <article className="privacy-video-card">
+        <div className="privacy-stage">
+          {mode === "mock" ? <PrivacyMockScene privacyMode={privacyMode} medicationEnabled={enabledPlugins.some((plugin) => plugin.plugin_id === "elderly_care")} objectEnabled={enabledPlugins.some((plugin) => plugin.plugin_id === "workshop")} /> :
+            <div className="privacy-stream-placeholder"><ShieldCheck size={30} /><strong>隐私渲染流未接入</strong><span>隐私监护页不会直接回退到原始视频。{session ? `已发现媒体会话，等待骨骼/卡漫输出接口。` : realReason}</span></div>}
+          <div className="camera-chip"><span className="camera-online-dot" /> 客厅 · Camera 01 <i /> {mode === "mock" ? "08:01:23" : session ? "LIVE" : "NO STREAM"}</div>
+          <div className="privacy-player-controls"><button aria-label="暂停"><Pause size={19} fill="currentColor" /></button><span>08:01 / 10:00</span><div className="privacy-progress"><i /></div><button aria-label="运行分析" onClick={onRun}><Sparkles size={18} /></button></div>
+        </div>
+      </article>
+
+      <aside className="privacy-side-column">
+        <section className="privacy-info-card privacy-status-card">
+          <div className="privacy-card-heading"><div><Activity size={20} /><strong>当前状态</strong></div><span className="healthy-pill"><i />正常</span></div>
+          <div className="privacy-status-row"><Users size={17} /><span>人物</span><strong>{mode === "mock" ? "Person 01" : session ? "已发现" : "待接入"}</strong></div>
+          <div className="privacy-status-row"><Sparkles size={17} /><span>当前动作</span><strong>{enabledPlugins.some((plugin) => plugin.plugin_id === "elderly_care") ? "手靠近药盒" : "基础轨迹"}</strong></div>
+          <div className="privacy-status-row"><ShieldCheck size={17} /><span>停留区域</span><strong>客厅 · 茶几</strong></div>
+          <div className="privacy-status-row"><ShieldCheck size={17} /><span>状态</span><strong className="status-ok">{connection.status === "offline" ? "数据源离线" : "正常"}</strong></div>
+        </section>
+
+        {enabledPlugins.map((plugin, index) => <PluginMonitorCard key={plugin.plugin_id} plugin={plugin} events={plugin.plugin_id === "elderly_care" ? medicationEvents : events.filter((event) => event.plugin_id === plugin.plugin_id).slice(0, 2)} objects={displayObjects} mode={mode} onToggle={onToggle} stretch={index === enabledPlugins.length - 1} />)}
+        {enabledPlugins.length === 0 && <section className="privacy-info-card plugin-live-card plugin-live-empty"><Network size={24} /><strong>未启用场景插件</strong><span>展开左侧“插件功能”后启用需要的监护能力。</span></section>}
+      </aside>
+    </div>
+
+    <ActionTimeline entries={timeline} />
+  </section>;
 }
+
+function PrivacyMockScene({ privacyMode, medicationEnabled, objectEnabled }: { privacyMode: PrivacyMode; medicationEnabled: boolean; objectEnabled: boolean }) {
+  return <div className={`privacy-mock-scene ${privacyMode}`}>
+    <svg className="room-scene-svg" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid slice" aria-label="Mock 客厅隐私监护画面">
+      <defs>
+        <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#f5eee4" /><stop offset="1" stopColor="#dfd2c0" /></linearGradient>
+        <linearGradient id="floor" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#b98f6a" /><stop offset="1" stopColor="#765440" /></linearGradient>
+        <linearGradient id="windowLight" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#dff3ff" /><stop offset="1" stopColor="#fbffff" /></linearGradient>
+      </defs>
+      <rect width="1000" height="410" fill="url(#wall)" />
+      <polygon points="0,390 1000,360 1000,620 0,620" fill="url(#floor)" />
+      <rect x="700" y="70" width="220" height="245" rx="4" fill="#9d775e" opacity=".55" />
+      <rect x="714" y="82" width="92" height="220" fill="url(#windowLight)" />
+      <rect x="814" y="82" width="92" height="220" fill="url(#windowLight)" />
+      <rect x="80" y="300" width="420" height="145" rx="34" fill="#d6c6b7" />
+      <rect x="105" y="270" width="175" height="65" rx="22" fill="#ece5dc" />
+      <rect x="295" y="270" width="170" height="65" rx="22" fill="#b7b2a9" />
+      <rect x="90" y="430" width="480" height="26" rx="8" fill="#8b684d" />
+      <rect x="150" y="455" width="26" height="100" fill="#72533f" />
+      <rect x="500" y="455" width="26" height="100" fill="#72533f" />
+      <rect x="585" y="470" width="290" height="95" rx="48" fill="#eee6dc" opacity=".9" />
+      <circle cx="130" cy="230" r="28" fill="#66845e" opacity=".85" />
+      <circle cx="160" cy="210" r="34" fill="#7b9a6d" opacity=".85" />
+      <rect x="135" y="235" width="28" height="75" rx="8" fill="#a77852" />
+
+      <g className="cartoon-body">
+        <circle cx="590" cy="205" r="54" fill="#f0c9ab" stroke="#69575a" strokeWidth="4" />
+        <path d="M541 198c5-50 87-76 106-10-24-20-65-26-106 10Z" fill="#b8ada8" />
+        <path d="M550 254 Q590 235 626 260 L655 390 Q610 418 554 389 Z" fill="#8b79a7" stroke="#564a63" strokeWidth="4" />
+        <path d="M565 278 L510 365" stroke="#8b79a7" strokeWidth="30" strokeLinecap="round" />
+        <path d="M620 280 L654 365" stroke="#8b79a7" strokeWidth="30" strokeLinecap="round" />
+        <path d="M575 390 L570 535" stroke="#3f4651" strokeWidth="34" strokeLinecap="round" />
+        <path d="M625 390 L640 535" stroke="#3f4651" strokeWidth="34" strokeLinecap="round" />
+        <circle cx="572" cy="205" r="4" fill="#5d4f4d" /><circle cx="607" cy="205" r="4" fill="#5d4f4d" />
+        <path d="M582 224 Q592 232 603 223" fill="none" stroke="#9b6a63" strokeWidth="3" strokeLinecap="round" />
+      </g>
+
+      <g className="skeleton-overlay">
+        <g stroke="#5fa7ff" strokeWidth="5" strokeLinecap="round" fill="none">
+          <path d="M590 250 L590 300 L563 345 L536 388" />
+          <path d="M590 300 L621 344 L647 386" />
+          <path d="M590 300 L579 400 L573 500" />
+          <path d="M590 300 L621 401 L638 500" />
+        </g>
+        {[["590","250"],["590","300"],["563","345"],["536","388"],["621","344"],["647","386"],["579","400"],["573","500"],["621","401"],["638","500"]].map(([cx, cy]) => <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="8" fill="#ffffff" stroke="#5fa7ff" strokeWidth="4" />)}
+      </g>
+    </svg>
+    <div className="person-label">Person 01</div>
+    {medicationEnabled && <div className="object-detection medicine-box"><b>降压药盒</b><span /></div>}
+    {objectEnabled && <div className="object-detection water-box"><b>水杯</b><span /></div>}
+  </div>;
+}
+
+function PluginMonitorCard({ plugin, events, objects, mode, onToggle, stretch }: {
+  plugin: Plugin;
+  events: UnifiedEvent[];
+  objects: RegisteredObject[];
+  mode: Mode;
+  onToggle: (plugin: Plugin) => Promise<void>;
+  stretch: boolean;
+}) {
+  const isMedication = plugin.plugin_id === "elderly_care";
+  const isObjectWatch = plugin.plugin_id === "workshop";
+  const title = isMedication ? "用药辅助" : isObjectWatch ? "物品看护" : plugin.name;
+  return <section className={`privacy-info-card plugin-live-card ${stretch ? "stretch" : ""}`}>
+    <div className="privacy-card-heading">
+      <div>{isObjectWatch ? <Box size={20} /> : <ClipboardCheck size={20} />}<strong>{title}</strong><span className="enabled-pill"><i />已启用</span></div>
+      <button className="plugin-inline-toggle" onClick={() => onToggle(plugin)}>停用</button>
+    </div>
+    {isMedication ? <div className="plugin-live-list">
+      {(events.length ? events : mode === "mock" ? [
+        { event_id: "mock-med-1", title: "疑似服药行为", started_at: new Date(), review_status: "pending" },
+        { event_id: "mock-med-2", title: "时间与计划匹配", started_at: new Date(), review_status: "pending" },
+      ] : []).slice(0, 2).map((event: any, index: number) => <div className="plugin-live-row" key={event.event_id ?? index}><div className="plugin-live-thumb medicine-thumb" /><div><span>{index === 0 ? "07:58" : "08:05"}</span><strong>{event.title}</strong></div><em>{event.review_status === "pending" ? "待确认" : "已记录"}</em></div>)}
+      {!events.length && mode !== "mock" && <div className="plugin-card-empty">等待用药相关事件</div>}
+    </div> : isObjectWatch ? <div className="plugin-live-list">
+      {(objects.length ? objects : mode === "mock" ? [{ object_id: "med", name: "降压药盒" }, { object_id: "water", name: "水杯" }] : []).slice(0, 2).map((item: any, index: number) => <div className="plugin-live-row object-row" key={item.object_id ?? index}><div className={`plugin-live-thumb ${index === 0 ? "medicine-thumb" : "water-thumb"}`} /><div><strong>{item.name}</strong><span>{mode === "mock" ? (index === 0 ? "最后位置：客厅 · 茶几" : "当前位置：茶几") : "等待位置事实"}</span></div><ArrowUpRight size={15} /></div>)}
+    </div> : <div className="plugin-generic-state"><Sparkles size={18} /><span>{plugin.description}</span></div>}
+  </section>;
+}
+
+function ActionTimeline({ entries }: { entries: TimelineEntry[] }) {
+  if (!entries.length) return <section className="action-timeline-card"><div className="action-timeline-heading"><div><Activity size={20} /><strong>最近动作</strong></div></div><div className="timeline-empty">暂无最近动作</div></section>;
+  const offsets = [2, -7, 4, -5, 5, -2, 7, -4];
+  return <section className="action-timeline-card">
+    <div className="action-timeline-heading"><div><Activity size={20} /><strong>最近动作</strong></div><span>根据当前启用插件动态更新</span></div>
+    <div className="action-timeline-track">
+      <svg viewBox="0 0 1000 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 36 C90 58 145 2 245 28 S400 56 505 25 S660 4 760 32 S900 5 1000 28" /></svg>
+      <div className="action-timeline-items" style={{ gridTemplateColumns: `repeat(${entries.length}, minmax(120px, 1fr))` }}>
+        {entries.map((entry, index) => <div className={`action-timeline-item ${entry.kind}`} key={entry.id} style={{ transform: `translateY(${offsets[index % offsets.length]}px)` }}>
+          <i className="action-node" />
+          <span className="action-time">{entry.time}</span>
+          <strong>{entry.title}</strong>
+          <small>{entry.detail}</small>
+        </div>)}
+      </div>
+    </div>
+  </section>;
+}
+
 function EventsViewInteractive({ events, onReview }: { events: UnifiedEvent[]; onReview: (event: UnifiedEvent, status: ReviewStatus) => Promise<void> }) {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<ReviewStatus | "all">("all");
