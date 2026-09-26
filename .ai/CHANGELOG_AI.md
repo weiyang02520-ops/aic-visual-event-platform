@@ -392,3 +392,11 @@ AI-FINALIZATION
 READY_FOR_MASTER_FREEZE → AI_ALGORITHM_FROZEN
 actor: chatgpt-master
 notes: A1–A5 accepted. AI public contracts are frozen for frontend integration. Manual/user-led mode remains active; no TASK-0011 dispatched. M2 frontend is ready and waiting for user direction.
+
+
+2026-09-26T04:45:00Z
+FRONTEND-M2
+WAITING_FOR_USER → ACTIVE_USER_LED
+actor: chatgpt-master
+merge_commit: c801fbad1759206ac4860e4074604a3b95cc10f4
+notes: User approved the privacy-monitor composition. PR #12 merged: light product UI, collapsible plugin controls, plugin-driven side cards, person-only cartoon/skeleton privacy rendering, fail-closed Real media behavior, and dynamic recent-action timeline. AI_ALGORITHM_FROZEN remains unchanged; next frontend step waits for user direction.
