@@ -12,7 +12,22 @@ export function createMockAdapter(): Repository {
   let objects = structuredClone(mockObjects);
   let persons = structuredClone(mockPersons);
   return {
-    async health(): Promise<RepositoryHealth> { await wait(80); return { status: "mock" }; },
+    async health(): Promise<RepositoryHealth> {
+      await wait(80);
+      const running = plugins.filter((plugin) => plugin.enabled && plugin.state !== "disabled").length;
+      return {
+        status: "healthy",
+        service: "mock-adapter",
+        detected_people: 1,
+        exception_count: 0,
+        checks: {
+          camera: { status: "healthy", detail: "Mock 摄像头源已准备" },
+          ai_model: { status: "warning", detail: "Mock 推理 fixture，未连接真实模型" },
+          plugin_runtime: { status: running ? "healthy" : "warning", detail: `${running} 个插件处于运行状态` },
+          backend: { status: "healthy", detail: "Mock adapter 在线" },
+        },
+      };
+    },
     async listPlugins() { await wait(); return structuredClone(plugins); },
     async togglePlugin(pluginId, enabled) {
       await wait();

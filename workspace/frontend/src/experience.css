@@ -1232,6 +1232,39 @@ body {
 .enabled-pill.plugin-state-degraded { color:#bd7a2d; background:#fff3df; }
 .enabled-pill.plugin-state-error { color:#c95752; background:#fff0ef; }
 .plugin-card-empty { min-height:54px; display:flex; align-items:center; justify-content:center; gap:7px; color:#8795a8; font-size:11px; }
+
+/* AI Dashboard: contract-backed runtime summary and provider health. */
+.ai-dashboard-overview { display:grid; gap:14px; margin-bottom:16px; }
+.ai-dashboard-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:18px; padding:0 2px; }
+.ai-dashboard-heading h2 { margin:7px 0 0; color:#172743; font-size:21px; letter-spacing:-.04em; }
+.ai-dashboard-heading p { margin:7px 0 0; color:#8091a7; font-size:11px; }
+.ai-overall-status { min-height:28px; padding:0 10px; display:inline-flex; align-items:center; gap:6px; border-radius:999px; font:10px "DM Mono", monospace; text-transform:lowercase; }
+.ai-overall-status i, .ai-health-row em i { width:7px; height:7px; display:inline-block; border-radius:50%; background:currentColor; }
+.ai-overall-status.healthy, .ai-health-row em.healthy { color:#119b58; background:#eaf9f0; }
+.ai-overall-status.warning, .ai-health-row em.warning { color:#c17a27; background:#fff3df; }
+.ai-overall-status.offline, .ai-health-row em.offline { color:#d35d58; background:#fff0ef; }
+.ai-stat-grid { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:14px; }
+.ai-stat-card { min-height:126px; position:relative; overflow:hidden; padding:18px 19px; border:1px solid rgba(215,226,239,.96); border-radius:17px; background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(248,251,255,.86)); box-shadow:0 11px 26px rgba(46,80,126,.065); }
+.ai-stat-card::after { content:""; width:110px; height:110px; position:absolute; right:-33px; bottom:-52px; border-radius:50%; background:currentColor; opacity:.08; }
+.ai-stat-card.cyan { color:#287ff3; } .ai-stat-card.violet { color:#7667ee; } .ai-stat-card.green { color:#17a967; } .ai-stat-card.amber { color:#e8953e; } .ai-stat-card.blue { color:#4f86d8; }
+.ai-stat-top { position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; gap:8px; color:currentColor; }
+.ai-stat-top > span:last-child { overflow:hidden; color:#8a99ad; font:9px "DM Mono", monospace; text-overflow:ellipsis; white-space:nowrap; }
+.ai-stat-icon { width:29px; height:29px; display:grid; place-items:center; border-radius:9px; background:color-mix(in srgb,currentColor 11%,white); }
+.ai-stat-card strong { position:relative; z-index:1; display:block; margin-top:14px; color:#172742; font-size:29px; letter-spacing:-.05em; }
+.ai-stat-card label { position:relative; z-index:1; display:block; margin-top:3px; color:#7889a2; font-size:11px; }
+.ai-health-panel { padding:22px 23px; }
+.ai-health-source { color:#8b9aaf; font:9px "DM Mono", monospace; }
+.ai-health-grid { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:10px; margin-top:17px; }
+.ai-health-row { min-width:0; min-height:68px; display:grid; grid-template-columns:31px minmax(0,1fr) auto; align-items:center; gap:9px; padding:10px; border:1px solid #e5ecf4; border-radius:11px; background:#fbfdff; }
+.ai-health-icon { width:31px; height:31px; display:grid; place-items:center; border-radius:9px; }
+.ai-health-icon.healthy { color:#17a967; background:#e7f8ee; } .ai-health-icon.warning { color:#d08735; background:#fff2df; } .ai-health-icon.offline { color:#dc6560; background:#fff0ef; }
+.ai-health-row > div { min-width:0; }
+.ai-health-row strong, .ai-health-row small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ai-health-row strong { color:#304563; font-size:11px; }
+.ai-health-row small { margin-top:4px; color:#8c9aad; font-size:9px; }
+.ai-health-row em { min-height:22px; padding:0 7px; display:inline-flex; align-items:center; gap:5px; border-radius:999px; font:8px "DM Mono", monospace; font-style:normal; }
+@media (max-width: 1050px) { .ai-health-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width: 720px) { .ai-dashboard-heading { align-items:flex-start; flex-direction:column; gap:10px; } .ai-stat-grid { grid-template-columns:1fr 1fr; gap:10px; } .ai-stat-card { min-height:112px; padding:15px; } .ai-health-grid { grid-template-columns:1fr; } }
 @media (max-width: 1050px) {
   .object-memory-workspace { grid-template-columns:1fr; }
   .object-memory-detail { min-height:0; }

@@ -1,7 +1,19 @@
+export type HealthStatus = "healthy" | "warning" | "offline";
+
+export interface HealthCheckContract {
+  id: string;
+  label: string;
+  status: HealthStatus;
+  detail: string;
+}
+
 export interface RepositoryHealthContract {
   status: string;
   service?: string;
   version?: string;
+  checks?: Record<string, Partial<HealthCheckContract>>;
+  detected_people?: number;
+  exception_count?: number;
   [key: string]: unknown;
 }
 
