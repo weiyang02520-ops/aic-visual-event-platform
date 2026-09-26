@@ -1097,3 +1097,15 @@ body {
   .metric-card { border-radius: 14px; padding: 15px; }
   .panel { border-radius: 16px; }
 }
+
+/* Metric icon contrast: keep the icon tint while using a light surface. */
+.metric-card .metric-icon {
+  color: inherit;
+  background: #edf3fb;
+  box-shadow: none;
+}
+.metric-card .metric-icon svg { color: inherit; stroke-width: 2.2; }
+.metric-card.cyan .metric-icon { color: #287ff3; background: #e6f1ff; }
+.metric-card.amber .metric-icon { color: #e8953e; background: #fff1df; }
+.metric-card.violet .metric-icon { color: #7667ee; background: #efedff; }
+.metric-card.green .metric-icon { color: #17a967; background: #e5f8ee; }
