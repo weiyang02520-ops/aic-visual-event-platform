@@ -15,7 +15,7 @@ export interface EvidenceRefContract {
 
 export interface PrimitiveFactContract {
   fact_type: string;
-  timestamp: IsoTimestamp;
+  timestamp?: IsoTimestamp;
   confidence: number;
   subject?: JsonObject | null;
   object?: JsonObject | null;

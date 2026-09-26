@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { createMockRepository, createRealRepository } from "./repository";
 import { choosePlayback, classifyPlaybackUrl, createMakerverseLiveAdapter } from "./media";
+import { EventCenter } from "./features/events";
 import type { LiveSession, Mode, Plugin, RegisteredObject, RegisteredPerson, Repository, RepositoryConnection, RepositoryConnectionStatus, ReviewStatus, Scenario, UnifiedEvent, View } from "./types";
 
 const navItems: { id: View; label: string; icon: typeof LayoutDashboard }[] = [
@@ -233,7 +234,7 @@ function App() {
 
           {view === "dashboard" && <Dashboard events={events} plugins={plugins} pendingCount={pendingCount} enabledCount={enabledCount} evidenceCount={evidenceCount} loading={loading} mode={mode} connection={connection} onNavigate={setView} onReview={review} />}
           {view === "monitor" && <MonitorLive scenario={scenario} mode={mode} connection={connection} plugins={plugins} events={events} objects={objects} onToggle={toggle} onRun={runDemo} onModeChange={setMode} />}
-          {view === "events" && <EventsViewInteractive events={events} onReview={review} />}
+          {view === "events" && <EventCenter events={events} onReview={review} />}
           {view === "plugins" && <PluginsView plugins={plugins} connection={connection} onToggle={toggle} />}
           {view === "registry" && <RegistryView repo={repo} mode={mode} connection={connection} objects={objects} persons={persons} onObjects={setObjects} onPersons={setPersons} onToast={setToast} />}
           {view === "settings" && <SettingsView mode={mode} scenario={scenario} connection={connection} />}
@@ -619,28 +620,6 @@ function ActionTimeline({ entries }: { entries: TimelineEntry[] }) {
       </div>
     </div>
   </section>;
-}
-
-function EventsViewInteractive({ events, onReview }: { events: UnifiedEvent[]; onReview: (event: UnifiedEvent, status: ReviewStatus) => Promise<void> }) {
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<ReviewStatus | "all">("all");
-  const [selected, setSelected] = useState<UnifiedEvent | null>(null);
-  const normalizedQuery = query.trim().toLowerCase();
-  const filtered = events.filter((event) => {
-    if (status !== "all" && event.review_status !== status) return false;
-    if (!normalizedQuery) return true;
-    return [event.title, event.description, event.plugin_id, event.source_id, event.location ?? "", String(event.object?.label ?? ""), String(event.subject?.label ?? "")]
-      .join(" ").toLowerCase().includes(normalizedQuery);
-  });
-  return <section className="panel full-panel"><div className="panel-heading"><div><span className="panel-kicker">EVENT CENTER / HISTORY</span><h2>事件中心</h2></div><div className="filter-row"><label className="search-box"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索事件、位置或对象" /></label><label className="filter-select"><SlidersHorizontal size={15} /><select value={status} onChange={(event) => setStatus(event.target.value as ReviewStatus | "all")}><option value="all">全部状态</option><option value="pending">待复核</option><option value="confirmed">已确认</option><option value="rejected">已驳回</option></select></label></div></div><div className="event-table"><div className="event-table-head"><span>事件</span><span>来源</span><span>置信度</span><span>状态</span><span>时间</span><span /></div>{filtered.length === 0 ? <EmptyState text="没有匹配事件" /> : filtered.map((event) => { const evidenceStatus = event.evidence[0]?.status ?? "unavailable"; const evidenceText = evidenceStatus === "fixture" ? "测试 fixture" : evidenceStatus === "provided_unverified" ? "已提供·未验证" : evidenceStatus === "available" ? "可回放" : "待解析"; return <div className="event-table-row" key={event.event_id}><div className="table-event"><div className={`event-type ${event.severity}`}><Activity size={15} /></div><div><strong>{event.title}</strong><small>{event.plugin_id} · {event.object?.label as string ?? "基础事实"}</small></div></div><span className="source-cell"><strong>{event.source_id}</strong><small className="evidence-inline">证据：{evidenceText}</small></span><span className="confidence"><i style={{ width: `${event.confidence * 100}%` }} />{Math.round(event.confidence * 100)}%</span><span className={`review-badge ${event.review_status}`}>{event.review_status === "pending" ? "待复核" : event.review_status === "confirmed" ? "已确认" : "已驳回"}</span><span className="table-time">{relativeTime(event.started_at)}</span><button className="table-open" onClick={() => setSelected(event)} title="查看事件详情"><ArrowUpRight size={15} /></button>{event.review_status === "pending" && <div className="table-row-actions"><button onClick={() => onReview(event, "confirmed")}><Check size={14} /></button><button onClick={() => onReview(event, "rejected")}><X size={14} /></button></div>}</div>; })}</div>{selected && <EventDetail event={selected} onClose={() => setSelected(null)} onReview={onReview} />}</section>;
-}
-
-function EventDetail({ event, onClose, onReview }: { event: UnifiedEvent; onClose: () => void; onReview: (event: UnifiedEvent, status: ReviewStatus) => Promise<void> }) {
-  async function review(status: ReviewStatus) {
-    await onReview(event, status);
-    onClose();
-  }
-  return <div className="event-drawer-backdrop" onClick={onClose}><aside className="event-drawer" onClick={(click) => click.stopPropagation()}><div className="drawer-heading"><div><span className="panel-kicker">EVENT DETAIL / {event.plugin_id}</span><h2>{event.title}</h2></div><button className="icon-button" onClick={onClose}><X size={16} /></button></div><p className="drawer-description">{event.description}</p><div className="drawer-facts"><div><span>来源</span><strong>{event.source_id}</strong></div><div><span>置信度</span><strong>{Math.round(event.confidence * 100)}%</strong></div><div><span>时间窗</span><strong>{event.started_at} → {event.ended_at}</strong></div><div><span>位置</span><strong>{event.location ?? "未标注"}</strong></div></div><h3>基础事实</h3><div className="fact-list">{event.facts.length ? event.facts.map((fact, index) => <div key={`${fact.fact_type}-${index}`}><b>{fact.fact_type}</b><span>{Math.round(fact.confidence * 100)}% · {fact.location ?? "未标注位置"}</span></div>) : <span className="drawer-muted">没有附加事实</span>}</div><h3>证据时间窗</h3><div className="evidence-list">{event.evidence.length ? event.evidence.map((evidence, index) => <div key={`${evidence.source_id}-${index}`}><b>{evidence.status}</b><span>{evidence.source_id}</span><small>{evidence.started_at} → {evidence.ended_at}</small>{evidence.uri && evidence.status === "available" ? <a className="evidence-open" href={evidence.uri} target="_blank" rel="noreferrer">打开证据回放</a> : <small className="evidence-unavailable">回放地址未验证</small>}</div>) : <span className="drawer-muted">没有可解析证据；不能伪造回放地址</span>}</div>{event.review_status === "pending" && <div className="drawer-actions"><button className="primary-button" onClick={() => review("confirmed")}><Check size={15} /> 确认事件</button><button className="ghost-button drawer-reject" onClick={() => review("rejected")}><X size={15} /> 驳回</button></div>}</aside></div>;
 }
 
 export default App;
