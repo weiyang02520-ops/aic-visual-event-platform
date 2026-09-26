@@ -1,23 +1,23 @@
-import type { Repository, RepositoryHealth } from "../types";
+import type { Repository } from "../types";
 import type { AnalysisJobContract, EvidenceResolutionContract, SourceInspectionContract } from "../contracts";
 import type { DetectorProviderStatusContract } from "../contracts";
-import { requestJson } from "./httpClient";
+import { BackendApiClient, createBackendApi, toLegacyEvent, toLegacyHealth, toLegacyJob, toLegacyObject, toLegacyPerson, toLegacyPlugin } from "./backend";
 
 /** Real HTTP adapter. It only maps existing backend routes; it does not add a fallback path. */
-export function createRealAdapter(baseUrl: string): Repository {
-  const request = <T>(path: string, options?: RequestInit) => requestJson<T>(baseUrl, path, options);
+export function createRealAdapter(baseUrl: string, options?: { timeoutMs?: number }): Repository {
+  const api = createBackendApi({ baseUrl, timeoutMs: options?.timeoutMs });
   return {
-    health: () => request<RepositoryHealth>("/health"),
-    listPlugins: () => request<import("../types").Plugin[]>("/api/v1/plugins"),
-    togglePlugin: (id, enabled) => request<import("../types").Plugin>(`/api/v1/plugins/${id}/${enabled ? "enable" : "disable"}`, { method: "POST" }),
-    listEvents: () => request<import("../types").UnifiedEvent[]>("/api/v1/events"),
-    reviewEvent: (id, status) => request<import("../types").UnifiedEvent>(`/api/v1/events/${id}/review`, { method: "POST", body: JSON.stringify({ status }) }),
-    createAnalysis: (source) => request<AnalysisJobContract>("/api/v1/analysis/jobs", { method: "POST", body: JSON.stringify({ source }) }),
-    getAnalysis: (jobId) => request<AnalysisJobContract>(`/api/v1/analysis/jobs/${encodeURIComponent(jobId)}`),
-    listObjects: () => request<import("../types").RegisteredObject[]>("/api/v1/objects"),
-    createObject: (name, description = "新注册对象", referenceUris = []) => request<import("../types").RegisteredObject>("/api/v1/objects", { method: "POST", body: JSON.stringify({ name, description, reference_uris: referenceUris }) }),
-    listPersons: () => request<import("../types").RegisteredPerson[]>("/api/v1/persons"),
-    createPerson: (name, role, referenceUris = []) => request<import("../types").RegisteredPerson>("/api/v1/persons", { method: "POST", body: JSON.stringify({ display_name: name, role, reference_uris: referenceUris }) }),
+    health: async () => toLegacyHealth(await api.health()),
+    listPlugins: async () => (await api.listPlugins()).map(toLegacyPlugin),
+    togglePlugin: async (id, enabled) => toLegacyPlugin(await api.togglePlugin(id, enabled)),
+    listEvents: async () => (await api.listEvents()).map(toLegacyEvent),
+    reviewEvent: async (id, status) => toLegacyEvent(await api.reviewEvent(id, status)),
+    createAnalysis: async (source) => toLegacyJob(await api.createAnalysis(source)),
+    getAnalysis: async (jobId) => toLegacyJob(await api.getAnalysis(jobId)),
+    listObjects: async () => (await api.listObjects()).map(toLegacyObject),
+    createObject: async (name, description = "新注册对象", referenceUris = []) => toLegacyObject(await api.createObject(name, description, referenceUris)),
+    listPersons: async () => (await api.listPersons()).map(toLegacyPerson),
+    createPerson: async (name, role, referenceUris = []) => toLegacyPerson(await api.createPerson(name, role, referenceUris)),
   };
 }
 
@@ -27,13 +27,13 @@ export interface ExtendedRealAdapter extends Repository {
   inspectSource(source: string): Promise<SourceInspectionContract>;
 }
 
-export function createExtendedRealAdapter(baseUrl: string): ExtendedRealAdapter {
-  const adapter = createRealAdapter(baseUrl);
-  const request = <T>(path: string, options?: RequestInit) => requestJson<T>(baseUrl, path, options);
+export function createExtendedRealAdapter(baseUrl: string, options?: { timeoutMs?: number }): ExtendedRealAdapter {
+  const adapter = createRealAdapter(baseUrl, options);
+  const client = new BackendApiClient({ baseUrl, timeoutMs: options?.timeoutMs });
   return {
     ...adapter,
-    listDetectorProviders: (source) => request<DetectorProviderStatusContract[]>(`/api/v1/providers/detectors${source ? `?source=${encodeURIComponent(source)}` : ""}`),
-    resolveEvidence: (sourceId, startedAt, endedAt, uri) => request<EvidenceResolutionContract>(`/api/v1/evidence/resolve?source_id=${encodeURIComponent(sourceId)}&started_at=${encodeURIComponent(startedAt)}&ended_at=${encodeURIComponent(endedAt)}${uri ? `&uri=${encodeURIComponent(uri)}` : ""}`),
-    inspectSource: (source) => request<SourceInspectionContract>(`/api/v1/sources/inspect?source=${encodeURIComponent(source)}`),
+    listDetectorProviders: (source) => client.get<DetectorProviderStatusContract[]>(`/api/v1/providers/detectors${source ? `?source=${encodeURIComponent(source)}` : ""}`),
+    resolveEvidence: (sourceId, startedAt, endedAt, uri) => client.get<EvidenceResolutionContract>(`/api/v1/evidence/resolve?source_id=${encodeURIComponent(sourceId)}&started_at=${encodeURIComponent(startedAt)}&ended_at=${encodeURIComponent(endedAt)}${uri ? `&uri=${encodeURIComponent(uri)}` : ""}`),
+    inspectSource: (source) => client.get<SourceInspectionContract>(`/api/v1/sources/inspect?source=${encodeURIComponent(source)}`),
   };
 }

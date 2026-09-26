@@ -6,11 +6,12 @@ import type {
 import type { UnifiedEventContract, ReviewStatus } from "./events";
 import type { DetectorProviderStatusContract, RepositoryHealthContract } from "./providers";
 import type { RegisteredObjectContract, RegisteredPersonContract } from "./registry";
+import type { PluginContract } from "./plugins";
 
 export interface FrontendApiAdapter {
   health(): Promise<RepositoryHealthContract>;
-  listPlugins(): Promise<import("../types").Plugin[]>;
-  togglePlugin(pluginId: string, enabled: boolean): Promise<import("../types").Plugin>;
+  listPlugins(): Promise<PluginContract[]>;
+  togglePlugin(pluginId: string, enabled: boolean): Promise<PluginContract>;
   listEvents(): Promise<UnifiedEventContract[]>;
   reviewEvent(eventId: string, status: ReviewStatus): Promise<UnifiedEventContract>;
   createAnalysis(source: string): Promise<AnalysisJobContract>;
