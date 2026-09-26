@@ -10,7 +10,7 @@ Status: COMPLETE. Optional pose adapter, model-ready OpenCV BGR path, actual Ult
 Status: COMPLETE. TASK-0010 passed Master review; AI_ALGORITHM_FROZEN. Final AI evidence: 430 passed / VERIFY_OK.
 
 ## M2 — Frontend Quality + AI Integration
-Status: READY / WAITING_FOR_USER. AI_ALGORITHM_FROZEN is complete, so frontend work may resume when the user explicitly chooses the next direction. No TASK-0011 is auto-dispatched.
+Status: ACTIVE / USER-LED. The user approved the initial privacy-monitor direction and PR #12 was merged. Continue frontend work only when the user explicitly chooses the next page/refinement; no automatic task dispatch.
 
 ## M3 — Existing Backend Integration
 Add evidence/playback adapters against existing contracts; avoid intrusive backend changes.
