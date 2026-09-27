@@ -28,13 +28,14 @@ import {
   X,
 } from "lucide-react";
 import { createMockRepository, createRealRepository } from "./repository";
-import { toDashboardSnapshot, toPluginContract } from "./api";
+import { createRuntimeAdapter, toDashboardSnapshot, toEventContract as toEventContractAdapter, toLegacyEvent, toLegacyObject, toLegacyPerson, toPluginContract } from "./api";
 import { choosePlayback, classifyPlaybackUrl, createMakerverseLiveAdapter } from "./media";
 import { EventCenter } from "./features/events";
 import { ObjectMemoryPanel } from "./features/objects";
-import { AIDashboardOverview } from "./features/dashboard";
+import { AIDashboardOverview, CompetitionDemoFlow } from "./features/dashboard";
 import { buildRuntimeTimeline, getPluginPresentation, pluginEventsFor, pluginLifecycleLabel, PluginRuntimeCard, sceneSignals, type RuntimeTimelineEntry } from "./plugins";
 import type { DashboardSnapshotContract } from "./contracts";
+import type { RuntimeSnapshot } from "./api/ai-runtime-adapter";
 import type { LiveSession, Mode, Plugin, RegisteredObject, RegisteredPerson, Repository, RepositoryConnection, RepositoryConnectionStatus, RepositoryHealth, ReviewStatus, Scenario, UnifiedEvent, View } from "./types";
 
 const navItems: { id: View; label: string; icon: typeof LayoutDashboard }[] = [
@@ -52,6 +53,8 @@ const scenarioCopy: Record<Scenario, { label: string; subtitle: string }> = {
   robot: { label: "机器人辅助", subtitle: "感知事件与执行端接口预留" },
   universal: { label: "通用视觉", subtitle: "基础事实与可插拔场景" },
 };
+
+const emptyRuntimeSnapshot: RuntimeSnapshot = { persons: [], objects: [], events: [], plugins: [] };
 
 function viewFromHash(hash: string): View {
   const candidate = hash.replace(/^#/, "") as View;
@@ -81,6 +84,7 @@ function App() {
   const [view, setView] = useState<View>(() => viewFromHash(typeof window === "undefined" ? "" : window.location.hash));
   const [repo, setRepo] = useState<Repository>(() => createMockRepository());
   const [health, setHealth] = useState<RepositoryHealth>({ status: "loading" });
+  const [runtimeSnapshot, setRuntimeSnapshot] = useState<RuntimeSnapshot>(emptyRuntimeSnapshot);
   const [events, setEvents] = useState<UnifiedEvent[]>([]);
   const [plugins, setPlugins] = useState<Plugin[]>([]);
   const [objects, setObjects] = useState<RegisteredObject[]>([]);
@@ -89,6 +93,7 @@ function App() {
   const [connection, setConnection] = useState<RepositoryConnection>({ mode: "mock", status: "loading" });
   const [toast, setToast] = useState<string | null>(null);
   const [pluginsOpen, setPluginsOpen] = useState(false);
+  const [competitionDemo, setCompetitionDemo] = useState(true);
 
   useEffect(() => {
     function onHashChange() {
@@ -109,6 +114,7 @@ function App() {
     setRepo(nextRepo);
     setLoading(true);
     setHealth({ status: "loading" });
+    setRuntimeSnapshot(emptyRuntimeSnapshot);
     setConnection({ mode, status: "loading" });
     // Clear the previous source before any request starts. A late response from
     // the old source is ignored so Mock data cannot survive a failed Real load.
@@ -116,14 +122,16 @@ function App() {
     setPlugins([]);
     setObjects([]);
     setPersons([]);
-    Promise.all([nextRepo.health(), nextRepo.listEvents(), nextRepo.listPlugins(), nextRepo.listObjects(), nextRepo.listPersons()])
-      .then(([nextHealth, nextEvents, nextPlugins, nextObjects, nextPersons]) => {
+    const runtimeAdapter = createRuntimeAdapter(mode, { repository: mode === "mock" ? nextRepo : undefined, baseUrl: import.meta.env.VITE_AI_API_URL ?? "http://127.0.0.1:8010" });
+    Promise.all([nextRepo.health(), runtimeAdapter.getSnapshot()])
+      .then(([nextHealth, nextRuntime]) => {
         if (!active) return;
         setHealth(nextHealth);
-        setEvents(nextEvents);
-        setPlugins(nextPlugins);
-        setObjects(nextObjects);
-        setPersons(nextPersons);
+        setRuntimeSnapshot(nextRuntime);
+        setEvents(nextRuntime.events.map(toLegacyEvent));
+        setPlugins(nextRuntime.plugins.map((plugin) => ({ ...plugin })));
+        setObjects(nextRuntime.objects.map(toLegacyObject));
+        setPersons(nextRuntime.persons.map(toLegacyPerson));
         setConnection({ mode, status: mode === "mock" ? "mock" : "online" });
       })
       .catch((error: unknown) => {
@@ -134,6 +142,7 @@ function App() {
         setObjects([]);
         setPersons([]);
         setHealth({ status: "offline" });
+        setRuntimeSnapshot(emptyRuntimeSnapshot);
         setConnection({ mode, status: "offline", reason });
         setToast(`${mode === "real" ? "Real API" : "Mock"} 数据源不可用：${reason}`);
       })
@@ -161,6 +170,7 @@ function App() {
     try {
       const updated = await repo.reviewEvent(event.event_id, status);
       setEvents((current) => current.map((item) => (item.event_id === updated.event_id ? updated : item)));
+      setRuntimeSnapshot((current) => ({ ...current, events: current.events.map((item) => item.event_id === updated.event_id ? toEventContractAdapter(updated) : item) }));
       setToast(status === "confirmed" ? "事件已确认，已写入复核记录" : "事件已驳回");
     } catch (error) {
       setToast(`事件复核失败：${errorMessage(error)}`);
@@ -172,6 +182,7 @@ function App() {
     try {
       const updated = await repo.togglePlugin(plugin.plugin_id, !plugin.enabled);
       setPlugins((current) => current.map((item) => (item.plugin_id === updated.plugin_id ? updated : item)));
+      setRuntimeSnapshot((current) => ({ ...current, plugins: current.plugins.map((item) => item.plugin_id === updated.plugin_id ? toPluginContract(updated) : item) }));
       setToast(`${updated.name} 已${updated.enabled ? "启用" : "停用"}`);
     } catch (error) {
       setToast(`插件操作失败：${errorMessage(error)}`);
@@ -181,7 +192,7 @@ function App() {
   async function runDemo() {
     if (!ensureActionAvailable("分析任务")) return;
     try {
-      const source = mode === "mock" ? (scenario === "workshop" ? "mock://workshop-tool" : "mock://elderly-medication") : "camera.mp4";
+      const source = mode === "mock" ? (competitionDemo || scenario !== "workshop" ? "mock://elderly-medication" : "mock://workshop-tool") : "camera.mp4";
       const job = await repo.createAnalysis(source);
       let finalJob = job;
       if (mode === "real" && !["completed", "failed", "stopped"].includes(finalJob.status)) {
@@ -193,6 +204,7 @@ function App() {
       }
       const nextEvents = await repo.listEvents();
       setEvents(nextEvents);
+      setRuntimeSnapshot((current) => ({ ...current, events: nextEvents.map(toEventContractAdapter) }));
       setToast(`分析任务 ${finalJob.status === "completed" ? "已完成" : finalJob.status === "failed" ? "失败" : finalJob.status === "stopped" ? "已停止" : "已提交"}`);
     } catch (error) {
       setToast(`分析任务失败：${errorMessage(error)}`);
@@ -242,9 +254,9 @@ function App() {
       <main className="main-content">
         {view !== "monitor" && <header className="topbar"><div className="breadcrumbs"><span>控制台</span><span>/</span><strong>{currentScenario.label}</strong></div><div className="top-actions"><div className="mode-toggle"><button className={mode === "mock" ? "selected" : ""} onClick={() => setMode("mock")}>Mock</button><button className={mode === "real" ? "selected" : ""} onClick={() => setMode("real")}>Real API</button></div><button className="icon-button"><Bell size={18} /><i /></button><div className="top-avatar">未</div></div></header>}
         <div className={`content-wrap ${view === "monitor" ? "monitor-content-wrap" : ""}`}>
-          {view !== "monitor" && <section className="page-intro"><div><div className="eyebrow"><span className="live-pulse" /> LIVE OPERATIONS / 01</div><h1>{currentScenario.label} <span>控制台</span></h1><p>{currentScenario.subtitle} · {mode === "mock" ? "离线演示数据" : "AI REST 数据源"}</p></div><div className="intro-actions"><div className={`connection-state ${connection.status}`}><span className={`status-dot ${connectionDotClass(connection.status)}`} /><strong>{connectionLabel(connection)}</strong>{connection.reason && <small title={connection.reason}>{connection.reason}</small>}</div><label className="select-wrap"><SlidersHorizontal size={15} /><select value={scenario} onChange={(event) => setScenario(event.target.value as Scenario)}>{Object.entries(scenarioCopy).map(([key, item]) => <option key={key} value={key}>{item.label}</option>)}</select></label><button className="primary-button" onClick={runDemo}><Play size={15} fill="currentColor" /> 开始一次分析</button></div></section>}
+          {view !== "monitor" && <section className="page-intro"><div><div className="eyebrow"><span className="live-pulse" /> LIVE OPERATIONS / 01</div><h1>{currentScenario.label} <span>控制台</span></h1><p>{currentScenario.subtitle} · {mode === "mock" ? "离线演示数据" : "AI REST 数据源"}</p></div><div className="intro-actions"><div className={`connection-state ${connection.status}`}><span className={`status-dot ${connectionDotClass(connection.status)}`} /><strong>{connectionLabel(connection)}</strong>{connection.reason && <small title={connection.reason}>{connection.reason}</small>}</div><label className="select-wrap"><SlidersHorizontal size={15} /><select value={scenario} onChange={(event) => setScenario(event.target.value as Scenario)}>{Object.entries(scenarioCopy).map(([key, item]) => <option key={key} value={key}>{item.label}</option>)}</select></label><button className={`demo-mode-button ${competitionDemo ? "active" : ""}`} onClick={() => { setCompetitionDemo((current) => !current); if (!competitionDemo) setScenario("elderly"); }}><ClipboardCheck size={15} /> {competitionDemo ? "比赛 Demo 已开启" : "进入比赛 Demo"}</button><button className="primary-button" onClick={runDemo}><Play size={15} fill="currentColor" /> 开始一次分析</button></div></section>}
 
-          {view === "dashboard" && <Dashboard snapshot={dashboardSnapshot} events={events} enabledCount={enabledCount} mode={mode} connection={connection} onNavigate={setView} onReview={review} />}
+          {view === "dashboard" && <Dashboard snapshot={dashboardSnapshot} runtime={runtimeSnapshot} events={events} enabledCount={enabledCount} mode={mode} connection={connection} onNavigate={setView} onReview={review} />}
           {view === "monitor" && <MonitorLive scenario={scenario} mode={mode} connection={connection} plugins={plugins} events={events} objects={objects} onToggle={toggle} onRun={runDemo} onModeChange={setMode} />}
           {view === "events" && <EventCenter events={events} onReview={review} />}
           {view === "plugins" && <PluginsView plugins={plugins} connection={connection} onToggle={toggle} />}
@@ -257,10 +269,11 @@ function App() {
   );
 }
 
-function Dashboard({ snapshot, events, enabledCount, mode, connection, onNavigate, onReview }: { snapshot: DashboardSnapshotContract; events: UnifiedEvent[]; enabledCount: number; mode: Mode; connection: RepositoryConnection; onNavigate: (view: View) => void; onReview: (event: UnifiedEvent, status: ReviewStatus) => Promise<void> }) {
+function Dashboard({ snapshot, runtime, events, enabledCount, mode, connection, onNavigate, onReview }: { snapshot: DashboardSnapshotContract; runtime: RuntimeSnapshot; events: UnifiedEvent[]; enabledCount: number; mode: Mode; connection: RepositoryConnection; onNavigate: (view: View) => void; onReview: (event: UnifiedEvent, status: ReviewStatus) => Promise<void> }) {
   const recent = events.slice(0, 3);
   return <>
     <AIDashboardOverview snapshot={snapshot} />
+    <CompetitionDemoFlow runtime={runtime} />
     <section className="dashboard-grid"><div className="panel monitor-panel"><div className="panel-heading"><div><span className="panel-kicker">PRIMARY SOURCE / 01</span><h2>客厅摄像头 <span className="live-tag">{mode === "mock" ? "MOCK" : "未接入"}</span></h2></div><button className="ghost-button" onClick={() => onNavigate("monitor")}>展开监控 <ArrowUpRight size={15} /></button></div><div className="video-preview"><div className="video-grid" /><div className="camera-label"><span className="status-dot red" /> living-room-cam-01 <span>00:08:42</span></div><div className="video-center"><div className="play-ring"><Play size={22} fill="currentColor" /></div><p>{mode === "mock" ? "Mock 视频源 · 等待真实流接入" : connection.status === "offline" ? `Real API 离线：${connection.reason ?? "未连接"}` : "Real API 已连接 · 媒体流未接入"}</p></div><div className="video-scan" /></div><div className="stream-footer"><span><Gauge size={14} /> 事件管线 <b>{connection.status === "online" ? "已连接" : connection.status === "mock" ? "Mock" : "未就绪"}</b></span><span><Radio size={14} /> 延迟 <b>—</b></span><span><Eye size={14} /> 证据 <b>{mode === "mock" ? "演示" : "待接入"}</b></span></div></div><div className="panel scene-panel"><div className="panel-heading"><div><span className="panel-kicker">SCENARIO PROFILE</span><h2>场景能力</h2></div><button className="more-button" onClick={() => onNavigate("plugins")}>管理</button></div><div className="scene-orbit"><div className="orbit-ring ring-one" /><div className="orbit-ring ring-two" /><div className="orbit-core"><Sparkles size={22} /><span>VISUAL<br />FACTS</span></div><div className="orbit-label label-a"><b>人</b><span>轨迹</span></div><div className="orbit-label label-b"><b>物</b><span>关系</span></div><div className="orbit-label label-c"><b>时</b><span>证据</span></div></div><div className="scene-note"><span className={`status-dot ${connectionDotClass(connection.status)}`} /><span>{connection.status === "offline" ? "等待数据源恢复" : connection.status === "loading" ? "正在连接数据源" : "通用视觉底座运行中"}</span><b>{enabledCount} 个插件已启用</b></div></div></section>
     <section className="lower-grid"><div className="panel events-panel"><div className="panel-heading"><div><span className="panel-kicker">REVIEW QUEUE / {String(events.length).padStart(2, "0")}</span><h2>最近事件</h2></div><button className="more-button" onClick={() => onNavigate("events")}>查看全部 <ArrowUpRight size={14} /></button></div>{recent.length ? recent.map((event) => <EventRow key={event.event_id} event={event} onReview={onReview} />) : <EmptyState text="还没有事件" />}</div><div className="panel readiness-panel"><div className="panel-heading"><div><span className="panel-kicker">DELIVERY READINESS</span><h2>交付进度</h2></div><span className="readiness-score">{Math.min(99, 42 + enabledCount * 10)}%</span></div><Progress label="AI 核心闭环" value={78} /><Progress label="前端演示" value={62} /><Progress label="真实流适配" value={18} muted /><Progress label="机器人融合" value={8} muted /><div className="readiness-foot"><span>当前为原型阶段</span><span>Mock 可演示</span></div></div></section>
   </>;

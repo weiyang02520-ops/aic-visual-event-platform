@@ -1263,8 +1263,26 @@ body {
 .ai-health-row strong { color:#304563; font-size:11px; }
 .ai-health-row small { margin-top:4px; color:#8c9aad; font-size:9px; }
 .ai-health-row em { min-height:22px; padding:0 7px; display:inline-flex; align-items:center; gap:5px; border-radius:999px; font:8px "DM Mono", monospace; font-style:normal; }
+.competition-demo-flow { padding:22px 23px; margin-bottom:16px; }
+.demo-mode-button { min-height:40px; padding:0 12px; display:inline-flex; align-items:center; gap:6px; border:1px solid #dbe5f0; border-radius:11px; color:#687d99; background:#f8fbff; font-size:10px; font-weight:700; transition:all .18s ease; }
+.demo-mode-button:hover, .demo-mode-button.active { color:#176fe9; border-color:#bcd4f4; background:#eaf3ff; }
+.competition-demo-lead { margin:8px 0 0; color:#8091a7; font-size:11px; }
+.competition-demo-source { min-height:26px; padding:0 9px; display:inline-flex; align-items:center; border-radius:999px; color:#287ff3; background:#eaf3ff; font:9px "DM Mono", monospace; }
+.competition-demo-stages { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px; margin-top:17px; }
+.competition-demo-stage { min-width:0; min-height:84px; display:flex; align-items:flex-start; gap:8px; padding:11px 9px; border:1px solid #e5ecf4; border-radius:11px; background:#fbfdff; }
+.competition-demo-stage.ready { border-color:#cfe7da; background:linear-gradient(145deg,#fbfffd,#f3fbf6); }
+.competition-demo-stage.pending { opacity:.72; }
+.competition-demo-icon { width:27px; height:27px; display:grid; place-items:center; flex:0 0 27px; border-radius:8px; color:#9aacbf; background:#edf3fa; }
+.competition-demo-stage.ready .competition-demo-icon { color:#17a967; background:#e5f8ee; }
+.competition-demo-stage > div { min-width:0; }
+.competition-demo-stage small, .competition-demo-stage strong, .competition-demo-stage span { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.competition-demo-stage small { color:#8b9caf; font-size:9px; }
+.competition-demo-stage strong { margin-top:5px; color:#304563; font-size:10px; }
+.competition-demo-stage span { margin-top:4px; color:#93a0b1; font-size:9px; }
 @media (max-width: 1050px) { .ai-health-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width: 720px) { .ai-dashboard-heading { align-items:flex-start; flex-direction:column; gap:10px; } .ai-stat-grid { grid-template-columns:1fr 1fr; gap:10px; } .ai-stat-card { min-height:112px; padding:15px; } .ai-health-grid { grid-template-columns:1fr; } }
+@media (max-width: 1050px) { .competition-demo-stages { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media (max-width: 720px) { .competition-demo-flow { padding:18px; } .competition-demo-stages { grid-template-columns:1fr 1fr; } }
 @media (max-width: 1050px) {
   .object-memory-workspace { grid-template-columns:1fr; }
   .object-memory-detail { min-height:0; }
