@@ -2,6 +2,8 @@ import { ArrowRight, CircleDot } from "lucide-react";
 import type { PrimitiveFactContract } from "../../contracts";
 
 const labels: Record<string, string> = {
+  person_entered_zone: "人物进入监控区",
+  object_detected: "检测到对象",
   object_picked: "拿起对象",
   pickup_candidate: "出现拿取候选",
   hand_to_face: "手靠近面部",

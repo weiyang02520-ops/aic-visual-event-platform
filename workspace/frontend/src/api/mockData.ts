@@ -11,9 +11,9 @@ export function createMockEvents(): UnifiedEvent[] {
       event_id: "evt-demo-001", plugin_id: "elderly_care", plugin_version: "0.1.0", event_type: "suspected_medication",
       title: "疑似发生服药相关行为", description: "检测到药盒拿起与手部接近面部的连续事实，建议结合历史视频人工复核。",
       source_id: "living-room-cam-01", started_at: new Date(Date.now() - 1000 * 60 * 8).toISOString(), ended_at: new Date(Date.now() - 1000 * 60 * 7).toISOString(),
-      confidence: 0.78, severity: "medium", review_status: "pending", subject: { id: "person_01", label: "爷爷" }, object: { id: "medicine_box_01", label: "降压药盒" }, location: "客厅桌面",
+      confidence: 0.78, severity: "medium", review_status: "pending", subject: { id: "person_01", label: "爷爷", identity_status: "identified", privacy_mode: "skeleton", pose: "standing", action: "hand_near_object", confidence: 0.92 }, object: { id: "medicine_box_01", label: "降压药盒", category: "medicine", bbox: [320, 248, 86, 62], state: "tracked", confidence: 0.95 }, location: "客厅桌面",
       evidence: [{ source_id: "living-room-cam-01", started_at: new Date(Date.now() - 1000 * 60 * 8 - 3000).toISOString(), ended_at: new Date(Date.now() - 1000 * 60 * 7 + 3000).toISOString(), resolver: "hls-evidence-resolver", status: "designed" }],
-      facts: [{ fact_type: "object_picked", confidence: 0.91, location: "药箱区域" }, { fact_type: "hand_to_face", confidence: 0.74, location: "客厅桌面" }], metadata: { interpretation: "辅助判断，不是医学诊断" },
+      facts: [{ fact_type: "person_entered_zone", confidence: 0.94, location: "客厅" }, { fact_type: "object_detected", confidence: 0.95, location: "客厅桌面" }, { fact_type: "hand_near_object", confidence: 0.89, location: "药箱区域" }, { fact_type: "object_picked", confidence: 0.91, location: "药箱区域" }, { fact_type: "hand_to_face", confidence: 0.74, location: "客厅桌面" }], metadata: { interpretation: "辅助判断，不是医学诊断", runtime_stage: "medication_event_ready", reasoning_chain: [{ fact_type: "person_entered_zone", confidence: 0.94, location: "客厅" }, { fact_type: "object_detected", confidence: 0.95, location: "客厅桌面" }, { fact_type: "hand_near_object", confidence: 0.89, location: "药箱区域" }, { fact_type: "object_picked", confidence: 0.91, location: "药箱区域" }, { fact_type: "hand_to_face", confidence: 0.74, location: "客厅桌面" }] },
     },
     {
       event_id: "evt-demo-002", plugin_id: "workshop", plugin_version: "0.1.0", event_type: "object_removed",
