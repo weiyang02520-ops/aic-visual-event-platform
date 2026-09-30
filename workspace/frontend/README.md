@@ -1,55 +1,71 @@
-# Sentinel 视觉事件控制台
+# Sentinel · AI 视觉机器人智能监护前端
 
-面向 Makerverse/livestream-rs + 独立 AI 服务的前端原型。当前版本优先保证离线 Mock 演示完整，再通过同一组 `Repository` 方法切换真实 AI REST API。
+面向老人用药辅助场景的 AI 视觉机器人平台前端。深色 “Robot OS” 界面，离线演示数据和真实 AI REST API 共用同一个 `Repository` 接口。
 
 ## 启动
 
 ```powershell
 cd frontend
 npm install
-npm run dev
+npm run dev      # http://127.0.0.1:5173
+npm run build    # tsc -b + vite build
+npm test         # node --test，覆盖场景引擎、推理解释、记忆索引
 ```
-
-浏览器打开 `http://127.0.0.1:5173`。
-
-## Real API
-
-默认 Real API 地址为 `http://127.0.0.1:8010`，也可以设置：
-
-```powershell
-$env:VITE_AI_API_URL = "http://127.0.0.1:8010"
-npm run dev
-```
-
-如果要让 Real 模式发现 Makerverse 在线直播会话，可额外配置：
-
-```powershell
-$env:VITE_MAKERVERSE_API_URL = "http://127.0.0.1:5000"
-$env:VITE_MAKERVERSE_TOKEN = "仅放在本地环境，不提交到仓库"
-```
-
-页面会调用 `/lives/online` 和 `/lives/{id}/endpoint`。隐私监护页不会把发现到的原始媒体地址直接当作隐私画面播放；Real 模式只有在后续接入明确的骨骼/卡漫渲染输出后才显示监护画面，否则保持“隐私渲染流未接入”的 fail-closed 状态。
-
-页面通过 `src/repository.ts` 的 `Repository` 接口访问数据，Mock/Real 切换不会散落在页面业务逻辑中。
-
-Real 模式切换时会先清空上一数据源的事件、插件、对象和人员，再请求 `/health` 与首屏数据。连接状态会显示为“连接中”“Real API 在线”或“Real API 离线”；失败时保留空状态和简短错误原因，不把 Mock 数据当作 Real 数据展示。复核、插件启停、分析任务和登记操作在 Real API 未在线时会直接提示失败，不会回退到 Mock。
-
-Real 模式创建分析任务后会按 `job_id` 轮询 `/api/v1/analysis/jobs/{id}`，直到 `completed`、`failed` 或 `stopped`，再刷新事件中心；这对应 AI API 的 `202 Accepted` 异步任务语义。
-
-Makerverse 媒体边界在 `src/media.ts`：它归一化 `/lives/online` 与 `/lives/{id}/endpoint` 的 DTO，并区分 Mock、RTMP、RTSP、HLS 和 HTTP-FLV。当前只完成地址分类和接口边界，真实播放器需要在部署地址、CORS、鉴权和浏览器实测确认后再接入；详见 `workspace/docs/MEDIA_PLAYBACK_ADAPTER.md`。
-
-AI 服务启动后，可以在另一个终端执行 `npm run smoke:real`，检查前端 Real API 所依赖的 health、plugins、events、objects、persons 和 evidence 路径。
 
 ## 页面
 
-- 首页：保留原有总览能力；
-- 隐私监护：当前重点页面。左侧“插件功能”可折叠，插件启停会同步控制监控画面中的检测提示、右侧插件卡片和最近动作时间线；
-- 隐私显示仅提供“卡漫模式 / 骨骼模式”，人物做卡漫/骨骼呈现，物品仍按语义检测结果显示；
-- 右侧“当前状态”固定存在，其他卡片由已启用插件动态生成，不再写死用药/物品模块；
-- 最近动作时间线按当前事实和插件动态生成，数量不是固定 4 项；
-- 事件中心：事件筛选、置信度、人工确认/驳回；
-- 插件管理：插件状态与全局启停；
-- 对象与人员：自定义对象和人员注册；
-- 系统设置：数据源、场景和证据边界说明。
+| 路由 | 页面 | 内容 |
+| --- | --- | --- |
+| `#/dashboard` | AI 总览 | AI 核心状态、当前人物（卡漫头像）、当前事件与推理条、识别对象、系统状态、最近智能分析 |
+| `#/monitor` | 隐私监护 | 由 COCO17 关键点驱动的卡漫人物，可切换卡漫 / 骨骼 / 融合；物品保留语义识别框；可播放、暂停、拖动的时间轴；人物状态、动作事实、识别对象、插件分析卡 |
+| `#/events/:id` | 事件分析中心 | 事件卡片流 + 推理流程（发现人物 → 检测药盒 → 检测拿取 → 检测动作 → 生成判断），点击节点查看对应事实；判断卡、人工确认 / 驳回、证据状态 |
+| `#/memory/:id` | AI 记忆库 | 药品 / 工具 / 生活用品画廊、最近已知位置、出现记录、认识的人；弹窗登记物品和人员 |
+| `#/plugins` | 插件中心 | 平台能力架构图、已安装插件（输入事实 / 输出 / 今日事件 / 启停）、规划中的插件（标注尚未实现） |
+| `#/demo` | 演示模式 | 全屏 6 幕：人物出现 → AI 识别 → 物品发现 → 动作分析 → 事件生成 → 智能提醒。`#/demo/15` 从第 15 秒开始 |
+| `#/settings` | 系统设置 | 数据源、运行状态、隐私边界 |
 
-Mock 模式使用明确的演示场景来展示“真实环境背景 + 人物卡漫/骨骼 + 物品检测”的产品逻辑。Real API 在线不代表隐私渲染流已经可用；隐私监护页不会自动回退到原始视频。真实骨骼/卡漫视频输出、媒体播放器和机器人协议仍需后续按实际接口验证。
+演示模式快捷键：空格 播放 / 暂停，← → 切换幕，R 重播，F 全屏，Esc 退出。演示数据模式下，“事件生成”一幕会通过 Repository 写入一条事件，结束后可直接跳到事件分析中心查看。
+
+## 数据源
+
+顶部 “演示 / 实时 API” 切换数据源。
+
+- 演示：`src/api/mockAdapter.ts` 的内存数据，加上 `src/engine/scene/mockScript.ts` 的 26 秒服药剧本。界面明确标注为演示数据，不代表模型输出。
+- 实时 API：`VITE_AI_API_URL`（默认 `http://127.0.0.1:8010`）。切换时先清空旧数据；离线时保持空状态并显示原因，不回退到演示数据。额外读取 `/ready` 和 `/api/v1/providers/detectors` 展示运行状态。
+- 实时隐私舞台：配置 `VITE_AI_PREVIEW_SOURCE` 后读取 `/api/v1/vision/preview`，只使用 `metadata.skeleton.keypoints` 和物品 bbox 渲染。未配置或失败时舞台保持关闭，**不会回退到原始视频**。
+
+```powershell
+$env:VITE_AI_API_URL = "http://127.0.0.1:8010"
+$env:VITE_AI_PREVIEW_SOURCE = "runtime/samples/task-0004-bus.avi"
+npm run dev
+```
+
+## 演示环境照片
+
+卡漫化只针对人物，房间和物品保持原样。演示模式的背景是一张**没有人的实拍房间照片**，卡通人物叠在上面，物品只加识别框。
+
+1. 拍一张演示房间的照片（茶几上放药盒、水杯，画面里不要有人），保存为 `public/demo-scene/living-room.jpg`。
+2. 复制 `public/demo-scene/scene.example.json` 为 `scene.json`，按照片像素填：`width`/`height` 是照片尺寸，`floorY` 是人站的位置（脚底）的纵坐标，`objects` 是各物品的 `[左, 上, 宽, 高]`（`obj-01` 药盒必填，`obj-04` 水杯、`obj-06` 老花镜可选）。
+3. 刷新页面。人物会自动按药盒和地面位置缩放，伸手正好落在药盒上。
+
+没有 `scene.json` 时背景是中性网格，界面上会标注“未放环境照片”。
+
+## 目录
+
+```
+src/
+  app/       App、hash 路由、RuntimeProvider（数据源与操作）、Shell
+  design/    tokens / base / ui 样式与基础组件
+  engine/    纯 TS：labels、explain（事件 → 推理阶段）、memory、scene（骨骼、姿态、剧本、真实预览映射）
+  render/    SceneStage、CartoonAvatar、SkeletonLayer、RoomBackdrop、ObjectGlyph
+  hooks/     场景时钟、实时预览、live scene
+  pages/     各页面及样式
+  api/ contracts/ plugins/   Repository 适配器、冻结契约、插件展示注册表
+```
+
+## 契约边界
+
+- 事件文案保留“疑似 / 候选 / 需复核”，始终显示“辅助判断，不是医学诊断”。
+- 只有证据状态为 `available` 且带 URI 时显示回放；其余只显示时间窗和状态。
+- “最近已知位置”是历史记录，不代表物品此刻在该位置。
+- 骨骼缺失关节时按关节逐段降级，不补画肢体。

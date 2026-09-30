@@ -1,0 +1,115 @@
+{
+  "image": "office.jpg",
+  "width": 1280,
+  "height": 960,
+  "room": "实验室",
+  "source": "yolo11n-pose",
+  "persons": [
+    {
+      "id": "person-1",
+      "confidence": 0.635,
+      "bbox": [
+        171.6,
+        543.7,
+        97.2,
+        172.1
+      ],
+      "keypoints": {
+        "nose": [
+          239.5,
+          574.6,
+          0.786
+        ],
+        "left_eye": [
+          236.3,
+          568.1,
+          0.178
+        ],
+        "right_eye": [
+          235.5,
+          569.0,
+          0.863
+        ],
+        "left_ear": [
+          212.5,
+          567.2,
+          0.069
+        ],
+        "right_ear": [
+          219.8,
+          569.1,
+          0.96
+        ],
+        "left_shoulder": [
+          195.4,
+          590.1,
+          0.939
+        ],
+        "right_shoulder": [
+          213.6,
+          596.4,
+          0.993
+        ],
+        "left_elbow": [
+          217.6,
+          631.4,
+          0.446
+        ],
+        "right_elbow": [
+          233.0,
+          642.0,
+          0.975
+        ],
+        "left_wrist": [
+          250.0,
+          623.7,
+          0.38
+        ],
+        "right_wrist": [
+          256.0,
+          626.8,
+          0.905
+        ],
+        "left_hip": [
+          193.5,
+          674.7,
+          0.802
+        ],
+        "right_hip": [
+          205.9,
+          680.5,
+          0.923
+        ],
+        "left_knee": [
+          245.9,
+          677.1,
+          0.295
+        ],
+        "right_knee": [
+          262.5,
+          682.0,
+          0.624
+        ],
+        "left_ankle": [
+          243.4,
+          723.6,
+          0.135
+        ],
+        "right_ankle": [
+          257.8,
+          731.8,
+          0.298
+        ]
+      },
+      "render": {
+        "mode": "unregistered",
+        "person_id": null,
+        "display_name": null,
+        "similarity": null,
+        "alert": true,
+        "basis": "registry-empty"
+      }
+    }
+  ],
+  "manual_masks": 1
+}

@@ -58,6 +58,11 @@ export interface EventFact {
   fact_type: string;
   confidence: number;
   location?: string | null;
+  /** Optional per-fact provenance from the frozen contract (timestamp, subject/object, metadata.source_id, continuity_segment). */
+  timestamp?: string;
+  subject?: Record<string, unknown> | null;
+  object?: Record<string, unknown> | null;
+  metadata?: Record<string, unknown>;
 }
 
 export interface UnifiedEvent {

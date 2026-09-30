@@ -1,0 +1,11 @@
+.medication-page .page-head p { max-width: 680px; }
+.med-list { margin: 12px 0; padding-left: 20px; color: var(--text-2); font-size: 14px; line-height: 1.8; }
+.med-list strong { color: var(--text); }
+.med-sample { margin-top: 32px; }
+.med-card { padding: 20px; }
+.med-card-head { display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; align-items: center; margin-bottom: 16px; }
+.med-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--ok-soft); color: var(--ok); }
+.med-card-head > div { display: flex; align-items: center; gap: 10px; }
+.med-card-head strong { font-size: 16px; }
+.med-card .kv { margin-bottom: 12px; }
+.med-card .faint { margin: 0; }

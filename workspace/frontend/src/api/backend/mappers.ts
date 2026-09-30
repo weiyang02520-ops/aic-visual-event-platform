@@ -8,7 +8,8 @@ export function toLegacyHealth(health: RepositoryHealthContract): RepositoryHeal
 export function toLegacyEvent(event: UnifiedEventContract): UnifiedEvent {
   return {
     ...event,
-    facts: event.facts.map((fact) => ({ fact_type: fact.fact_type, confidence: fact.confidence, location: fact.location })),
+    // Keep per-fact provenance: the action timeline needs timestamp, source and continuity segment.
+    facts: event.facts.map((fact) => ({ fact_type: fact.fact_type, confidence: fact.confidence, location: fact.location, timestamp: fact.timestamp, subject: fact.subject, object: fact.object, metadata: fact.metadata })),
     evidence: event.evidence.map((evidence) => ({ ...evidence })),
     metadata: { ...event.metadata },
   };

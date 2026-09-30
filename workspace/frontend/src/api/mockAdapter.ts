@@ -47,9 +47,16 @@ export function createMockAdapter(): Repository {
     async createAnalysis(source) {
       await wait(320);
       const job: AnalysisJob = { job_id: `mock-job-${Date.now()}`, source, status: "completed", progress: 1, event_ids: [] };
-      if (source.includes("elderly")) {
-        const event = structuredClone(events[0]);
-        event.event_id = `evt-${Date.now()}`; event.created_at = now(); events = [event, ...events]; job.event_ids = [event.event_id];
+      // Same rule as the backend PluginManager: disabled plugins do not evaluate, so they emit nothing.
+      const enabled = (id: string) => plugins.some((plugin) => plugin.plugin_id === id && plugin.enabled && plugin.state !== "disabled");
+      if (source.includes("elderly") && enabled("elderly_care")) {
+        const template = events.find((item) => item.event_type === "suspected_medication") ?? events[0];
+        const event = structuredClone(template);
+        const endedAt = Date.now();
+        event.event_id = `evt-${endedAt}`; event.created_at = now(); event.review_status = "pending";
+        event.started_at = new Date(endedAt - 20_000).toISOString(); event.ended_at = new Date(endedAt).toISOString();
+        event.evidence = event.evidence.map((item) => ({ ...item, started_at: new Date(endedAt - 23_000).toISOString(), ended_at: new Date(endedAt + 3_000).toISOString() }));
+        events = [event, ...events]; job.event_ids = [event.event_id];
       }
       jobs.set(job.job_id, structuredClone(job)); return job;
     },
