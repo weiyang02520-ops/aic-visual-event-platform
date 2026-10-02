@@ -112,7 +112,11 @@ class SQLiteStore:
         """Push event to Makerverse backend."""
         event_dict = event.model_dump(mode="json")
         event_dict["source_id"] = event.source_id
-        await client.push_event(event_dict)
+        try:
+            await client.push_event(event_dict)
+        except Exception as exc:
+            import logging
+            logging.getLogger(__name__).warning("Makerverse sync unavailable for event %s: %s", event.event_id, exc)
 
     def list_events(self, plugin_id: str | None = None, review_status: str | None = None) -> list[UnifiedEvent]:
         clauses: list[str] = []
