@@ -49,9 +49,18 @@ def test_jsonl_fixture_skips_bad_lines_and_supports_cancel(tmp_path):
         next(pipeline.iter_frames(str(fixture), token=token))
 
 
-def test_unknown_stream_requires_explicit_adapter():
-    with pytest.raises(FramePipelineError, match="no frame provider"):
-        list(FramePipeline().iter_frames("rtmp://127.0.0.1/live/demo"))
+@pytest.mark.parametrize(
+    "source",
+    [
+        "rtsp://127.0.0.1/live/demo",
+        "rtmp://127.0.0.1/live/demo",
+        "http://127.0.0.1/live/demo",
+        "https://127.0.0.1/live/demo.m3u8",
+        "hls://127.0.0.1/live/demo.m3u8",
+    ],
+)
+def test_network_streams_route_to_optional_opencv_provider(source):
+    assert type(FramePipeline().provider_for(source)).__name__ == "OpenCVFrameProvider"
 
 
 def test_video_extension_routes_to_optional_opencv_provider(tmp_path):
@@ -176,6 +185,63 @@ class _FakeCV2:
     @staticmethod
     def cvtColor(_image, _conversion):
         return type("GrayImage", (), {"shape": (2, 2)})()
+
+
+def test_opencv_provider_reads_network_stream_and_marks_transport(monkeypatch):
+    source = "rtsp://127.0.0.1/live/demo"
+    monkeypatch.setitem(sys.modules, "cv2", _FakeCV2(25.0, [0.0]))
+
+    frames = list(FramePipeline().iter_frames(source, interval_ms=0, max_frames=1))
+
+    assert len(frames) == 1
+    assert frames[0].metadata["provider"] == "opencv"
+    assert frames[0].metadata["source_kind"] == "stream"
+    assert frames[0].metadata["stream_transport"] == "rtsp"
+
+
+def test_opencv_provider_reports_unreachable_network_stream(monkeypatch):
+    class ClosedCapture:
+        def isOpened(self):
+            return False
+
+        def release(self):
+            pass
+
+    class ClosedCV2:
+        def VideoCapture(self, _source):
+            return ClosedCapture()
+
+    monkeypatch.setitem(sys.modules, "cv2", ClosedCV2())
+
+    with pytest.raises(FramePipelineError, match="could not open stream"):
+        list(FramePipeline().iter_frames("rtmp://127.0.0.1/live/missing", max_frames=1))
+
+
+def test_opencv_provider_reports_network_stream_without_frames(monkeypatch):
+    class EmptyCapture:
+        def isOpened(self):
+            return True
+
+        def get(self, _property_id):
+            return 25.0
+
+        def read(self):
+            return False, None
+
+        def release(self):
+            pass
+
+    class EmptyCV2:
+        CAP_PROP_FPS = 1
+        CAP_PROP_POS_MSEC = 2
+
+        def VideoCapture(self, _source):
+            return EmptyCapture()
+
+    monkeypatch.setitem(sys.modules, "cv2", EmptyCV2())
+
+    with pytest.raises(FramePipelineError, match="returned no frames"):
+        list(FramePipeline().iter_frames("https://127.0.0.1/live/missing.m3u8", max_frames=1))
 
 
 @pytest.mark.parametrize("fps", [None, float("nan"), float("inf"), -1.0, 10**1000])

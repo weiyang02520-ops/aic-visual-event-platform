@@ -352,4 +352,6 @@ def test_source_resolver_routes_without_decoding():
     stream = resolver.inspect("rtmp://127.0.0.1/live/demo")
     assert stream.kind == "stream"
     assert stream.status == "configured"
+    assert stream.provider == "opencv-stream-provider"
+    assert "realtime-frames" in stream.capabilities
     assert resolver.inspect("C:/does-not-exist.mp4").status == "unavailable"

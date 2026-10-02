@@ -146,7 +146,7 @@ class JsonlFrameProvider:
 
 
 class OpenCVFrameProvider:
-    """Optional local video provider for common file containers.
+    """Optional OpenCV provider for local files and network media streams.
 
     OpenCV is imported lazily so the service still starts in minimal
     environments. The payload carries the decoded BGR image for model
@@ -155,18 +155,31 @@ class OpenCVFrameProvider:
     """
 
     extensions = {".mp4", ".avi", ".mov", ".mkv", ".webm", ".m4v"}
+    stream_schemes = {"rtsp", "rtmp", "http", "https", "hls"}
 
     def iter_frames(self, source: str, *, interval: timedelta, max_frames: int | None, token: CancellationToken, recover: bool) -> Iterator[Frame]:
+        parsed = urlparse(source)
+        scheme = parsed.scheme.lower()
+        is_stream = scheme in self.stream_schemes
         path = _source_path(source)
-        if not path.exists() or not path.is_file():
+        if not is_stream and (not path.exists() or not path.is_file()):
             raise FramePipelineError(f"local source does not exist: {path}")
         try:
             import cv2
         except ImportError as exc:
-            raise FramePipelineError("OpenCV provider unavailable; install the media extra or use JSONL fixtures") from exc
-        capture = cv2.VideoCapture(str(path))
+            raise FramePipelineError(
+                "OpenCV/FFmpeg provider unavailable; install visual-event-ai[media] "
+                "to decode local, RTSP, RTMP, HTTP, or HLS sources"
+            ) from exc
+        capture_target = source if is_stream else str(path)
+        capture = cv2.VideoCapture(capture_target)
         if not capture.isOpened():
             capture.release()
+            if is_stream:
+                raise FramePipelineError(
+                    "OpenCV could not open stream; check URL reachability and "
+                    f"FFmpeg/GStreamer codec support: {source}"
+                )
             raise FramePipelineError(f"OpenCV could not open local video: {path}")
         reported_fps = _finite_float(capture.get(cv2.CAP_PROP_FPS))
         fps = reported_fps if reported_fps is not None and reported_fps > 0 else 25.0
@@ -184,6 +197,12 @@ class OpenCVFrameProvider:
                 token.raise_if_cancelled()
                 ok, image = capture.read()
                 if not ok:
+                    if is_stream:
+                        state = "returned no frames" if emitted == 0 else "ended before the requested frame limit"
+                        raise FramePipelineError(
+                            f"OpenCV stream {state}; check "
+                            f"stream availability and decoder support: {source}"
+                        )
                     break
                 if read_index % step != 0:
                     read_index += 1
@@ -228,7 +247,13 @@ class OpenCVFrameProvider:
                         "shape": [height, width],
                         "channels": channels,
                     },
-                    metadata={"provider": "opencv", "fps": fps, "read_index": read_index},
+                    metadata={
+                        "provider": "opencv",
+                        "source_kind": "stream" if is_stream else "file",
+                        **({"stream_transport": scheme} if is_stream else {}),
+                        "fps": fps,
+                        "read_index": read_index,
+                    },
                 )
                 emitted += 1
                 read_index += 1
@@ -246,6 +271,12 @@ class FramePipeline:
             scheme = "file"
         if scheme == "mock":
             return self.providers["mock"]
+        if scheme in OpenCVFrameProvider.stream_schemes:
+            if "opencv" not in self.providers:
+                raise FramePipelineError(
+                    "OpenCV provider is not configured for RTSP/RTMP/HTTP/HLS stream sources"
+                )
+            return self.providers["opencv"]
         if scheme in {"", "file"}:
             path = _source_path(source)
             if path.suffix.lower() in OpenCVFrameProvider.extensions:

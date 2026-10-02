@@ -36,11 +36,11 @@ class SourceResolver:
             return SourceDescriptor(
                 value,
                 "stream",
-                "livestream-rs-adapter",
+                "opencv-stream-provider",
                 "configured",
                 value,
-                ("stream-handoff", "evidence-uri"),
-                "transport connectivity is verified when livestream-rs is available",
+                ("realtime-frames", "evidence-uri"),
+                "stream connectivity is verified when the OpenCV/FFmpeg provider opens the source",
             )
         if scheme == "file":
             candidate = Path(parsed.path)

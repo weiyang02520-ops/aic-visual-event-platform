@@ -44,7 +44,7 @@ def test_api_health_plugins_and_job(monkeypatch, tmp_path):
         params={"source": "rtmp://127.0.0.1/live/demo"},
     )
     assert inspection.status_code == 200
-    assert inspection.json()["provider"] == "livestream-rs-adapter"
+    assert inspection.json()["provider"] == "opencv-stream-provider"
     frames = client.get(
         "/api/v1/sources/frames",
         params={"source": "mock://elderly-medication?frames=2", "max_frames": 2},
