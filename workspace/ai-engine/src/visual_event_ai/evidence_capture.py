@@ -7,6 +7,7 @@ import mimetypes
 import os
 from pathlib import Path
 from typing import Any, Protocol
+from urllib.parse import quote
 
 import httpx
 
@@ -70,7 +71,7 @@ class HttpEvidenceClipUploader:
         self.event_id = event_id.strip() if isinstance(event_id, str) and event_id.strip() else None
         endpoint = endpoint_url.strip() if isinstance(endpoint_url, str) and endpoint_url.strip() else None
         if endpoint is None and isinstance(base_url, str) and base_url.strip() and self.event_id:
-            endpoint = f"{base_url.rstrip('/')}/api/v1/events/{self.event_id}/evidence"
+            endpoint = f"{base_url.rstrip('/')}/api/v1/events/{quote(self.event_id, safe='')}/evidence"
         self.endpoint_url = endpoint
         self.retries = max(0, int(retries))
         self._owns_client = client is None
@@ -93,7 +94,7 @@ class HttpEvidenceClipUploader:
         )
         base_url = os.getenv("MAKERVERSE_URL") or os.getenv("MAKERVERSE_BASE_URL")
         if configured_endpoint and event_id:
-            configured_endpoint = configured_endpoint.replace("{event_id}", event_id)
+            configured_endpoint = configured_endpoint.replace("{event_id}", quote(event_id, safe=""))
         elif configured_endpoint and "{event_id}" in configured_endpoint:
             configured_endpoint = None
         return cls(
