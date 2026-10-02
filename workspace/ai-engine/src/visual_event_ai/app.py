@@ -25,6 +25,7 @@ from .models import (
     RegistryMatchRequest,
     RegistryMatchView,
 )
+from .makerverse_client import MakerverseClient
 from .plugins import PluginManager
 from .service import AnalysisService
 from .sources import SourceResolver
@@ -51,11 +52,23 @@ def create_app() -> FastAPI:
     plugins = PluginManager(plugin_dir)
     plugins.scan()
     zones = parse_zones_json(os.getenv("AI_ZONES_JSON"))
-    service = AnalysisService(SQLiteStore(db_path), plugins, zones=zones)
+    store = SQLiteStore(db_path)
+    service = AnalysisService(store, plugins, zones=zones)
     sources = SourceResolver()
     frame_pipeline = FramePipeline()
     evidence = EvidenceResolver()
     detectors = DetectorProviderRegistry()
+
+    # Makerverse client (optional, for pushing events)
+    makerverse_url = os.getenv("MAKERVERSE_URL")
+    if makerverse_url:
+        makerverse = MakerverseClient(
+            makerverse_url,
+            live_id=os.getenv("MAKERVERSE_LIVE_ID"),
+            retries=int(os.getenv("MAKERVERSE_RETRIES", "2")),
+        )
+        # Pass makerverse client to store for event pushing
+        store.makerverse = makerverse
 
     app = FastAPI(title="Visual Event AI", version="0.1.0")
     app.add_middleware(
@@ -241,10 +254,28 @@ def create_app() -> FastAPI:
 
     @app.get("/api/v1/objects", response_model=list[RegisteredObject])
     def list_objects() -> list[RegisteredObject]:
+        """List registered objects. Proxy to Makerverse if available, else local SQLite."""
+        if makerverse_url and os.getenv("MAKERVERSE_PROXY_REGISTRY") == "1":
+            try:
+                import httpx
+                response = httpx.get(f"{makerverse_url}/api/v1/objects", timeout=5.0)
+                response.raise_for_status()
+                return response.json()
+            except Exception:
+                pass  # Fallback to local
         return service.store.list_objects()
 
     @app.post("/api/v1/objects", response_model=RegisteredObject, status_code=201)
     def create_object(request: RegisteredObjectCreate) -> RegisteredObject:
+        """Register a new object. Proxy to Makerverse if available, else local SQLite."""
+        if makerverse_url and os.getenv("MAKERVERSE_PROXY_REGISTRY") == "1":
+            try:
+                import httpx
+                response = httpx.post(f"{makerverse_url}/api/v1/objects", json=request.model_dump(), timeout=5.0)
+                response.raise_for_status()
+                return response.json()
+            except Exception:
+                pass  # Fallback to local
         try:
             return service.store.save_object(request)
         except EmbeddingError as exc:
@@ -258,10 +289,28 @@ def create_app() -> FastAPI:
 
     @app.get("/api/v1/persons", response_model=list[RegisteredPerson])
     def list_persons() -> list[RegisteredPerson]:
+        """List registered persons. Proxy to Makerverse if available, else local SQLite."""
+        if makerverse_url and os.getenv("MAKERVERSE_PROXY_REGISTRY") == "1":
+            try:
+                import httpx
+                response = httpx.get(f"{makerverse_url}/api/v1/persons", timeout=5.0)
+                response.raise_for_status()
+                return response.json()
+            except Exception:
+                pass  # Fallback to local
         return service.store.list_persons()
 
     @app.post("/api/v1/persons", response_model=RegisteredPerson, status_code=201)
     def create_person(request: RegisteredPersonCreate) -> RegisteredPerson:
+        """Register a new person. Proxy to Makerverse if available, else local SQLite."""
+        if makerverse_url and os.getenv("MAKERVERSE_PROXY_REGISTRY") == "1":
+            try:
+                import httpx
+                response = httpx.post(f"{makerverse_url}/api/v1/persons", json=request.model_dump(), timeout=5.0)
+                response.raise_for_status()
+                return response.json()
+            except Exception:
+                pass  # Fallback to local
         try:
             return service.store.save_person(request)
         except EmbeddingError as exc:

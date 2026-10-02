@@ -33,6 +33,7 @@ class SQLiteStore:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._init_schema()
+        self.makerverse = None  # Will be set by app.py if MAKERVERSE_URL is configured
 
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self.path)
@@ -75,8 +76,11 @@ class SQLiteStore:
                 """
             )
 
-    def save_event(self, event: UnifiedEvent) -> None:
+    def save_event(self, event: UnifiedEvent, makerverse_client=None) -> None:
+        """Save event to SQLite (fallback) and optionally push to Makerverse."""
         payload = _event_payload(event)
+
+        # Always save to SQLite as fallback
         with self._connect() as db:
             db.execute(
                 """INSERT OR REPLACE INTO events
@@ -91,6 +95,24 @@ class SQLiteStore:
                     payload,
                 ),
             )
+
+        self._schedule_makerverse(event, makerverse_client or self.makerverse)
+
+    def _schedule_makerverse(self, event: UnifiedEvent, client: Any) -> None:
+        if client is None:
+            return
+        import asyncio
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            return
+        loop.create_task(self._push_to_makerverse(event, client))
+
+    async def _push_to_makerverse(self, event: UnifiedEvent, client) -> None:
+        """Push event to Makerverse backend."""
+        event_dict = event.model_dump(mode="json")
+        event_dict["source_id"] = event.source_id
+        await client.push_event(event_dict)
 
     def list_events(self, plugin_id: str | None = None, review_status: str | None = None) -> list[UnifiedEvent]:
         clauses: list[str] = []
@@ -121,7 +143,7 @@ class SQLiteStore:
         event.review_status = status
         if note:
             event.metadata["review_note"] = note
-        self.save_event(event)
+        self.save_event(event, makerverse_client=self.makerverse)
         return event
 
     def create_job(self, source: str, metadata: dict[str, Any]) -> AnalysisJobView:
@@ -210,6 +232,8 @@ class SQLiteStore:
             )
             if cursor.rowcount != 1:
                 raise KeyError(job.job_id)
+        for event, _ in event_rows:
+            self._schedule_makerverse(event, self.makerverse)
 
     def get_job(self, job_id: str) -> AnalysisJobView | None:
         with self._connect() as db:
