@@ -1,5 +1,5 @@
-import { ContractApiError } from "../contracts/common";
-import type { ApiErrorPayload } from "../contracts/common";
+import { ContractApiError } from "../contracts/common.ts";
+import type { ApiErrorPayload } from "../contracts/common.ts";
 
 export interface RequestJsonOptions extends RequestInit {
   timeoutMs?: number;
@@ -43,5 +43,9 @@ export async function requestJson<T>(baseUrl: string, path: string, options?: Re
     const message = `${response.status} ${response.statusText}${detail ? `：${detail}` : ""}`.trim();
     throw new ContractApiError(message, response.status, detail);
   }
+  // Makerverse review updates intentionally return 204 No Content. Treat an
+  // empty successful response as an absent JSON value instead of attempting to
+  // parse it and surfacing a SyntaxError to the adapter.
+  if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
 }

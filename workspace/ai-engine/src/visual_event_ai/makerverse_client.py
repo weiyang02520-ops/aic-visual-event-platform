@@ -115,16 +115,25 @@ def _metadata_root(value: Any) -> dict[str, Any]:
 
 
 def _metadata_json(event: Mapping[str, Any]) -> str | None:
-    """Build AiEvent.Metadata while preserving UnifiedEvent-only fields."""
+    """Build AiEvent.Metadata while preserving UnifiedEvent-only fields.
+
+    ``source_id`` belongs to the unified event contract, but Makerverse's
+    ``AiEvent`` model has no top-level property for it.  Prefer the explicit
+    event value when present and keep a metadata value as the fallback for
+    callers that already supplied provenance there.
+    """
 
     metadata_present = "metadata" in event and event.get("metadata") is not None
     related_present = any(
         key in event and event.get(key) is not None for key in _RELATED_FIELDS
     )
-    if not metadata_present and not related_present:
+    source_id_present = "source_id" in event and event.get("source_id") is not None
+    if not metadata_present and not related_present and not source_id_present:
         return None
 
     root = _metadata_root(event.get("metadata"))
+    if source_id_present:
+        root["source_id"] = _json_compatible(event["source_id"])
     for key in _RELATED_FIELDS:
         if key in event and event.get(key) is not None:
             root[key] = _json_compatible(event[key])

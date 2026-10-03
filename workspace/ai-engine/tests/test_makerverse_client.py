@@ -42,7 +42,11 @@ def test_makerverse_payload_uses_configured_live_id_and_whitelists_fields():
     assert "source_id" not in captured
     assert "schema_version" not in captured
     assert isinstance(captured["metadata"], str)
-    assert json.loads(captured["metadata"]) == {"facts": [], "evidence": []}
+    assert json.loads(captured["metadata"]) == {
+        "source_id": "camera-01",
+        "facts": [],
+        "evidence": [],
+    }
 
 
 def test_makerverse_payload_matches_ai_event_json_string_fields_and_preserves_related_data():
@@ -76,7 +80,7 @@ def test_makerverse_payload_matches_ai_event_json_string_fields_and_preserves_re
             "subject": {"id": "person-1", "label": "老人"},
             "object": {"id": "medicine-1", "label": "药盒"},
             "location": None,
-            "metadata": {"source_id": "camera-01", "continuity_segment": 2},
+            "metadata": {"source_id": "legacy-camera", "continuity_segment": 2},
             "facts": [{
                 "fact_type": "hand_to_face",
                 "timestamp": started_at,
@@ -116,6 +120,35 @@ def test_makerverse_payload_matches_ai_event_json_string_fields_and_preserves_re
     assert metadata["continuity_segment"] == 2
     assert metadata["facts"][0]["timestamp"] == started_at.isoformat()
     assert metadata["evidence"][0]["ended_at"] == ended_at.isoformat()
+
+
+def test_makerverse_payload_writes_source_id_when_metadata_and_related_fields_are_absent():
+    captured = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured.update(json.loads(request.content))
+        return httpx.Response(201, json={"event_id": captured["event_id"]}, request=request)
+
+    client = MakerverseClient("http://makerverse", live_id="live-001", retries=0)
+    asyncio.run(client.client.aclose())
+    client.client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    try:
+        asyncio.run(client.push_event({
+            "event_id": "evt-source-only",
+            "source_id": "camera-01",
+            "plugin_id": "elderly_care",
+            "plugin_version": "0.1.0",
+            "event_type": "suspected_medication",
+            "title": "疑似服药",
+            "started_at": "2026-01-01T00:00:00Z",
+            "ended_at": "2026-01-01T00:00:05Z",
+            "review_status": "pending",
+        }))
+    finally:
+        asyncio.run(client.client.aclose())
+
+    assert "source_id" not in captured
+    assert json.loads(captured["metadata"]) == {"source_id": "camera-01"}
 
 
 def test_makerverse_client_requires_live_id():
