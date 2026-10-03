@@ -200,3 +200,25 @@ def build_evidence_uploader(event_id: str | None = None, **kwargs: Any) -> Evide
 
     uploader = HttpEvidenceClipUploader.from_env(event_id, **kwargs)
     return uploader if uploader.configured else UnavailableClipUploader()
+
+
+# Additive lazy exports keep the original uploader/window contract intact while
+# allowing integrations that already import evidence adapters from this module
+# to discover the rolling recorder without introducing an import cycle.
+_RECORDER_EXPORTS = {
+    "BufferedEvidenceFrame",
+    "CLIP_AVAILABLE",
+    "CLIP_ERROR",
+    "CLIP_UNAVAILABLE",
+    "CLIP_UNSUPPORTED",
+    "EvidenceClipResult",
+    "RollingEvidenceRecorder",
+}
+
+
+def __getattr__(name: str) -> Any:
+    if name in _RECORDER_EXPORTS:
+        from . import evidence_recorder
+
+        return getattr(evidence_recorder, name)
+    raise AttributeError(name)
