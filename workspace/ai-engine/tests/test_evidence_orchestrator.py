@@ -279,3 +279,42 @@ def test_available_without_uri_is_not_a_success(tmp_path):
     assert result.available is False
     assert "without a usable URI" in (result.reason or "")
     hook.close()
+
+
+def test_per_event_upload_failure_closes_uploader_and_removes_generated_clip(tmp_path):
+    recorder = RollingEvidenceRecorder("camera-01", output_dir=tmp_path, writer_factory=_WriterFactory())
+    created: list[object] = []
+
+    class FailingUploader:
+        def __init__(self):
+            self.closed = False
+
+        async def upload(self, _window, clip):
+            assert isinstance(clip, Path)
+            assert clip.exists()
+            raise OSError("remote evidence endpoint failed")
+
+        async def aclose(self):
+            self.closed = True
+
+    def uploader_factory(_event_id: str):
+        uploader = FailingUploader()
+        created.append(uploader)
+        return uploader
+
+    hook = EvidenceCaptureOrchestrator(
+        recorder,
+        enabled=True,
+        pre_seconds=0,
+        post_seconds=0,
+        uploader_factory=uploader_factory,
+    )
+    hook.append_frame(BASE, _Image(), source_id="camera-01")
+
+    result = asyncio.run(hook.capture_event(_event("event-failure")))
+
+    assert result.status == "error"
+    assert "remote evidence endpoint failed" in (result.reason or "")
+    assert created and created[0].closed is True
+    assert list(tmp_path.iterdir()) == []
+    hook.close()

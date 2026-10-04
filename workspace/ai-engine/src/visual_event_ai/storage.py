@@ -137,6 +137,9 @@ class SQLiteStore:
         self._makerverse_pending: set[str] = set()
         self._makerverse_synced: set[str] = set()
         self._makerverse_tasks: set[asyncio.Task[Any]] = set()
+        self._makerverse_loop_clients: dict[
+            asyncio.AbstractEventLoop, dict[int, Any]
+        ] = {}
         self._makerverse_closed = False
 
     def _connect(self) -> sqlite3.Connection:
@@ -228,6 +231,7 @@ class SQLiteStore:
             return
         with self._makerverse_lock:
             self._makerverse_tasks.add(task)
+            self._makerverse_loop_clients.setdefault(loop, {})[id(client)] = client
         task.add_done_callback(lambda done: self._makerverse_task_done(event_id, done))
 
     def _makerverse_task_done(self, event_id: str, task: asyncio.Task[Any]) -> None:
@@ -296,11 +300,28 @@ class SQLiteStore:
     async def shutdown(self) -> None:
         """Await loop-owned tasks, then stop the sync worker."""
 
+        loop = asyncio.get_running_loop()
         with self._makerverse_lock:
             self._makerverse_closed = True
             tasks = tuple(self._makerverse_tasks)
         if tasks:
             await asyncio.gather(*tasks, return_exceptions=True)
+        with self._makerverse_lock:
+            loop_clients = tuple(
+                self._makerverse_loop_clients.pop(loop, {}).values()
+            )
+        for client in loop_clients:
+            close = getattr(client, "close", None)
+            if not callable(close):
+                continue
+            try:
+                result = close()
+                if inspect.isawaitable(result):
+                    await result
+            except Exception:
+                logging.getLogger(__name__).warning(
+                    "Makerverse client close failed", exc_info=True
+                )
         await asyncio.to_thread(self._makerverse_worker.shutdown, wait=True)
 
     def list_events(self, plugin_id: str | None = None, review_status: str | None = None) -> list[UnifiedEvent]:

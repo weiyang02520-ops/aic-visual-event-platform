@@ -197,14 +197,25 @@ class MakerverseClient:
             self._injected_transport = (
                 transport if isinstance(transport, httpx.MockTransport) else None
             )
+            try:
+                loop = asyncio.get_running_loop()
+            except RuntimeError:
+                loop = None
+            if loop is not None:
+                self._loop_clients[loop] = value
+                self._injected_owner = loop
 
     def _client_for_loop(self) -> httpx.AsyncClient:
         loop = asyncio.get_running_loop()
         with self._client_lock:
             existing = self._loop_clients.get(loop)
-            if existing is not None and not existing.is_closed:
+            if existing is not None and not getattr(existing, "is_closed", False):
                 return existing
-            if self._injected_client is not None and self._injected_owner is None:
+            if (
+                self._injected_client is not None
+                and self._injected_owner is None
+                and not getattr(self._injected_client, "is_closed", False)
+            ):
                 client = self._injected_client
                 self._injected_owner = loop
             elif self._injected_transport is not None:
@@ -229,7 +240,7 @@ class MakerverseClient:
             if client is None and self._compat_client is not None:
                 client = self._compat_client
                 self._compat_client = None
-        if client is not None and not client.is_closed:
+        if client is not None and not getattr(client, "is_closed", False):
             await client.aclose()
 
     async def push_event(self, event: dict[str, Any]) -> dict[str, Any]:
