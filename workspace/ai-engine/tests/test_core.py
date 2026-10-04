@@ -349,6 +349,12 @@ def test_stopping_running_frame_job_cancels_provider_and_finishes_as_stopped(tmp
 def test_source_resolver_routes_without_decoding():
     resolver = SourceResolver()
     assert resolver.inspect("mock://elderly-medication").provider == "mock-provider"
+    camera = resolver.inspect("camera://0")
+    assert camera.kind == "camera"
+    assert camera.status == "configured"
+    assert camera.provider == "opencv-camera-provider"
+    assert "camera-index" in camera.capabilities
+    assert resolver.inspect("webcam://0").kind == "camera"
     stream = resolver.inspect("rtmp://127.0.0.1/live/demo")
     assert stream.kind == "stream"
     assert stream.status == "configured"
