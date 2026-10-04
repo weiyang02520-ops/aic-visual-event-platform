@@ -80,6 +80,11 @@ def create_app() -> FastAPI:
     )
     app.state.analysis = service
 
+    @app.on_event("shutdown")
+    async def shutdown_makerverse() -> None:
+        # Drain loop-owned pushes and the sync worker before closing the app.
+        await store.shutdown()
+
     @app.get("/health")
     def health() -> dict[str, str]:
         return {"status": "ok", "service": "visual-event-ai", "version": "0.1.0"}
@@ -246,6 +251,7 @@ def create_app() -> FastAPI:
         return event
 
     @app.post("/api/v1/events/{event_id}/review", response_model=UnifiedEvent)
+    @app.patch("/api/v1/events/{event_id}/review", response_model=UnifiedEvent)
     def review_event(event_id: str, request: ReviewRequest) -> UnifiedEvent:
         event = service.store.review_event(event_id, request.status, request.note)
         if event is None:

@@ -73,7 +73,10 @@ def test_event_export_builds_default_and_configured_time_windows(tmp_path):
     assert result.window is not None
     assert result.window.started_at == BASE - timedelta(seconds=10)
     assert result.window.ended_at == BASE + timedelta(seconds=15)
-    assert result.frame_count == 26
+    # Export is CFR-resampled at the configured 25 fps.  The 25-second
+    # inclusive event window therefore carries 625 output frames even though
+    # the fixture source only supplies one frame per second.
+    assert result.frame_count == 625
     assert result.clip is not None and result.clip.is_file()
     assert len(factory.writers) == 1
     assert factory.writers[0].frames
@@ -93,8 +96,8 @@ def test_export_filters_frames_to_window_and_rejects_mismatched_source(tmp_path)
     window = recorder.window_for_event(BASE, BASE + timedelta(seconds=1), pre_seconds=1, post_seconds=1)
     result = recorder.export(window)
     assert result.status == CLIP_AVAILABLE
-    assert result.frame_count == 4  # -1, 0, 1, 2
-    assert len(factory.writers[0].frames) == 4
+    assert result.frame_count == 75  # three seconds at 25 fps
+    assert len(factory.writers[0].frames) == 75
 
     with pytest.raises(ValueError, match="does not match"):
         recorder.export(EvidenceWindow("camera-02", BASE - timedelta(seconds=1), BASE + timedelta(seconds=2)))
@@ -179,6 +182,63 @@ def test_close_removes_owned_clips_and_rejects_new_frames(tmp_path):
     with pytest.raises(RuntimeError, match="closed"):
         recorder.append_frame(BASE, _Image())
     recorder.close()  # idempotent cleanup
+
+
+def test_zero_max_frames_is_empty_and_external_cleanup_path_is_not_deleted(tmp_path):
+    recorder = RollingEvidenceRecorder(
+        "camera-01",
+        output_dir=tmp_path,
+        max_frames=0,
+        writer_factory=_WriterFactory(),
+    )
+    _append_full_window(recorder)
+    assert recorder.buffered_frames == 0
+    result = recorder.export_event(BASE, BASE + timedelta(seconds=5))
+    assert result.status == CLIP_UNAVAILABLE
+
+    external = tmp_path / "external.mp4"
+    external.write_bytes(b"keep")
+    recorder.cleanup_clip(external)
+    assert external.exists()
+    recorder.close()
+
+
+def test_real_cv2_export_preserves_sparse_window_duration_without_future_frames(tmp_path):
+    cv2 = pytest.importorskip("cv2")
+    np = pytest.importorskip("numpy")
+
+    recorder = RollingEvidenceRecorder("camera-01", output_dir=tmp_path, fps=25.0)
+    # Deliberately sparse and irregular timestamps.  Values identify the
+    # source timestamp so the first output frame can prove that no future
+    # sample was used to fill the initial gap.
+    for offset in (-10, -3, 4, 10):
+        recorder.append_frame(
+            BASE + timedelta(seconds=offset),
+            np.full((48, 64, 3), offset + 20, dtype=np.uint8),
+        )
+
+    result = recorder.export_event(BASE, BASE, pre_seconds=10, post_seconds=10)
+    assert result.status == CLIP_AVAILABLE
+    assert result.clip is not None
+    capture = cv2.VideoCapture(str(result.clip))
+    try:
+        fps = float(capture.get(cv2.CAP_PROP_FPS))
+        metadata_count = int(round(float(capture.get(cv2.CAP_PROP_FRAME_COUNT))))
+        decoded: list[object] = []
+        while True:
+            ok, frame = capture.read()
+            if not ok:
+                break
+            decoded.append(frame)
+    finally:
+        capture.release()
+    assert metadata_count == len(decoded) == 500
+    assert fps == pytest.approx(25.0, abs=0.1)
+    assert len(decoded) / fps == pytest.approx(20.0, abs=1.0 / fps)
+    # The first target tick is at the window start (-10s), so it must use the
+    # -10s source frame rather than the later -3s frame.
+    assert float(decoded[0].mean()) == pytest.approx(10.0, abs=4.0)
+    recorder.close()
 
 
 def test_upload_event_passes_evidence_window_and_generated_clip_to_uploader(tmp_path):

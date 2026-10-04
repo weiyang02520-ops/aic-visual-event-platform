@@ -5,7 +5,10 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import httpx
+
 from visual_event_ai.evidence_capture import EvidenceUploadResult
+from visual_event_ai.evidence_capture import HttpEvidenceClipUploader
 from visual_event_ai.evidence_orchestrator import (
     CAPTURE_AVAILABLE,
     CAPTURE_DISABLED,
@@ -69,6 +72,20 @@ class _Uploader:
         self.windows.append(window)
         self.clips.append(clip)
         return EvidenceUploadResult("available", f"https://makerverse/evidence/{len(self.windows)}")
+
+
+class _TrackingClient:
+    def __init__(self, urls: list[str]):
+        self.urls = urls
+        self.closed = False
+
+    async def post(self, url, **_kwargs):
+        self.urls.append(str(url))
+        request = httpx.Request("POST", str(url))
+        return httpx.Response(200, json={"status": "available", "uri": f"{url}/clip"}, request=request)
+
+    async def aclose(self):
+        self.closed = True
 
 
 def _event(event_id: str, source_id: str = "camera-01", offset: int = 0) -> _Event:
@@ -167,3 +184,98 @@ def test_close_cleans_owned_clip_when_capture_is_not_uploaded(tmp_path):
 
     assert not exported.clip.exists()
     assert recorder.closed is True
+
+
+def test_per_event_http_uploader_factory_binds_distinct_event_urls_and_closes_clients(tmp_path):
+    factory = _WriterFactory()
+    recorder = RollingEvidenceRecorder("camera-01", output_dir=tmp_path, writer_factory=factory)
+    urls: list[str] = []
+    clients: list[_TrackingClient] = []
+
+    def uploader_factory(event_id: str):
+        client = _TrackingClient(urls)
+        clients.append(client)
+        uploader = HttpEvidenceClipUploader(
+            base_url="http://makerverse",
+            event_id=event_id,
+            client=client,
+        )
+        # The factory owns one client per event and asks the uploader to close
+        # it after that event.  The production constructor still defaults to
+        # ownership=False for injected clients.
+        uploader._owns_client = True
+        return uploader
+
+    hook = EvidenceCaptureOrchestrator(
+        recorder,
+        enabled=True,
+        pre_seconds=0,
+        post_seconds=0,
+        uploader_factory=uploader_factory,
+    )
+    hook.append_frame(BASE, _Image(), source_id="camera-01")
+    hook.append_frame(BASE + timedelta(seconds=30), _Image(), source_id="camera-01")
+
+    results = asyncio.run(hook.capture_events([_event("event-1"), _event("event-2", offset=30)]))
+
+    assert [result.status for result in results] == [CAPTURE_AVAILABLE, CAPTURE_AVAILABLE]
+    assert [result.uri for result in results] == [url + "/clip" for url in urls]
+    assert urls == [
+        "http://makerverse/api/v1/events/event-1/evidence",
+        "http://makerverse/api/v1/events/event-2/evidence",
+    ]
+    assert all(client.closed for client in clients)
+    assert all(not clip.exists() for clip in factory.writers[0].path.parent.glob("*.mp4"))
+    hook.close()
+
+
+def test_fixed_event_uploader_mismatch_fails_closed_without_second_http_post(tmp_path):
+    factory = _WriterFactory()
+    recorder = RollingEvidenceRecorder("camera-01", output_dir=tmp_path, writer_factory=factory)
+    urls: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        urls.append(str(request.url))
+        return httpx.Response(200, json={"status": "available", "uri": "http://makerverse/evidence/1"}, request=request)
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    uploader = HttpEvidenceClipUploader(
+        base_url="http://makerverse",
+        event_id="event-1",
+        client=client,
+    )
+    hook = EvidenceCaptureOrchestrator(recorder, uploader, enabled=True, pre_seconds=0, post_seconds=0)
+    hook.append_frame(BASE, _Image(), source_id="camera-01")
+    hook.append_frame(BASE + timedelta(seconds=30), _Image(), source_id="camera-01")
+
+    results = asyncio.run(hook.capture_events([_event("event-1"), _event("event-2", offset=30)]))
+
+    assert results[0].status == CAPTURE_AVAILABLE
+    assert results[1].status == CAPTURE_UNAVAILABLE
+    assert "bound to event_id" in (results[1].reason or "")
+    assert urls == ["http://makerverse/api/v1/events/event-1/evidence"]
+    asyncio.run(hook.aclose())
+
+
+def test_available_without_uri_is_not_a_success(tmp_path):
+    recorder = RollingEvidenceRecorder("camera-01", output_dir=tmp_path, writer_factory=_WriterFactory())
+
+    class MissingUriUploader:
+        async def upload(self, _window, _clip):
+            return EvidenceUploadResult("available", None)
+
+    hook = EvidenceCaptureOrchestrator(
+        recorder,
+        MissingUriUploader(),
+        enabled=True,
+        pre_seconds=0,
+        post_seconds=0,
+    )
+    hook.append_frame(BASE, _Image(), source_id="camera-01")
+
+    result = asyncio.run(hook.capture_event(_event("event-no-uri")))
+
+    assert result.status == "error"
+    assert result.available is False
+    assert "without a usable URI" in (result.reason or "")
+    hook.close()

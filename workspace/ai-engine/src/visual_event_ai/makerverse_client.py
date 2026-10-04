@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import threading
 from collections.abc import Mapping
 from datetime import date, datetime, time
 from enum import Enum
@@ -147,10 +148,89 @@ class MakerverseClient:
         self.base_url = base_url.rstrip("/")
         self.live_id = live_id.strip() if live_id and live_id.strip() else None
         self.retries = max(0, int(retries))
-        self.client = httpx.AsyncClient(timeout=timeout)
+        self._timeout = timeout
+        # AsyncClient instances are owned by the event loop that created them.
+        # A store may use one persistent loop in its sync worker and FastAPI
+        # may use a different loop for request-time calls, so never share one
+        # instance between loops.
+        self._loop_clients: dict[asyncio.AbstractEventLoop, httpx.AsyncClient] = {}
+        self._client_lock = threading.RLock()
+        self._injected_client: httpx.AsyncClient | None = None
+        self._injected_owner: asyncio.AbstractEventLoop | None = None
+        self._injected_transport: httpx.AsyncBaseTransport | None = None
+        self._compat_client: httpx.AsyncClient | None = None
+        self._pushed_event_ids: set[str] = set()
+        self._pushed_ids_lock = threading.Lock()
+
+    @property
+    def client(self) -> httpx.AsyncClient:
+        """Return the client for the current loop.
+
+        The property remains available for test/integration transport
+        injection.  Production requests use :meth:`_client_for_loop`, which
+        creates the AsyncClient lazily in the owning loop.
+        """
+
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            # Backwards-compatible access from synchronous test setup.  This
+            # object is never used for a request until it is assigned as an
+            # injected client or claimed by an owning loop.
+            with self._client_lock:
+                if self._injected_client is not None:
+                    return self._injected_client
+                if self._compat_client is None or self._compat_client.is_closed:
+                    self._compat_client = httpx.AsyncClient(timeout=self._timeout)
+                return self._compat_client
+        return self._client_for_loop()
+
+    @client.setter
+    def client(self, value: httpx.AsyncClient) -> None:
+        # Existing integrations assign a MockTransport-backed AsyncClient to
+        # this attribute.  Claim it lazily from the first loop that sends a
+        # request; a different loop will get its own client instead.
+        with self._client_lock:
+            self._injected_client = value
+            self._injected_owner = None
+            transport = getattr(value, "_transport", None)
+            self._injected_transport = (
+                transport if isinstance(transport, httpx.MockTransport) else None
+            )
+
+    def _client_for_loop(self) -> httpx.AsyncClient:
+        loop = asyncio.get_running_loop()
+        with self._client_lock:
+            existing = self._loop_clients.get(loop)
+            if existing is not None and not existing.is_closed:
+                return existing
+            if self._injected_client is not None and self._injected_owner is None:
+                client = self._injected_client
+                self._injected_owner = loop
+            elif self._injected_transport is not None:
+                # MockTransport is loop-neutral and is commonly injected by
+                # tests.  Clone only the AsyncClient so a second asyncio.run
+                # never reuses the first loop's client.
+                client = httpx.AsyncClient(transport=self._injected_transport)
+            else:
+                client = httpx.AsyncClient(timeout=self._timeout)
+            self._loop_clients[loop] = client
+            return client
 
     async def close(self):
-        await self.client.aclose()
+        """Close only the AsyncClient owned by the current event loop."""
+
+        loop = asyncio.get_running_loop()
+        with self._client_lock:
+            client = self._loop_clients.pop(loop, None)
+            if client is None and self._injected_owner is loop:
+                client = self._injected_client
+                self._injected_owner = None
+            if client is None and self._compat_client is not None:
+                client = self._compat_client
+                self._compat_client = None
+        if client is not None and not client.is_closed:
+            await client.aclose()
 
     async def push_event(self, event: dict[str, Any]) -> dict[str, Any]:
         """Push a completed AI event to Makerverse.
@@ -161,6 +241,14 @@ class MakerverseClient:
         live_id = event.get("live_id") or self.live_id
         if not isinstance(live_id, str) or not live_id.strip():
             raise ValueError("Makerverse live_id is not configured; set MAKERVERSE_LIVE_ID")
+        event_id = event.get("event_id")
+        if isinstance(event_id, str):
+            with self._pushed_ids_lock:
+                if event_id in self._pushed_event_ids:
+                    # The backend treats event_id as unique.  Returning a
+                    # local idempotent receipt avoids a second POST when the
+                    # same event is reviewed more than once.
+                    return {"event_id": event_id, "idempotent": True}
         payload: dict[str, Any] = {}
         for key, value in event.items():
             if key not in _EVENT_FIELDS or value is None:
@@ -182,12 +270,16 @@ class MakerverseClient:
             payload["metadata"] = metadata
         payload["live_id"] = live_id.strip()
         url = f"{self.base_url}/api/v1/events"
+        client = self._client_for_loop()
         last_error: Exception | None = None
         for attempt in range(self.retries + 1):
             try:
-                response = await self.client.post(url, json=payload)
+                response = await client.post(url, json=payload)
                 response.raise_for_status()
                 result = response.json()
+                if isinstance(event_id, str):
+                    with self._pushed_ids_lock:
+                        self._pushed_event_ids.add(event_id)
                 logger.info("Pushed event %s to Makerverse", payload.get("event_id"))
                 return result
             except (httpx.HTTPError, ValueError) as exc:
@@ -202,7 +294,7 @@ class MakerverseClient:
         """Fetch registered objects from Makerverse."""
         url = f"{self.base_url}/api/v1/objects"
         try:
-            response = await self.client.get(url)
+            response = await self._client_for_loop().get(url)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPError as exc:
@@ -213,7 +305,7 @@ class MakerverseClient:
         """Fetch registered persons from Makerverse."""
         url = f"{self.base_url}/api/v1/persons"
         try:
-            response = await self.client.get(url)
+            response = await self._client_for_loop().get(url)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPError as exc:
@@ -224,7 +316,7 @@ class MakerverseClient:
         """Fetch medication plans from Makerverse."""
         url = f"{self.base_url}/api/v1/medication/plans"
         try:
-            response = await self.client.get(url)
+            response = await self._client_for_loop().get(url)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPError as exc:

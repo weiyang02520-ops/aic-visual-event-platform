@@ -22,11 +22,12 @@ media for mock or fixture payloads, and it is disabled by default.
 from __future__ import annotations
 
 import asyncio
+import inspect
 import logging
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any
+from typing import Any, Callable
 
 from .evidence_capture import (
     EvidenceClipUploader,
@@ -43,6 +44,13 @@ CAPTURE_DISABLED = "disabled"
 CAPTURE_AVAILABLE = "available"
 CAPTURE_UNAVAILABLE = "unavailable"
 CAPTURE_ERROR = "error"
+
+
+# The factory is intentionally additive.  ``EvidenceClipUploader`` itself is
+# unchanged; callers that already provide one shared uploader keep the old
+# constructor path, while HTTP integrations can construct a fresh event-bound
+# uploader for each event.
+EvidenceUploaderFactory = Callable[[str], EvidenceClipUploader | Any]
 
 
 @dataclass(frozen=True)
@@ -63,7 +71,10 @@ class EvidenceCaptureResult:
 
     @property
     def available(self) -> bool:
-        return self.status == CAPTURE_AVAILABLE
+        # A remote status of ``available`` without a URI is not a usable
+        # evidence result.  Keep this property aligned with capture_event's
+        # fail-closed status mapping.
+        return self.status == CAPTURE_AVAILABLE and bool(self.uri)
 
     @property
     def uri(self) -> str | None:
@@ -115,7 +126,9 @@ class EvidenceCaptureOrchestrator:
 
     ``capture_events`` is asynchronous because ``EvidenceClipUploader`` is an
     async protocol.  It does not call ``AnalysisService.run_job`` or
-    ``SQLiteStore.complete_job`` and is never triggered implicitly.
+    ``SQLiteStore.complete_job`` and is never triggered implicitly.  When
+    ``uploader_factory`` is configured, it receives each event id and its
+    returned uploader is closed immediately after that event.
     """
 
     def __init__(
@@ -123,6 +136,7 @@ class EvidenceCaptureOrchestrator:
         recorder: RollingEvidenceRecorder | None = None,
         uploader: EvidenceClipUploader | None = None,
         *,
+        uploader_factory: EvidenceUploaderFactory | None = None,
         enabled: bool = False,
         pre_seconds: int = 10,
         post_seconds: int = 10,
@@ -132,6 +146,9 @@ class EvidenceCaptureOrchestrator:
         self.pre_seconds = _non_negative_seconds(pre_seconds, "pre_seconds")
         self.post_seconds = _non_negative_seconds(post_seconds, "post_seconds")
         self.recorder = recorder
+        if uploader_factory is not None and not callable(uploader_factory):
+            raise TypeError("uploader_factory must be callable or None")
+        self.uploader_factory = uploader_factory
         # Keep the unavailable fallback explicit so an enabled adapter without
         # an endpoint never fabricates a Makerverse URI.
         self.uploader = uploader or UnavailableClipUploader()
@@ -210,6 +227,8 @@ class EvidenceCaptureOrchestrator:
         if not isinstance(started_at, datetime) or not isinstance(ended_at, datetime):
             return EvidenceCaptureResult(event_id, CAPTURE_UNAVAILABLE, reason="event timestamps are required for evidence upload")
 
+        event_uploader: EvidenceClipUploader | Any = self.uploader
+        close_event_uploader = False
         try:
             window = self.recorder.window_for_event(
                 started_at,
@@ -217,10 +236,46 @@ class EvidenceCaptureOrchestrator:
                 pre_seconds=self.pre_seconds,
                 post_seconds=self.post_seconds,
             )
+
+            if self.uploader_factory is not None:
+                # A factory may be synchronous (the common case) or an async
+                # callable owned by an integration.  Neither form changes the
+                # uploader protocol itself.
+                event_uploader = self.uploader_factory(event_id)
+                if inspect.isawaitable(event_uploader):
+                    event_uploader = await event_uploader
+                close_event_uploader = True
+
+            if event_uploader is None or not callable(getattr(event_uploader, "upload", None)):
+                return EvidenceCaptureResult(
+                    event_id,
+                    CAPTURE_UNAVAILABLE,
+                    window,
+                    reason="uploader_factory did not return an evidence uploader",
+                )
+
+            # HttpEvidenceClipUploader exposes ``event_id`` when it was built
+            # for a specific endpoint.  Reusing such an instance for another
+            # event would silently POST both clips to the first event URL, so
+            # reject the mismatch before any media upload.  Uploaders with no
+            # binding (including explicit custom endpoint instances) retain
+            # the existing compatibility behavior.
+            bound_event_id = getattr(event_uploader, "event_id", None)
+            if isinstance(bound_event_id, str) and bound_event_id.strip() and bound_event_id.strip() != event_id:
+                return EvidenceCaptureResult(
+                    event_id,
+                    CAPTURE_UNAVAILABLE,
+                    window,
+                    reason=(
+                        f"uploader is bound to event_id {bound_event_id.strip()!r}, "
+                        f"cannot upload event_id {event_id!r}"
+                    ),
+                )
+
             upload = await self.recorder.upload_event(
                 started_at,
                 ended_at,
-                self.uploader,
+                event_uploader,
                 pre_seconds=self.pre_seconds,
                 post_seconds=self.post_seconds,
             )
@@ -229,20 +284,35 @@ class EvidenceCaptureOrchestrator:
         except Exception as exc:  # pragma: no cover - defensive integration boundary
             logger.exception("evidence capture failed event_id=%s", event_id)
             return EvidenceCaptureResult(event_id, CAPTURE_ERROR, window if "window" in locals() else None, reason=str(exc))
+        finally:
+            if close_event_uploader:
+                close_uploader = getattr(event_uploader, "aclose", None)
+                if callable(close_uploader):
+                    try:
+                        await close_uploader()
+                    except Exception:  # pragma: no cover - defensive resource cleanup
+                        logger.warning("event evidence uploader close failed event_id=%s", event_id, exc_info=True)
 
         upload_status = getattr(upload, "status", None)
-        if upload_status == CAPTURE_AVAILABLE:
+        upload_uri = getattr(upload, "uri", None)
+        has_uri = isinstance(upload_uri, str) and bool(upload_uri.strip())
+        if upload_status == CAPTURE_AVAILABLE and has_uri:
             status = CAPTURE_AVAILABLE
+        elif upload_status == CAPTURE_AVAILABLE:
+            status = CAPTURE_ERROR
         elif upload_status in {CAPTURE_UNAVAILABLE, "unsupported"}:
             status = CAPTURE_UNAVAILABLE
         else:
             status = CAPTURE_ERROR
+        reason = getattr(upload, "reason", None)
+        if upload_status == CAPTURE_AVAILABLE and not has_uri and not reason:
+            reason = "uploader reported available without a usable URI"
         return EvidenceCaptureResult(
             event_id,
             status,
             window,
             upload,
-            getattr(upload, "reason", None),
+            reason,
         )
 
     async def capture_events(self, events: Iterable[Any]) -> list[EvidenceCaptureResult]:
@@ -304,6 +374,7 @@ __all__ = [
     "CAPTURE_DISABLED",
     "CAPTURE_ERROR",
     "CAPTURE_UNAVAILABLE",
+    "EvidenceUploaderFactory",
     "EventEvidenceCaptureResult",
     "EvidenceCaptureOrchestrator",
     "EvidenceCaptureResult",

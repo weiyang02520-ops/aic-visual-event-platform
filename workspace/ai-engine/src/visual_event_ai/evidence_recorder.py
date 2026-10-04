@@ -280,7 +280,14 @@ class RollingEvidenceRecorder:
         cutoff = newest - timedelta(seconds=self.max_seconds)
         retained = [item for item in self._frames if item.timestamp >= cutoff]
         if self.max_frames is not None:
-            retained = sorted(retained, key=lambda item: item.timestamp)[-self.max_frames :]
+            # ``[-0:]`` means "the complete list" in Python.  Treat a zero
+            # frame limit as an intentionally disabled buffer instead of
+            # accidentally retaining every frame and defeating the memory
+            # bound.
+            if self.max_frames == 0:
+                retained = []
+            else:
+                retained = sorted(retained, key=lambda item: item.timestamp)[-self.max_frames :]
         self._frames = deque(retained)
 
     def window_for_event(
@@ -360,8 +367,33 @@ class RollingEvidenceRecorder:
         else:
             writer_factory = self.writer_factory
 
-        images: list[tuple[BufferedEvidenceFrame, Any, tuple[int, int]]] = []
-        for item in frames:
+        # A CFR writer has no timestamp channel.  Build a small timestamp
+        # index and feed it one frame for every target output tick.  The
+        # latest source frame at or before a target tick is carried forward;
+        # this preserves gaps without ever placing a future frame before its
+        # capture time.  Include one carry-in frame before the window start so
+        # a sparse stream can still cover the first output interval.
+        ordered_all = self._sorted_frames()
+        source_items = [item for item in ordered_all if item.timestamp <= window.ended_at]
+        start_index = -1
+        for index, item in enumerate(source_items):
+            if item.timestamp <= window.started_at:
+                start_index = index
+            else:
+                break
+        if start_index < 0:
+            return EvidenceClipResult(
+                CLIP_UNAVAILABLE,
+                window,
+                reason="no buffered frame is available at or before evidence window start",
+                frame_count=len(frames),
+            )
+
+        # Validate every source frame that could be selected by the timeline.
+        # This keeps the old conservative unsupported result for mixed payloads
+        # instead of silently dropping a bad frame in the middle of a gap.
+        images_by_item: dict[int, tuple[Any, tuple[int, int]]] = {}
+        for index, item in enumerate(source_items):
             image = _image_payload(item.payload)
             shape = _estimate_frame_shape(image)
             if image is None or shape is None:
@@ -371,9 +403,10 @@ class RollingEvidenceRecorder:
                     reason="buffered frame payload does not contain a usable OpenCV image",
                     frame_count=len(frames),
                 )
-            images.append((item, image, shape))
-        frame_size = images[0][2]
-        if any(shape != frame_size for _, _, shape in images):
+            images_by_item[index] = (image, shape)
+
+        frame_size = images_by_item[start_index][1]
+        if any(shape != frame_size for _, shape in images_by_item.values()):
             return EvidenceClipResult(
                 CLIP_UNSUPPORTED,
                 window,
@@ -399,26 +432,57 @@ class RollingEvidenceRecorder:
 
         writer: EvidenceWriter | None = None
         release_error: Exception | None = None
+        writer_failure: EvidenceClipResult | None = None
+        duration_seconds = max(0.0, (window.ended_at - window.started_at).total_seconds())
+        # A video with N CFR frames at fps has a physical duration of N/fps.
+        # Rounding to the nearest frame keeps the encoded duration within one
+        # output frame of the requested evidence window.
+        output_frame_count = max(1, int(round(duration_seconds * self.fps)))
+        tick_seconds = 1.0 / self.fps
         try:
             writer = writer_factory(path, self.fps, frame_size, self.codec)
             is_open = getattr(writer, "isOpened", None)
             if callable(is_open) and not is_open():
-                _unlink_quiet(path)
-                return EvidenceClipResult(
+                writer_failure = EvidenceClipResult(
                     CLIP_UNSUPPORTED,
                     window,
                     reason="OpenCV/FFmpeg could not open a video writer for the selected codec",
                     frame_count=len(frames),
                 )
-            write = getattr(writer, "write", None)
-            if not callable(write):
-                _unlink_quiet(path)
-                return EvidenceClipResult(CLIP_UNSUPPORTED, window, reason="video writer has no write method", frame_count=len(frames))
-            for _, image, _ in images:
-                write(image)
+            else:
+                write = getattr(writer, "write", None)
+                if not callable(write):
+                    writer_failure = EvidenceClipResult(
+                        CLIP_UNSUPPORTED,
+                        window,
+                        reason="video writer has no write method",
+                        frame_count=len(frames),
+                    )
+                else:
+                    source_index = start_index
+                    for output_index in range(output_frame_count):
+                        target_seconds = output_index * tick_seconds
+                        target_timestamp = window.started_at + timedelta(seconds=target_seconds)
+                        while (
+                            source_index + 1 < len(source_items)
+                            and source_items[source_index + 1].timestamp <= target_timestamp
+                        ):
+                            source_index += 1
+                        # ``start_index`` is guaranteed to be at or before the
+                        # window start, so this branch cannot use a future
+                        # frame.  Keep the guard for unusual datetime/codec
+                        # integrations and fail closed if it is ever reached.
+                        if source_index < 0 or source_items[source_index].timestamp > target_timestamp:
+                            writer_failure = EvidenceClipResult(
+                                CLIP_ERROR,
+                                window,
+                                reason="cannot resample evidence without a frame at or before target timestamp",
+                                frame_count=output_index,
+                            )
+                            break
+                        write(images_by_item[source_index][0])
         except Exception as exc:
-            _unlink_quiet(path)
-            return EvidenceClipResult(CLIP_ERROR, window, reason=f"video writer failed: {exc}", frame_count=len(frames))
+            writer_failure = EvidenceClipResult(CLIP_ERROR, window, reason=f"video writer failed: {exc}", frame_count=0)
         finally:
             if writer is not None:
                 try:
@@ -426,9 +490,16 @@ class RollingEvidenceRecorder:
                 except Exception as exc:  # pragma: no cover - defensive cleanup path
                     release_error = exc
 
+        # Release first, then clean up the allocated path.  Some writers flush
+        # their container trailer during ``release``; deleting earlier can
+        # leave a leaked handle or a partially written file on Windows.
+        if writer_failure is not None:
+            _unlink_quiet(path)
+            return writer_failure
+
         if release_error is not None:
             _unlink_quiet(path)
-            return EvidenceClipResult(CLIP_ERROR, window, reason=f"video writer release failed: {release_error}", frame_count=len(frames))
+            return EvidenceClipResult(CLIP_ERROR, window, reason=f"video writer release failed: {release_error}", frame_count=output_frame_count)
 
         try:
             size = path.stat().st_size
@@ -445,10 +516,10 @@ class RollingEvidenceRecorder:
                 window,
                 reason=f"encoded clip exceeds max_bytes={self.max_bytes}",
                 bytes_written=size,
-                frame_count=len(frames),
+                frame_count=output_frame_count,
             )
         self._owned_clips.add(path)
-        return EvidenceClipResult(CLIP_AVAILABLE, window, path, bytes_written=size, frame_count=len(frames))
+        return EvidenceClipResult(CLIP_AVAILABLE, window, path, bytes_written=size, frame_count=output_frame_count)
 
     def export_event(
         self,
@@ -482,6 +553,11 @@ class RollingEvidenceRecorder:
         else:
             path = Path(clip)
         if path is None:
+            return
+        # Only paths allocated by this recorder may be removed.  Callers can
+        # pass fixture or externally managed paths to upload_event; those are
+        # never owned by the recorder and must survive cleanup calls.
+        if path not in self._owned_clips:
             return
         self._owned_clips.discard(path)
         try:
