@@ -15,8 +15,11 @@ never races the normal event push.
 
 The adapter accepts the existing ``EvidenceClipUploader`` protocol and relies
 on ``RollingEvidenceRecorder.upload_event`` for window construction, clip
-export, uploader invocation, and generated-clip cleanup.  It does not create
-media for mock or fixture payloads, and it is disabled by default.
+export, uploader invocation, and generated-clip cleanup.  A caller can supply
+an optional ``uploader_factory(event_id)`` to bind a fresh HTTP uploader to
+each event; the shared-uploader path remains available for compatibility.  It
+does not create media for mock or fixture payloads, and it is disabled by
+default.
 """
 
 from __future__ import annotations
