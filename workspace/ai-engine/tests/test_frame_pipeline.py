@@ -63,6 +63,17 @@ def test_network_streams_route_to_optional_opencv_provider(source):
     assert type(FramePipeline().provider_for(source)).__name__ == "OpenCVFrameProvider"
 
 
+@pytest.mark.parametrize("source", ["camera://0", "webcam://0"])
+def test_camera_sources_route_to_optional_opencv_provider(source):
+    assert type(FramePipeline().provider_for(source)).__name__ == "OpenCVFrameProvider"
+
+
+@pytest.mark.parametrize("source", ["camera://", "camera://-1", "camera://abc", "webcam://1.5", "camera:0"])
+def test_camera_source_requires_non_negative_integer_index(source):
+    with pytest.raises(FramePipelineError, match="non-negative integer camera index"):
+        list(FramePipeline().iter_frames(source, max_frames=1))
+
+
 def test_video_extension_routes_to_optional_opencv_provider(tmp_path):
     path = tmp_path / "clip.mp4"
     path.write_bytes(b"fixture placeholder")
@@ -215,6 +226,93 @@ def test_opencv_provider_reports_unreachable_network_stream(monkeypatch):
 
     with pytest.raises(FramePipelineError, match="could not open stream"):
         list(FramePipeline().iter_frames("rtmp://127.0.0.1/live/missing", max_frames=1))
+
+
+def test_opencv_provider_reads_camera_index_and_marks_camera_metadata(monkeypatch):
+    class CameraCapture(_FakeCapture):
+        def __init__(self):
+            super().__init__(25.0, [0.0])
+            self.target = None
+            self.release_count = 0
+
+        def release(self):
+            self.release_count += 1
+
+    class CameraCV2(_FakeCV2):
+        def __init__(self):
+            super().__init__(25.0, [0.0])
+            self.capture = CameraCapture()
+
+        def VideoCapture(self, target):
+            self.capture.target = target
+            return self.capture
+
+    fake_cv2 = CameraCV2()
+    monkeypatch.setitem(sys.modules, "cv2", fake_cv2)
+
+    frames = list(FramePipeline().iter_frames("camera://0", interval_ms=0, max_frames=1))
+
+    assert len(frames) == 1
+    assert fake_cv2.capture.target == 0
+    assert fake_cv2.capture.release_count == 1
+    assert frames[0].metadata["source_kind"] == "camera"
+    assert frames[0].metadata["camera_index"] == 0
+    assert frames[0].metadata["stream_transport"] == "webcam"
+
+
+def test_opencv_provider_reports_unavailable_camera_without_mock_fallback(monkeypatch):
+    class ClosedCapture:
+        def __init__(self):
+            self.release_count = 0
+
+        def isOpened(self):
+            return False
+
+        def release(self):
+            self.release_count += 1
+
+    class ClosedCV2:
+        def __init__(self):
+            self.capture = ClosedCapture()
+
+        def VideoCapture(self, target):
+            assert target == 0
+            return self.capture
+
+    fake_cv2 = ClosedCV2()
+    monkeypatch.setitem(sys.modules, "cv2", fake_cv2)
+
+    with pytest.raises(FramePipelineError, match="could not open camera index 0"):
+        list(FramePipeline().iter_frames("camera://0", max_frames=1))
+    assert fake_cv2.capture.release_count == 1
+
+
+def test_opencv_provider_releases_camera_when_cancelled(monkeypatch):
+    class CameraCapture(_FakeCapture):
+        def __init__(self):
+            super().__init__(25.0, [0.0])
+            self.release_count = 0
+
+        def release(self):
+            self.release_count += 1
+
+    class CameraCV2(_FakeCV2):
+        def __init__(self):
+            super().__init__(25.0, [0.0])
+            self.capture = CameraCapture()
+
+        def VideoCapture(self, target):
+            assert target == 0
+            return self.capture
+
+    fake_cv2 = CameraCV2()
+    monkeypatch.setitem(sys.modules, "cv2", fake_cv2)
+    token = CancellationToken()
+    token.cancel()
+
+    with pytest.raises(FramePipelineError, match="cancelled"):
+        list(FramePipeline().iter_frames("webcam://0", token=token, max_frames=1))
+    assert fake_cv2.capture.release_count == 1
 
 
 def test_opencv_provider_reports_network_stream_without_frames(monkeypatch):

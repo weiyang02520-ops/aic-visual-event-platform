@@ -75,6 +75,51 @@ def _source_path(source: str) -> Path:
     return Path(source)
 
 
+def _camera_index(source: str) -> int:
+    """Return the device index encoded by a ``camera://`` style URI.
+
+    Camera sources deliberately use a URI instead of accepting a bare integer
+    so they cannot be confused with local file paths.  The authority form
+    (``camera://0``) is the public spelling; ``camera:///0`` is accepted as a
+    URI-equivalent spelling for callers that build URIs mechanically.
+    """
+
+    parsed = urlparse(source)
+    scheme = parsed.scheme.lower() or "camera"
+    raw_index: str | None
+    if parsed.netloc:
+        # A device URI has no path, query, or fragment.  Rejecting extra
+        # components keeps the selected device unambiguous.
+        raw_index = parsed.netloc if parsed.path in {"", "/"} else None
+    elif parsed.path.startswith("/") and parsed.path.count("/") == 1:
+        raw_index = parsed.path[1:]
+    else:
+        raw_index = None
+    if (
+        not raw_index
+        or not raw_index.isascii()
+        or not raw_index.isdigit()
+        or parsed.query
+        or parsed.fragment
+    ):
+        raise FramePipelineError(
+            f"{scheme} source must use a non-negative integer camera index, "
+            f"for example {scheme}://0"
+        )
+    try:
+        index = int(raw_index)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise FramePipelineError(
+            f"{scheme} source camera index is not a representable non-negative integer"
+        ) from exc
+    if index < 0:
+        raise FramePipelineError(
+            f"{scheme} source must use a non-negative integer camera index, "
+            f"for example {scheme}://0"
+        )
+    return index
+
+
 class MockFrameProvider:
     def iter_frames(self, source: str, *, interval: timedelta, max_frames: int | None, token: CancellationToken, recover: bool) -> Iterator[Frame]:
         query = parse_qs(urlparse(source).query)
@@ -156,25 +201,38 @@ class OpenCVFrameProvider:
 
     extensions = {".mp4", ".avi", ".mov", ".mkv", ".webm", ".m4v"}
     stream_schemes = {"rtsp", "rtmp", "http", "https", "hls"}
+    camera_schemes = {"camera", "webcam"}
 
     def iter_frames(self, source: str, *, interval: timedelta, max_frames: int | None, token: CancellationToken, recover: bool) -> Iterator[Frame]:
         parsed = urlparse(source)
         scheme = parsed.scheme.lower()
         is_stream = scheme in self.stream_schemes
+        is_camera = scheme in self.camera_schemes
+        camera_index = _camera_index(source) if is_camera else None
         path = _source_path(source)
-        if not is_stream and (not path.exists() or not path.is_file()):
+        if not is_stream and not is_camera and (not path.exists() or not path.is_file()):
             raise FramePipelineError(f"local source does not exist: {path}")
         try:
             import cv2
         except ImportError as exc:
+            if is_camera:
+                raise FramePipelineError(
+                    "OpenCV provider unavailable; install visual-event-ai[media] "
+                    "to capture webcam sources"
+                ) from exc
             raise FramePipelineError(
                 "OpenCV/FFmpeg provider unavailable; install visual-event-ai[media] "
                 "to decode local, RTSP, RTMP, HTTP, or HLS sources"
             ) from exc
-        capture_target = source if is_stream else str(path)
+        capture_target = camera_index if is_camera else source if is_stream else str(path)
         capture = cv2.VideoCapture(capture_target)
         if not capture.isOpened():
             capture.release()
+            if is_camera:
+                raise FramePipelineError(
+                    f"OpenCV could not open camera index {camera_index}; check camera "
+                    f"connection and permissions: {source}"
+                )
             if is_stream:
                 raise FramePipelineError(
                     "OpenCV could not open stream; check URL reachability and "
@@ -197,7 +255,13 @@ class OpenCVFrameProvider:
                 token.raise_if_cancelled()
                 ok, image = capture.read()
                 if not ok:
-                    if is_stream:
+                    if is_stream or is_camera:
+                        if is_camera:
+                            state = "returned no frames" if emitted == 0 else "ended before the requested frame limit"
+                            raise FramePipelineError(
+                                f"OpenCV camera index {camera_index} {state}; check camera "
+                                f"availability and permissions: {source}"
+                            )
                         state = "returned no frames" if emitted == 0 else "ended before the requested frame limit"
                         raise FramePipelineError(
                             f"OpenCV stream {state}; check "
@@ -249,8 +313,14 @@ class OpenCVFrameProvider:
                     },
                     metadata={
                         "provider": "opencv",
-                        "source_kind": "stream" if is_stream else "file",
-                        **({"stream_transport": scheme} if is_stream else {}),
+                        "source_kind": "camera" if is_camera else "stream" if is_stream else "file",
+                        **(
+                            {"stream_transport": "webcam", "camera_index": camera_index}
+                            if is_camera
+                            else {"stream_transport": scheme}
+                            if is_stream
+                            else {}
+                        ),
                         "fps": fps,
                         "read_index": read_index,
                     },
@@ -271,6 +341,10 @@ class FramePipeline:
             scheme = "file"
         if scheme == "mock":
             return self.providers["mock"]
+        if scheme in OpenCVFrameProvider.camera_schemes:
+            if "opencv" not in self.providers:
+                raise FramePipelineError("OpenCV provider is not configured for camera sources")
+            return self.providers["opencv"]
         if scheme in OpenCVFrameProvider.stream_schemes:
             if "opencv" not in self.providers:
                 raise FramePipelineError(

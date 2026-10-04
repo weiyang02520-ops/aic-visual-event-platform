@@ -32,6 +32,16 @@ class SourceResolver:
             scheme = ""
         if scheme == "mock":
             return SourceDescriptor(value, "mock", "mock-provider", "available", value, ("facts", "events"))
+        if scheme in {"camera", "webcam"}:
+            return SourceDescriptor(
+                value,
+                "camera",
+                "opencv-camera-provider",
+                "configured",
+                value,
+                ("realtime-frames", "camera-index"),
+                "camera availability and permissions are verified when the OpenCV provider opens the device",
+            )
         if scheme in {"rtmp", "rtsp", "http", "https", "hls"}:
             return SourceDescriptor(
                 value,
