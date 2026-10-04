@@ -77,7 +77,6 @@ class _MakerverseSyncWorker:
     def _run(self) -> None:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        clients: set[int] = set()
         client_refs: dict[int, Any] = {}
         try:
             while True:
@@ -86,7 +85,6 @@ class _MakerverseSyncWorker:
                     if item is self._STOP:
                         return
                     event, client = item  # type: ignore[misc]
-                    clients.add(id(client))
                     client_refs[id(client)] = client
                     loop.run_until_complete(self._push(event, client))
                 except Exception:
