@@ -374,20 +374,28 @@ class RollingEvidenceRecorder:
         # capture time.  Include one carry-in frame before the window start so
         # a sparse stream can still cover the first output interval.
         ordered_all = self._sorted_frames()
-        source_items = [item for item in ordered_all if item.timestamp <= window.ended_at]
-        start_index = -1
-        for index, item in enumerate(source_items):
+        carry_in: BufferedEvidenceFrame | None = None
+        for item in ordered_all:
             if item.timestamp <= window.started_at:
-                start_index = index
-            else:
+                carry_in = item
+            elif item.timestamp > window.ended_at:
                 break
-        if start_index < 0:
+        if carry_in is None:
             return EvidenceClipResult(
                 CLIP_UNAVAILABLE,
                 window,
                 reason="no buffered frame is available at or before evidence window start",
                 frame_count=len(frames),
             )
+        # Keep only the one carry-in frame plus the requested window.  Older
+        # buffered payloads are irrelevant to this export and must not make a
+        # valid window unsupported merely because they used a different frame
+        # adapter or image shape.
+        source_items = sorted(
+            [carry_in, *(item for item in frames if item is not carry_in)],
+            key=lambda item: item.timestamp,
+        )
+        start_index = 0
 
         # Validate every source frame that could be selected by the timeline.
         # This keeps the old conservative unsupported result for mixed payloads
